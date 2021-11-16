@@ -54,7 +54,7 @@ namespace Chess.UI
 
             // TEST START
             EngineTests.Perft pertTest = new EngineTests.Perft();
-            pertTest.Test(3, 0);
+            pertTest.Test(1, 1, true, false, false);
             // TEST END
         }
 
