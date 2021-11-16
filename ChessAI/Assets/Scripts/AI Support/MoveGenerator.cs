@@ -1035,6 +1035,10 @@ namespace Chess.EngineUtility
             {
                 remainingMove &= Constants.primitiveBitboards[from + 9 - (18 * genForColorIndex)];
             }
+            else
+            {
+                remainingMove = 0;
+            }
 
             while (remainingMove != 0)
             {

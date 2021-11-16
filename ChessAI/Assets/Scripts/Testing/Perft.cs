@@ -41,9 +41,7 @@ namespace Chess.EngineTests
             this.cumulativeMoveTypeCount = cumulativeMoveTypeCount;
 
             //position.LoadFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"); 
-            //position.LoadFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"); 
-            //position.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-            position.LoadFEN("rnb1kbnr/pppp1ppp/5q2/4p3/5P2/8/PPPPPKPP/RNBQ1BNR");
+            position.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             //position.sideToMove = !position.sideToMove;
             Task.Run(() => StartTest(initialDept, destinationDept, divide));
             //StartTest(initialDept, destinationDept, divide);
