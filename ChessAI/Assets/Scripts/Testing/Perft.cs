@@ -192,6 +192,7 @@ namespace Chess.EngineTests
             }
             else if (Move.GetFlag(move) == Move.Flag.epCapture)
             {
+                captures++;
                 ep++;
             }
             else if (Move.GetFlag(move) == Move.Flag.kingCastle || Move.GetFlag(move) == Move.Flag.queenCastle)
