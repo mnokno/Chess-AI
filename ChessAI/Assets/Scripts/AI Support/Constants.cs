@@ -17,7 +17,7 @@ namespace Chess.EngineUtility
         public static readonly ulong[] enEpssantMasks = new ulong[2] { 0xff0000000000, 0xff0000 }; // Contains mask for white and black en-passant captures
         public static readonly byte[][] enPassantFileToIndex = new byte[2][]; // Used to quickly convert en-passant target file to index [color][file]
         public static readonly ulong[] castleEmptyMasks = new ulong[4] { 0xe, 0x60, 0x0e00000000000000, 0x6000000000000000 }; // 0 = whit queen side, 1 = white king side, 2 = black queen side, 3 = black king side
-        public static readonly ulong[] castleNotAttackedMask = new ulong[4] { 0x1e, 0x70, 0x1e00000000000000, 0x07000000000000000 }; // 0 = whit queen side, 1 = white king side, 2 = black queen side, 3 = black king side
+        public static readonly ulong[] castleNotAttackedMask = new ulong[4] { 0x1c, 0x70, 0x1c00000000000000, 0x07000000000000000 }; // 0 = whit queen side, 1 = white king side, 2 = black queen side, 3 = black king side
 
 
         // 6 == noWe -> +7     7 == nort -> +8     0 == noEa -> +9
