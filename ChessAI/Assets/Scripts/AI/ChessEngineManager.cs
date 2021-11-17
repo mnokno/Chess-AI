@@ -12,6 +12,7 @@ namespace Chess.Engine
         #region
 
         public ChessEngine chessEngine;
+        public BoardInputManager inputManager;
 
         #endregion
 
@@ -58,7 +59,7 @@ namespace Chess.Engine
             ushort move = moves[Random.Range(0, moves.Count - 1)];
 
             MakeMove(move);
-            FindObjectOfType<BoardInputManager>().MakeAIMove(Move.GetFrom(move), Move.GetTo(move));
+            inputManager.MakeAIMove(Move.GetFrom(move), Move.GetTo(move));
         }
 
         #endregion

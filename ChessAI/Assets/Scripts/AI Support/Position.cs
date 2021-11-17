@@ -45,10 +45,21 @@ namespace Chess.EngineUtility
         /// General use functions
         #region General
 
-        public void LoadFEN(string FEN)
+        public void LoadFEN(FEN fen)
         {
-            bitboard = new Bitboard(FEN);
-            squareCentric = new SquareCentric(FEN);
+            // Loads information from the FEN string
+            sideToMove = fen.GetSideToMove();
+            castlingRights = fen.GetCastlingRights();
+            enPassantTargetFile = fen.GetEnPassantTargetFile();
+            halfmoveClock = fen.GetFullmoveCounter();
+            // Loads the position on the bit board
+            bitboard = new Bitboard(fen.GetPiecePlacment());
+            // Loads the potion on the square centric
+            squareCentric = new SquareCentric(fen.GetPiecePlacment());
+            // Updates zobristKey
+            this.zobristKey = ZobristHashing.GetZobristKey(this);
+            boardStateHistory.Clear();
+            boardStateHistory.Push(zobristKey);
         }
 
         // Returns true of the player to move is in check
@@ -107,7 +118,7 @@ namespace Chess.EngineUtility
                     }
                     else if (pieceToMove == (byte)SquareCentric.PieceType.Rook)
                     {
-                        if (sideToMove) // Could be capturing a rook, so a castling rights has to be updated
+                        if (sideToMove) // Player could be moving their rook so castling rights have to be updated
                         {
                             if (from == 0) // White queen side
                             {

@@ -32,7 +32,19 @@ namespace Chess.UI
         #region Initialization
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
+        {
+            // Checks if the game begins with an AI move
+            if (!parrentBoard.hvh && parrentBoard.whiteHumman != parrentBoard.whiteToMove)
+            {
+                // If so an AI move is played
+                parrentBoard.engineManager.MakeAIMove();
+                parrentBoard.whiteToMove = !parrentBoard.whiteToMove;
+            }
+        }
+
+        // Awake is called before Start
+        void Awake()
         {
             InitVariables(); // Calculates values of class variables
         }
@@ -176,10 +188,16 @@ namespace Chess.UI
         // Utilities
         #region Utilities
 
+        // Loads a FEN string
+        public void LoadFEN(FEN fen)
+        {
+            localPosition.LoadFEN(fen);
+        }
+
         // Shows legal moves
         private void ShowLegalMoves(int from)
         {
-            if (selectedPiece.pieceType.color == Piece.Color.White & parrentBoard.whiteHumman | parrentBoard.hvh)
+            if ((parrentBoard.whiteHumman ? selectedPiece.pieceType.color == Piece.Color.White : selectedPiece.pieceType.color == Piece.Color.Black) || parrentBoard.hvh)
             {
                 List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(localPosition, (byte)(localPosition.sideToMove ? 0 : 1)); // Gets a list of legal moves
                 List<ushort> validLegalMoves = new List<ushort>(); // Used to store legal moves for a given square
@@ -254,7 +272,7 @@ namespace Chess.UI
             if (from >= 0 & from < 64 & from >= 0 & from < 64) 
             {
                 // Checks if the player has permission to move selected piece
-                if (selectedPiece.pieceType.color == Piece.Color.White & parrentBoard.whiteHumman | parrentBoard.hvh)
+                if ((parrentBoard.whiteHumman ? selectedPiece.pieceType.color == Piece.Color.White : selectedPiece.pieceType.color == Piece.Color.Black) || parrentBoard.hvh)
                 {
                     // Checks if the move is legal
                     if (IsLegal(from, to))

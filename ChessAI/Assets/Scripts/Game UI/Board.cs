@@ -15,9 +15,12 @@ namespace Chess.UI
 
         [HideInInspector]
         public static readonly char[] FENPieceType = new char[6] { 'p', 'n', 'b', 'r', 'q', 'k' }; // Used to convert FEN string to a number
+        public string fenstring = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; //Loads the starting position by default
+        public FEN fen; // Reference to the fen instance
         public bool whiteBottom; // Used to decide where to generate white pieces and how to annotate the board
         public bool hvh; // Human versus human
         public bool whiteHumman; // True if human play white
+        [HideInInspector]
         public bool whiteToMove; // True if white is to move
 
         public BoardTheme.SquareTheme squareTheme; // Holds color theme of the chess board squares
@@ -38,6 +41,7 @@ namespace Chess.UI
         public Piece[] pieces = new Piece[64]; // Stores reference to all pieces
 
         public ChessEngineManager engineManager; // Reference to the chess engine used by this board
+        public BoardInputManager inputManager; // Reference to the board input manager
 
         #endregion
 
@@ -47,14 +51,24 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
+            // Disables/hides the board preview area
             GetComponentInParent<SpriteRenderer>().enabled = false;
-            engineManager = FindObjectOfType<ChessEngineManager>();
+            // Generates the chess board
             GenerateBoard();
-            LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+            // Converts FEN string to FEN instance
+            fen = new FEN(fenstring);
+            // Sets the player to move
+            whiteToMove = fen.GetSideToMove();
+            // Loads the chess pieces
+            LoadFEN(fen.GetPiecePlacment());
+            // Loads position for the input manager
+            inputManager.LoadFEN(fen);
+            // Loads position for the engine manager
+            engineManager.chessEngine.LoadFEN(fen);
 
             // TEST START
-            EngineTests.Perft pertTest = new EngineTests.Perft();
-            pertTest.Test(2, 2, true, true, false);
+            //EngineTests.Perft pertTest = new EngineTests.Perft();
+            //pertTest.Test(FEN, 1, 1, true, false, false);
             // TEST END
         }
 

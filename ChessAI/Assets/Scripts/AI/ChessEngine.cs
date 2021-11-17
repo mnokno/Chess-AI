@@ -34,6 +34,11 @@ namespace Chess.Engine
             return moveGenerator.GenerateLegalMoves(centralPosition, genForColorIndex, includeQuietMoves : includeQuietMoves, includeChecks : includeChecks);
         }
 
+        public void LoadFEN(FEN fen)
+        {
+            centralPosition.LoadFEN(fen);
+        }
+
         #endregion
     }
 }

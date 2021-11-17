@@ -35,16 +35,18 @@ namespace Chess.EngineTests
         #region Core functions
 
         // Public test function
-        public void Test(int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool cumulativeMoveTypeCount)
+        public void Test(FEN FEN, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool cumulativeMoveTypeCount)
         {
+            // Saves the flags
             this.countMoveTypes = countMoveTypes;
             this.cumulativeMoveTypeCount = cumulativeMoveTypeCount;
 
-            position.LoadFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"); 
-            //position.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-            //position.sideToMove = !position.sideToMove;
-            Task.Run(() => StartTest(initialDept, destinationDept, divide));
-            //StartTest(initialDept, destinationDept, divide);
+            // Loads the position from a FEN string
+            position.LoadFEN(FEN);
+
+            // Runs the test
+            Task.Run(() => StartTest(initialDept, destinationDept, divide)); // New thread option
+            //StartTest(initialDept, destinationDept, divide); // Main thread option
         }
 
         // Private initialization of the test
@@ -95,9 +97,13 @@ namespace Chess.EngineTests
             else
             {
                 // If the depth is 1 then the number of moves from the list is returned
-                if (dept == 1)
+                if (dept == 1 && !divide)
                 {
                     return nMoves;
+                }
+                else if(dept == 0)
+                {
+                    return 1;
                 }
             }
 
