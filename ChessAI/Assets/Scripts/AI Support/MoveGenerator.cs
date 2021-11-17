@@ -1233,7 +1233,7 @@ namespace Chess.EngineUtility
             {
                 if (genForColorIndex == 0)
                 {
-                    if ((position.castlingRights & 0b100) != 0) // White queen side
+                    if ((position.castlingRights & 0b1000) != 0) // White queen side
                     {
                         if (((Constants.castleNotAttackedMask[0] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[0] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
                         {
