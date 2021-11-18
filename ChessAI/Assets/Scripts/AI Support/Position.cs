@@ -193,6 +193,12 @@ namespace Chess.EngineUtility
                 halfmoveClock = 0; // Resets half move clock
                 ZobristHashing.Update(ref zobristKey, sideToMove, from, to, pieceToMove, pieceToTake, false); // Updates position in the zobrist key
 
+                if (pieceToMove == (byte)SquareCentric.PieceType.King)
+                {
+                    byte oldRight = castlingRights; // Saves old castling rights
+                    castlingRights &= (byte)(sideToMove ? 0b0011 : 0b1100); // Updates castling rights
+                    ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRight, castlingRights); // Updates castling rights in zobrist key
+                }
                 if (!sideToMove) // Could be capturing a rook, so a castling rights has to be updated, or the rook itself could be capering
                 {
                     if (to == 0) // White queen side
