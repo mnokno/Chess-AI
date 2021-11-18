@@ -53,11 +53,14 @@ namespace Chess.EngineTests
             // Reads the .json file to a string
             string json = File.ReadAllText(Application.streamingAssetsPath + "/Perft Testing Position.json");
             // Converts the jsonString to an array of objects
-            TestData testData = JsonUtility.FromJson<TestData>(json);
+            TestPositionCollection testPositions = JsonUtility.FromJson<TestPositionCollection>(json);
 
-            foreach (TestPosition position in testData.positions)
+            // Runs the perft test for each positions
+            foreach (TestPosition testPosition in testPositions.positions)
             {
-                Debug.Log(position.depth + " " + position.nodes + " " + position.fen); 
+                position.LoadFEN(new FEN(testPosition.fen));
+                long testResult = PerftTest(testPosition.depth, false);
+                Debug.Log($"{(testPosition.nodes == testResult ? "PASSED" : "FAILED")} --- FEN: {testPosition.fen} Depth: {testPosition.depth} ExpNodes: {testPosition.nodes} ResNodes: {testResult}");
             }
         }
 
@@ -243,7 +246,7 @@ namespace Chess.EngineTests
 
         // Used to parse .json test data
         [Serializable]
-        private struct TestData
+        private struct TestPositionCollection
         {
             public TestPosition[] positions;
         }
