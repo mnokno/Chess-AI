@@ -28,18 +28,16 @@ namespace Chess.EngineTests
 
         // Flags
         bool countMoveTypes;
-        bool cumulativeMoveTypeCount;
 
         #endregion
 
         #region Core functions
 
         // Public test function
-        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool cumulativeMoveTypeCount)
+        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes)
         {
             // Saves the flags
             this.countMoveTypes = countMoveTypes;
-            this.cumulativeMoveTypeCount = cumulativeMoveTypeCount;
 
             // Loads the position from a FEN string
             position.LoadFEN(fen);
@@ -78,13 +76,13 @@ namespace Chess.EngineTests
         }
 
         // Private recursive pert functions
-        private int PerftTest(int dept, bool divide)
+        private long PerftTest(int dept, bool divide)
         {
             List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
             //List<ushort> legalMoves = pseudoLegalMoveGenerator.GenerateLegalMoves(position);
             int nMoves = legalMoves.Count;
-            int nodes = 0;
-            int subNodes;
+            long nodes = 0;
+            long subNodes;
 
             if (countMoveTypes)
             {
@@ -119,17 +117,9 @@ namespace Chess.EngineTests
                     // Checks if move classification is enabled
                     if (countMoveTypes)
                     {
-                        // Classifies the move that was made
-                        if (cumulativeMoveTypeCount)
+                        if (dept == 1)
                         {
                             ClassifeMove(legalMoves[i]);
-                        }
-                        else
-                        {
-                            if (dept == 1)
-                            {
-                                ClassifeMove(legalMoves[i]);
-                            }
                         }
                     }
                     position.UnmakeMove(legalMoves[i]);
@@ -146,16 +136,9 @@ namespace Chess.EngineTests
                     if (countMoveTypes)
                     {
                         // Classifies the move that was made
-                        if (cumulativeMoveTypeCount)
+                        if (dept == 0)
                         {
                             ClassifeMove(legalMoves[i]);
-                        }
-                        else
-                        {
-                            if (dept == 0)
-                            {
-                                ClassifeMove(legalMoves[i]);
-                            }
                         }
                     }
                     position.UnmakeMove(legalMoves[i]);
