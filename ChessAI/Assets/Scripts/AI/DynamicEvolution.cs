@@ -11,7 +11,7 @@ namespace Chess.Engine
 
         public Position position;
         public static StaticEvaluation staticEvaluation = new StaticEvaluation();
-        public static PseudoLegalMoveGenerator moveGenerator = new PseudoLegalMoveGenerator();
+        public static MoveGenerator moveGenerator = new MoveGenerator();
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace Chess.Engine
                 return staticEvaluation.Evaluate(position) * (position.sideToMove ? 1 : -1);
             }
 
-            List<ushort> moves = moveGenerator.GenerateLegalMoves(position);
+            List<ushort> moves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
             if (moves.Count == 0)
             {
                 if (position.PlayerInCheck())

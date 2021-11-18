@@ -35,14 +35,14 @@ namespace Chess.EngineTests
         #region Core functions
 
         // Public test function
-        public void Test(FEN FEN, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool cumulativeMoveTypeCount)
+        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool cumulativeMoveTypeCount)
         {
             // Saves the flags
             this.countMoveTypes = countMoveTypes;
             this.cumulativeMoveTypeCount = cumulativeMoveTypeCount;
 
             // Loads the position from a FEN string
-            position.LoadFEN(FEN);
+            position.LoadFEN(fen);
 
             // Runs the test
             Task.Run(() => StartTest(initialDept, destinationDept, divide)); // New thread option

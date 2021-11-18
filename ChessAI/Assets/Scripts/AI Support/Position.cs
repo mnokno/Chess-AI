@@ -184,6 +184,7 @@ namespace Chess.EngineUtility
                     castlingRights &= 0b1100; // Updates castling rights
                 }
                 halfmoveClock++; // Increases calf move clock
+                enPassantTargetFile = 8; // Updates en-passant target file
             }
             else if (flag == 4) // Capture move
             {
@@ -192,7 +193,7 @@ namespace Chess.EngineUtility
                 halfmoveClock = 0; // Resets half move clock
                 ZobristHashing.Update(ref zobristKey, sideToMove, from, to, pieceToMove, pieceToTake, false); // Updates position in the zobrist key
 
-                if (!sideToMove) // Could be capturing a rook, so a castling rights has to be updated
+                if (!sideToMove) // Could be capturing a rook, so a castling rights has to be updated, or the rook itself could be capering
                 {
                     if (to == 0) // White queen side
                     {
@@ -204,6 +205,18 @@ namespace Chess.EngineUtility
                     {
                         byte oldRights = castlingRights; // Saves old castling rights
                         castlingRights &= 0b1011; // Updates castling rights
+                        ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                    }
+                    if (from == 56) // Black queen side
+                    {
+                        byte oldRights = castlingRights; // Saves old castling rights
+                        castlingRights &= 0b1101; // Updates castling rights
+                        ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                    }
+                    else if (from == 63) // Black king side
+                    {
+                        byte oldRights = castlingRights; // Saves old castling rights
+                        castlingRights &= 0b1110; // Updates castling rights
                         ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
                     }
                 }
@@ -219,6 +232,18 @@ namespace Chess.EngineUtility
                     {
                         byte oldRights = castlingRights; // Saves old castling rights
                         castlingRights &= 0b1110; // Updates castling rights
+                        ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                    }
+                    if (from == 0) // White queen side
+                    {
+                        byte oldRights = castlingRights; // Saves old castling rights
+                        castlingRights &= 0b0111; // Updates castling rights
+                        ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                    }
+                    else if (from == 7) // White king side
+                    {
+                        byte oldRights = castlingRights; // Saves old castling rights
+                        castlingRights &= 0b1011; // Updates castling rights
                         ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
                     }
                 }

@@ -19,8 +19,8 @@ namespace Chess.Engine
         // Class Initialization
         #region Initialization
 
-        // Start is called before the first frame update  
-        void Start()
+        // Awake is called before Start
+        void Awake()
         {
             chessEngine = new ChessEngine();
         }
@@ -42,7 +42,6 @@ namespace Chess.Engine
             #region TESTING
             DynamicEvolution dynamicEvolution = new DynamicEvolution();
             FindObjectOfType<TMPro.TextMeshProUGUI>().text = $"Eval: {dynamicEvolution.Evaluate(chessEngine.centralPosition, 1)}";
-
             #endregion
         }
 

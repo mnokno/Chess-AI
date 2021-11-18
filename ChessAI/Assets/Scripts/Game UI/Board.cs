@@ -15,7 +15,7 @@ namespace Chess.UI
 
         [HideInInspector]
         public static readonly char[] FENPieceType = new char[6] { 'p', 'n', 'b', 'r', 'q', 'k' }; // Used to convert FEN string to a number
-        public string fenstring = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; //Loads the starting position by default
+        public string fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; //Loads the starting position by default
         public FEN fen; // Reference to the fen instance
         public bool whiteBottom; // Used to decide where to generate white pieces and how to annotate the board
         public bool hvh; // Human versus human
@@ -56,7 +56,7 @@ namespace Chess.UI
             // Generates the chess board
             GenerateBoard();
             // Converts FEN string to FEN instance
-            fen = new FEN(fenstring);
+            fen = new FEN(fenString);
             // Sets the player to move
             whiteToMove = fen.GetSideToMove();
             // Loads the chess pieces
@@ -67,8 +67,8 @@ namespace Chess.UI
             engineManager.chessEngine.LoadFEN(fen);
 
             // TEST START
-            //EngineTests.Perft pertTest = new EngineTests.Perft();
-            //pertTest.Test(FEN, 1, 1, true, false, false);
+            EngineTests.Perft pertTest = new EngineTests.Perft();
+            pertTest.Test(new FEN(fenString), 1, 4 , false, true, false);
             // TEST END
         }
 
