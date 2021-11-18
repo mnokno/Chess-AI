@@ -34,7 +34,7 @@ namespace Chess.EngineTests
         #region Core functions
 
         // Public test function
-        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes)
+        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool onMainThread)
         {
             // Saves the flags
             this.countMoveTypes = countMoveTypes;
@@ -43,25 +43,63 @@ namespace Chess.EngineTests
             position.LoadFEN(fen);
 
             // Runs the test
-            Task.Run(() => StartTest(initialDept, destinationDept, divide)); // New thread option
-            //StartTest(initialDept, destinationDept, divide); // Main thread option
+            if (onMainThread)
+            {
+                StartTest(initialDept, destinationDept, divide); // Main thread option
+            }
+            else
+            {
+                Task.Run(() => StartTest(initialDept, destinationDept, divide)); // New thread option
+            }
         }
 
         // Public bulk test
-        public void BulkTest()
+        public void BulkTest(bool onMainThread)
         {
+            // Runs the bulk Test
+            if (onMainThread)
+            {
+                StartBulkTest(); // Main thread option
+            }
+            else
+            {
+                Task.Run(() => StartBulkTest()); // New thread option
+            }
+        }
+
+        // Start a bulk test
+        private void StartBulkTest()
+        {
+            // Creates and start the timer
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             // Reads the .json file to a string
             string json = File.ReadAllText(Application.streamingAssetsPath + "/Perft Testing Position.json");
             // Converts the jsonString to an array of objects
             TestPositionCollection testPositions = JsonUtility.FromJson<TestPositionCollection>(json);
+
+            // Counters
+            int passed = 1;
+            int currentTestNumber = 0;
+            int totalNumberOfTests = testPositions.positions.Length;
 
             // Runs the perft test for each positions
             foreach (TestPosition testPosition in testPositions.positions)
             {
                 position.LoadFEN(new FEN(testPosition.fen));
                 long testResult = PerftTest(testPosition.depth, false);
-                Debug.Log($"{(testPosition.nodes == testResult ? "PASSED" : "FAILED")} --- FEN: {testPosition.fen} Depth: {testPosition.depth} ExpNodes: {testPosition.nodes} ResNodes: {testResult}");
+                Debug.Log($"{(testPosition.nodes == testResult ? "PASSED" : "FAILED")} --- FEN: \"{testPosition.fen}\" -- Depth: {testPosition.depth} -- ExpNodes: {testPosition.nodes} -- ResNodes: {testResult} -- TestNumber: {currentTestNumber}/{totalNumberOfTests}");
+                passed += testPosition.nodes == testResult ? 1 : 0;
+                currentTestNumber++;
             }
+
+            // Logs the bulk result
+            Debug.Log($"PASSED: {passed}/{totalNumberOfTests}");
+
+            // Stops the timer and logs the time elapsed
+            stopwatch.Stop();
+            Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds / 1000f} seconds");
         }
 
         // Private initialization of the test
@@ -79,17 +117,17 @@ namespace Chess.EngineTests
 
                 if (countMoveTypes)
                 {
-                    Debug.Log($"Dept: {i}, Nodes: {PerftTest(i, divide)}, Captures: {captures}, Ep: {ep}, Castles: {castles}, Promotions: {promations}, Checks: {checks}, Checkmates: {checkmates}");
+                    Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i, divide)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
                 }
                 else
                 {
-                    Debug.Log($"Dept: {i}, Nodes: {PerftTest(i, divide)}");
+                    Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i, divide)}");
                 }
             }
 
             // Stops the timer and logs the time elapsed
             stopwatch.Stop();
-            Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds} milliseconds");
+            Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds / 1000f} seconds");
         }
 
         // Private recursive pert functions
