@@ -80,8 +80,8 @@ namespace Chess.EngineTests
             TestPositionCollection testPositions = JsonUtility.FromJson<TestPositionCollection>(json);
 
             // Counters
-            int passed = 1;
-            int currentTestNumber = 0;
+            int passed = 0;
+            int currentTestNumber = 1;
             int totalNumberOfTests = testPositions.positions.Length;
 
             // Runs the perft test for each positions
