@@ -5,6 +5,7 @@ using Chess.EngineUtility;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Chess.EngineTests
 {
@@ -44,6 +45,20 @@ namespace Chess.EngineTests
             // Runs the test
             Task.Run(() => StartTest(initialDept, destinationDept, divide)); // New thread option
             //StartTest(initialDept, destinationDept, divide); // Main thread option
+        }
+
+        // Public bulk test
+        public void BulkTest()
+        {
+            // Reads the .json file to a string
+            string json = File.ReadAllText(Application.streamingAssetsPath + "/Perft Testing Position.json");
+            // Converts the jsonString to an array of objects
+            TestData testData = JsonUtility.FromJson<TestData>(json);
+
+            foreach (TestPosition position in testData.positions)
+            {
+                Debug.Log(position.depth + " " + position.nodes + " " + position.fen); 
+            }
         }
 
         // Private initialization of the test
@@ -211,7 +226,7 @@ namespace Chess.EngineTests
 
         #endregion
 
-        #region Enums
+        #region Enums and structs
 
         // Maps square ID to rank-file
         private enum Squares
@@ -225,6 +240,21 @@ namespace Chess.EngineTests
             a7, b7, c7, d7, e7, f7, g7, h7,
             a8, b8, c8, d8, e8, f8, g8, h8
         };
+
+        // Used to parse .json test data
+        [Serializable]
+        private struct TestData
+        {
+            public TestPosition[] positions;
+        }
+        // Used to parse .json test data
+        [Serializable]
+        private struct TestPosition
+        {
+            public int depth;
+            public long nodes;
+            public string fen;
+        }
 
         #endregion
     }

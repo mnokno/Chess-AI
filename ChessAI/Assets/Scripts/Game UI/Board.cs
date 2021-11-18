@@ -67,7 +67,8 @@ namespace Chess.UI
             engineManager.chessEngine.LoadFEN(fen);
 
             // TEST START
-            //EngineTests.Perft pertTest = new EngineTests.Perft();
+            EngineTests.Perft pertTest = new EngineTests.Perft();
+            pertTest.BulkTest();
             //pertTest.Test(new FEN(fenString), 1, 4, false, false);
             // TEST END
         }
