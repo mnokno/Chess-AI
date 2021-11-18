@@ -36,31 +36,26 @@ namespace Chess.EngineUtility
 
         #region Core
 
-        public List<ushort> GenerateLegalMoves(Position position, byte genForColorIndex, bool includeQuietMoves = true, bool includeChecks = true)
+        public List<ushort> GenerateLegalMoves(Position position, byte genForColorIndex, bool includeQuiet = true, bool includeChecks = true, bool includeCastling = true)
         {
+            // Initiates the search
             InitSearch(position, genForColorIndex);
+            // Calculates the bitboard
             CalculateBitBoards();
-            GenerateLegalMoves();
+            // Checks if quiet moves are spoused to be generated
+            if (includeQuiet)
+            {
+                // Generates all legal moves
+                GenerateLegalMoves();
+            }
+            else
+            {
+                // Generates non-quiet moves
+                GenerateNonQuietMoves(includeChecks, includeCastling);
+            }
 
-            #region TESTING
-            //var assembly = System.Reflection.Assembly.GetAssembly(typeof(UnityEditor.Editor));
-            //var type = assembly.GetType("UnityEditor.LogEntries");
-            //var method = type.GetMethod("Clear");
-            //method.Invoke(new object(), null);
-            //foreach (ushort move in legalMoves)
-            //{
-            //    Debug.Log($"From {Move.GetFrom(move)}, To {Move.GetTo(move)}, Flag {Move.GetFlag(move)} ");           
-            //}
-            //Debug.Log("Pin Ray BB: \n" + BitboardUtility.FormatBitboard(pinRayBB));
-            //Debug.Log("under Bishop Attack BB: \n" + BitboardUtility.FormatBitboard(underBishopAttackBB));
-            //Debug.Log("under Rook Attack BB: \n" + BitboardUtility.FormatBitboard(underRookAttackBB));
-            //Debug.Log("under Queen Attack BB: \n" + BitboardUtility.FormatBitboard(underQueenAttackBB));
-            //Debug.Log("under Attack BB: \n" + BitboardUtility.FormatBitboard(underAttackBB));
-            //Debug.Log("Check Ray BB: \n" + BitboardUtility.FormatBitboard(checkRayBB));
-            //Debug.Log("pins exist " + pinsExistInPosition);
-            #endregion
-
-            return legalMoves; // Returns list containing generated moves
+            // Returns list containing generated moves
+            return legalMoves; 
         }
 
         #endregion
@@ -73,7 +68,7 @@ namespace Chess.EngineUtility
             this.position = position;
             this.legalMoves = new List<ushort>(256);
             this.inCheck = false;
-            this.inDoubleCheck = false;
+            this.inDoubleCheck = false;            
             this.genForColorIndex = genForColorIndex;
             this.genForColorIndexInverse = (byte)(genForColorIndex == 0 ? 1 : 0);   
             this.defKingIndex = (byte)BitOps.BitScanForward(position.bitboard.pieces[5 + 7 * this.genForColorIndex]);
@@ -789,6 +784,26 @@ namespace Chess.EngineUtility
                 // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
                 GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
                 #endregion
+            }
+        }
+
+        // Generates all non-quiet moves, has option to exclude quiet moves
+        private void GenerateNonQuietMoves(bool includeChecks, bool includeCastling)
+        {
+            if (inDoubleCheck) // If the king is in a double check only king moves have potential to be legal
+            {
+                #region King moves
+                // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
+                GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                #endregion
+            }
+            else if (pinsExistInPosition)
+            {
+
+            }
+            else
+            {
+
             }
         }
 

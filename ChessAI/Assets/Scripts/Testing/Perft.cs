@@ -28,16 +28,20 @@ namespace Chess.EngineTests
 
         // Flags
         bool countMoveTypes;
+        bool includeQuiet;
+        bool includeChecks;
 
         #endregion
 
         #region Core functions
 
         // Public test function
-        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool onMainThread)
+        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool onMainThread, bool includeQuiet = true, bool includeChecks = true)
         {
             // Saves the flags
             this.countMoveTypes = countMoveTypes;
+            this.includeQuiet = includeQuiet;
+            this.includeChecks = includeChecks;
 
             // Loads the position from a FEN string
             position.LoadFEN(fen);
@@ -56,6 +60,10 @@ namespace Chess.EngineTests
         // Public bulk test
         public void BulkTest(bool onMainThread)
         {
+            // Updates the flags
+            includeQuiet = true;
+            includeChecks = true;
+
             // Runs the bulk Test
             if (onMainThread)
             {
@@ -133,7 +141,7 @@ namespace Chess.EngineTests
         // Private recursive pert functions
         private long PerftTest(int dept, bool divide)
         {
-            List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
+            List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1), includeQuiet: includeQuiet, includeChecks: includeChecks);
             //List<ushort> legalMoves = pseudoLegalMoveGenerator.GenerateLegalMoves(position);
             int nMoves = legalMoves.Count;
             long nodes = 0;

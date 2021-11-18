@@ -29,9 +29,9 @@ namespace Chess.Engine
         // Class utilities
         #region Utilities
 
-        public List<ushort> GenerateLegalMoves(byte genForColorIndex, bool includeQuietMoves = true, bool includeChecks = true)
+        public List<ushort> GenerateLegalMoves(byte genForColorIndex, bool includeQuiet = true, bool includeChecks = true)
         {
-            return moveGenerator.GenerateLegalMoves(centralPosition, genForColorIndex, includeQuietMoves : includeQuietMoves, includeChecks : includeChecks);
+            return moveGenerator.GenerateLegalMoves(centralPosition, genForColorIndex, includeQuiet : includeQuiet, includeChecks : includeChecks);
         }
 
         public void LoadFEN(FEN fen)
