@@ -13,8 +13,6 @@ namespace Chess.EngineUtility
         private bool inDoubleCheck; // true if the king is checked by at least two pieces
         private byte genForColorIndex; // Index of the player that the moves are generated for | 0=white, 1=black
         private byte genForColorIndexInverse; // Index of the player that is attacking the player that the moves are generated for | 0=white, 1=black
-        private bool includeQuietMoves; // If set to false only capture, check and promotion move will be generated (), otherwise all legal moves are generated
-        private bool includeChecks; // If set to false only capture and promotions will be generated
         private byte defKingIndex; // Index of the defending side's king
         private ulong defKingBB; // Bitboard contacting the defending king
         private byte attKingIndex; // Index of the attacking side's kink
@@ -40,7 +38,7 @@ namespace Chess.EngineUtility
 
         public List<ushort> GenerateLegalMoves(Position position, byte genForColorIndex, bool includeQuietMoves = true, bool includeChecks = true)
         {
-            InitSearch(position, genForColorIndex, includeQuietMoves, includeChecks);
+            InitSearch(position, genForColorIndex);
             CalculateBitBoards();
             GenerateLegalMoves();
 
@@ -70,16 +68,14 @@ namespace Chess.EngineUtility
         #region Utilities
 
         // Sets parameters to initial values for the search
-        private void InitSearch(Position position, byte genForColorIndex, bool includeQuietMoves, bool includeChecks)
+        private void InitSearch(Position position, byte genForColorIndex)
         {
             this.position = position;
             this.legalMoves = new List<ushort>(256);
             this.inCheck = false;
             this.inDoubleCheck = false;
             this.genForColorIndex = genForColorIndex;
-            this.genForColorIndexInverse = (byte)(genForColorIndex == 0 ? 1 : 0);
-            this.includeQuietMoves = includeQuietMoves;
-            this.includeChecks = includeChecks;      
+            this.genForColorIndexInverse = (byte)(genForColorIndex == 0 ? 1 : 0);   
             this.defKingIndex = (byte)BitOps.BitScanForward(position.bitboard.pieces[5 + 7 * this.genForColorIndex]);
             this.defKingBB = this.position.bitboard.pieces[5 + 7 * genForColorIndex];
             this.attKingIndex = (byte)BitOps.BitScanForward(position.bitboard.pieces[5 + 7 * this.genForColorIndexInverse]);
@@ -1185,7 +1181,6 @@ namespace Chess.EngineUtility
 
         #endregion
 
-
         #region Move generation for independent pieces (king, castling)
 
         // King cant be pinned so only one implementation of this function is required
@@ -1305,7 +1300,7 @@ namespace Chess.EngineUtility
         // Returns true if the square if under attack
         public bool SquareAttackedBy(Position position, byte genForColorIndex, byte square)
         {
-            InitSearch(position, genForColorIndex, true, true);
+            InitSearch(position, genForColorIndex);
             CalculateBitBoards();
             return (underAttackBB & Constants.primitiveBitboards[square]) != 0;
         }
