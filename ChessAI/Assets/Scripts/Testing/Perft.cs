@@ -13,7 +13,6 @@ namespace Chess.EngineTests
         #region Class variables
 
         // Class generation variables
-        public static readonly string[] testPosition = new string[14];
         public Position position = new Position();
         public MoveGenerator moveGenerator = new MoveGenerator();
         public PseudoLegalMoveGenerator pseudoLegalMoveGenerator = new PseudoLegalMoveGenerator();
