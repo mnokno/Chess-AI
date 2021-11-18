@@ -165,6 +165,8 @@ namespace Chess.EngineUtility
             }
             else if (flag == 2 | flag == 3) // Castling move
             {
+                halfmoveClock++; // Increases calf move clock
+                enPassantTargetFile = 8; // Updates en-passant target file
                 if (flag == 2) // King side
                 {
                     ZobristHashing.Update(ref zobristKey, sideToMove, CastlingDirection.KingSide); // Updates position in zobrist key
@@ -183,8 +185,6 @@ namespace Chess.EngineUtility
                     ZobristHashing.UpdateCastlingRights(ref zobristKey, castlingRights, 0b0000); // Updates castling rights in the zobrist key
                     castlingRights &= 0b1100; // Updates castling rights
                 }
-                halfmoveClock++; // Increases calf move clock
-                enPassantTargetFile = 8; // Updates en-passant target file
             }
             else if (flag == 4) // Capture move
             {
@@ -273,6 +273,36 @@ namespace Chess.EngineUtility
                 }
                 else // Promotion with capture
                 {
+                    if (!sideToMove) // Could be capturing a rook, so a castling rights has to be updated
+                    {
+                        if (to == 0) // White queen side
+                        {
+                            byte oldRights = castlingRights; // Saves old castling rights
+                            castlingRights &= 0b0111; // Updates castling rights
+                            ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                        }
+                        else if (to == 7) // White king side
+                        {
+                            byte oldRights = castlingRights; // Saves old castling rights
+                            castlingRights &= 0b1011; // Updates castling rights
+                            ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                        }
+                    }
+                    else
+                    {
+                        if (to == 56) // Black queen side
+                        {
+                            byte oldRights = castlingRights; // Saves old castling rights
+                            castlingRights &= 0b1101; // Updates castling rights
+                            ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                        }
+                        else if (to == 63) // Black king side
+                        {
+                            byte oldRights = castlingRights; // Saves old castling rights
+                            castlingRights &= 0b1110; // Updates castling rights
+                            ZobristHashing.UpdateCastlingRights(ref zobristKey, oldRights, castlingRights); // Updates castling rights in zobrist key
+                        }
+                    }
                     ZobristHashing.Update(ref zobristKey, sideToMove, from, to, pieceToMove, (byte)(flag - 11), true, pieceToTake); // Updates position in the zobrist key
                 }
             }
