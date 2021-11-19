@@ -606,15 +606,10 @@ namespace Chess.EngineUtility
                     #region En-peasant
                     if (position.enPassantTargetFile != 8) // If an en-passant capture is possible 
                     {
-                        ulong eligiblePawnsNotPinned = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & ~pinRayBB; // Only pawns from this bit board can perform this en-peasant capture and are not pinned
-                        ulong eligiblePawnPinned = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & pinRayBB; // Only pawns from this bit board can perform this en-peasant capture and are pinned
-                        if (eligiblePawnsNotPinned != 0) // There is at lest one pawn that is not pinned and can perform this en-passant capture
+                        ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])); // Only pawns from this bit board can perform this en-peasant capture
+                        if (eligiblePawns != 0) // There is at lest one pawn that is not pinned and can perform this en-passant capture
                         {
-                            GenEnPassant(eligiblePawnsNotPinned);
-                        }
-                        if (eligiblePawnPinned != 0) // There is at least one pawn that is pinned and can perform this en-passant capture
-                        {
-                            GenEnPassant(eligiblePawnPinned);
+                            GenEnPassant(eligiblePawns);
                         }
                     }
                     #endregion
@@ -799,11 +794,59 @@ namespace Chess.EngineUtility
             }
             else if (pinsExistInPosition)
             {
-
+                if (inCheck)
+                {
+                    #region En-peasant
+                    if (position.enPassantTargetFile != 8) // If an en-passant capture is possible 
+                    {
+                        if ((checkingPieceBB & Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile]) != 0)
+                        {
+                            ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & ~pinRayBB; // Only pawns from this bit board can perform this en-peasant capture
+                            if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
+                            {
+                                GenEnPassant(eligiblePawns);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+                else
+                {
+                    #region Castling
+                    if (includeCastling)
+                    {
+                        GenMovesForCastling();
+                    }
+                    #endregion
+                }
             }
             else
             {
-
+                if (inCheck)
+                {
+                    #region En-peasant
+                    if (position.enPassantTargetFile != 8) // If an en-passant capture is possible 
+                    {
+                        if ((checkingPieceBB & Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile]) != 0)
+                        {
+                            ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & ~pinRayBB; // Only pawns from this bit board can perform this en-peasant capture
+                            if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
+                            {
+                                GenEnPassant(eligiblePawns);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+                else
+                {
+                    #region Castling
+                    if (includeCastling)
+                    {
+                        GenMovesForCastling();
+                    }
+                    #endregion
+                }
             }
         }
 
