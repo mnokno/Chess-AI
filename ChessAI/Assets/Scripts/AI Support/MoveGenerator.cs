@@ -1608,16 +1608,16 @@ namespace Chess.EngineUtility
         private bool DoesRevealCheck(ushort from, ushort to)
         {
             // Gets the pin direction between the moved piece (original location) and defending king
-            byte pinIndex = GetPinDirectionIndex(from, defKingIndex);
-            if (pinIndex != 10 && pinIndex != GetPinDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
+            byte pinDirectionIndex = GetPinDirectionIndex(from, defKingIndex);
+            if (pinDirectionIndex != 10 && pinDirectionIndex != GetPinDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
             {
-                if (pinIndex < 4)
+                if (pinDirectionIndex < 4)
                 {
-                    return DoesRayHitTarget(pinIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(pinDirectionIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
                 }
                 else
                 {
-                    return DoesRayHitTarget(pinIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(pinDirectionIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
                 }
             }
             else
@@ -1628,20 +1628,44 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        #region Do sliding pieces check the ping after moving
+        #region Do sliding pieces check the king after moving
 
         private bool DoesBishopCheckAfterMove(ushort from, ushort to)
         {
-            return false;
+            // Checks if the bishop in the new position has potential to check the king
+            if ((PrecomputedMoveData.bishopAttacks[to] & defKingBB) != 0)
+            {
+                return false;
+            }
+            else // This piece does not have potential to 
+            {
+                return false;
+            }
         }
         private bool DoesRookCheckAfterMove(ushort from, ushort to)
         {
-            return false;
+            // Checks if the rook in the new position has potential to check the king
+            if ((PrecomputedMoveData.rookAttacks[to] & defKingBB) != 0)
+            {
+                return false;
+            }
+            else // This piece does not have potential to 
+            {
+                return false;
+            }
         }
 
         private bool DoesQueenCheckAfterMove(ushort from, ushort to)
         {
-            return false;
+            // Checks if the queen in the new position has potential to check the king
+            if ((PrecomputedMoveData.queenAttacks[to] & defKingBB) != 0)
+            {
+                return false;
+            }
+            else // This piece does not have potential to 
+            {
+                return false;
+            }
         }
 
         #endregion
