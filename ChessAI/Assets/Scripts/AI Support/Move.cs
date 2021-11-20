@@ -56,6 +56,7 @@ namespace Chess.EngineUtility
             public static readonly ushort rookPromotionCapture = 14;
             public static readonly ushort queenPromotionCapture = 15;
         }
+
         #endregion
     }
 }

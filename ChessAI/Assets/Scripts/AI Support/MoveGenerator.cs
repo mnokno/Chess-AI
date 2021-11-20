@@ -18,7 +18,7 @@ namespace Chess.EngineUtility
         private byte attKingIndex; // Index of the attacking side's kink
         private bool pinsExistInPosition; // True if there is at lest one absolute pin in the position
 
-        private ulong underPawnAttackBB; // Bitboard containing squares attacked by the opponents pawns
+        public ulong underPawnAttackBB; // Bitboard containing squares attacked by the opponents pawns
         private ulong underKnightAttackBB; // Bitboard containing squares attacked by the opponents knights
         private ulong underBishopAttackBB; // Bitboard containing squares attacked by the opponents bishops
         private ulong underRookAttackBB; // Bitboard containing squares attacked by the opponents rooks
@@ -28,6 +28,7 @@ namespace Chess.EngineUtility
         private ulong checkRayBB; // Bitboard containing rays that check the king
         private ulong checkingPieceBB; // Bitboard containing piece that is currently checking the king
         private ulong pinRayBB; // Bitboard containing rays creating absolute pins
+        private ulong allPiecesBB; // Bitboard containing all the pieces
 
         private ulong promotionRankMask; // Mask for the rank of proration for the genFor player
         private ulong remainingPieces; // Bitboard of remaining pieces
@@ -108,11 +109,11 @@ namespace Chess.EngineUtility
                     else
                     {
                         inCheck = true;
-                        checkingPieceBB = BitboardUtility.GenerateShift(1, pos); // Adds this pawn to the checking pieces bitboard
+                        checkingPieceBB = Constants.primitiveBitboards[pos]; // Adds this pawn to the checking pieces bitboard
                     }         
                 }
                 underPawnAttackBB |= attacksBB; // Adds attacks of this pawn to the pawn attacks bitboard
-                remainingPieces ^= BitboardUtility.GenerateShift(1, pos); // Removes this pawn from the remaining pieces bitboard
+                remainingPieces ^= Constants.primitiveBitboards[pos]; // Removes this pawn from the remaining pieces bitboard
             }
             #endregion
 
@@ -132,11 +133,11 @@ namespace Chess.EngineUtility
                     else
                     {
                         inCheck = true;
-                        checkingPieceBB = BitboardUtility.GenerateShift(1, pos); // Adds this knight to the checking pieces bitboard
+                        checkingPieceBB = Constants.primitiveBitboards[pos]; // Adds this knight to the checking pieces bitboard
                     }
                 }
                 underKnightAttackBB |= attacksBB; // Adds attacks of this knight to the knight attacks bitboard
-                remainingPieces ^= BitboardUtility.GenerateShift(1, pos); // Removes this knight from the remaining pieces bitboard
+                remainingPieces ^= Constants.primitiveBitboards[pos]; // Removes this knight from the remaining pieces bitboard
             }
             #endregion
 
@@ -153,7 +154,7 @@ namespace Chess.EngineUtility
 
                     for (int j = 1; j < Constants.squaresToEdge[i][pos] + 1; j++) // For each square in a given direction until edge is reached
                     {
-                        ulong cRayPoint = BitboardUtility.GenerateShift(1, pos + Constants.directionOffsets[i] * j); // The currently investigated point on the ray
+                        ulong cRayPoint = Constants.primitiveBitboards[pos + Constants.directionOffsets[i] * j]; // The currently investigated point on the ray
                         if ((cRayPoint & position.bitboard.pieces[6 + 7 * genForColorIndex]) != 0) // This squared is occupied by the defending side
                         {
                             if ((cRayPoint & position.bitboard.pieces[5 + 7 * genForColorIndex]) != 0) // This square is occupied by the defending sides king
@@ -173,7 +174,7 @@ namespace Chess.EngineUtility
                                     else
                                     {
                                         inCheck = true;
-                                        checkingPieceBB = BitboardUtility.GenerateShift(1, pos); // Adds this bishop to the checking pieces bitboard
+                                        checkingPieceBB = Constants.primitiveBitboards[pos]; // Adds this bishop to the checking pieces bitboard
                                     }                                
                                     checkRayBB |= rayBB;
                                     rayBB |= cRayPoint;
@@ -217,7 +218,7 @@ namespace Chess.EngineUtility
                         underBishopAttackBB |= rayBB;
                     }
                 }
-                remainingPieces ^= BitboardUtility.GenerateShift(1, pos); // Removes this bishop from the remaining pieces bitboard
+                remainingPieces ^= Constants.primitiveBitboards[pos]; // Removes this bishop from the remaining pieces bitboard
             }
             #endregion
 
@@ -234,7 +235,7 @@ namespace Chess.EngineUtility
 
                     for (int j = 1; j < Constants.squaresToEdge[i][pos] + 1; j++) // For each square in a given direction until edge is reached
                     {
-                        ulong cRayPoint = BitboardUtility.GenerateShift(1, pos + Constants.directionOffsets[i] * j); // The currently investigated point on the ray
+                        ulong cRayPoint = Constants.primitiveBitboards[pos + Constants.directionOffsets[i] * j]; // The currently investigated point on the ray
                         if ((cRayPoint & position.bitboard.pieces[6 + 7 * genForColorIndex]) != 0) // This squared is occupied by the defending side
                         {
                             if ((cRayPoint & position.bitboard.pieces[5 + 7 * genForColorIndex]) != 0) // This square is occupied by the defending sides king
@@ -254,7 +255,7 @@ namespace Chess.EngineUtility
                                     else
                                     {
                                         inCheck = true;
-                                        checkingPieceBB = BitboardUtility.GenerateShift(1, pos); // Adds this rook to the checking pieces bitboard
+                                        checkingPieceBB = Constants.primitiveBitboards[pos]; // Adds this rook to the checking pieces bitboard
                                     }
                                     checkRayBB |= rayBB;
                                     rayBB |= cRayPoint;
@@ -298,7 +299,7 @@ namespace Chess.EngineUtility
                         underRookAttackBB |= rayBB;
                     }
                 }
-                remainingPieces ^= BitboardUtility.GenerateShift(1, pos); // Removes this rooks from the remaining pieces bitboard
+                remainingPieces ^= Constants.primitiveBitboards[pos]; // Removes this rooks from the remaining pieces bitboard
             }
             #endregion
 
@@ -315,7 +316,7 @@ namespace Chess.EngineUtility
 
                     for (int j = 1; j < Constants.squaresToEdge[i][pos] + 1; j++) // For each square in a given direction until edge is reached
                     {
-                        ulong cRayPoint = BitboardUtility.GenerateShift(1, pos + Constants.directionOffsets[i] * j); // The currently investigated point on the ray
+                        ulong cRayPoint = Constants.primitiveBitboards[pos + Constants.directionOffsets[i] * j]; // The currently investigated point on the ray
                         if ((cRayPoint & position.bitboard.pieces[6 + 7 * genForColorIndex]) != 0) // This squared is occupied by the defending side
                         {
                             if ((cRayPoint & position.bitboard.pieces[5 + 7 * genForColorIndex]) != 0) // This square is occupied by the defending sides king
@@ -335,7 +336,7 @@ namespace Chess.EngineUtility
                                     else
                                     {
                                         inCheck = true;
-                                        checkingPieceBB = BitboardUtility.GenerateShift(1, pos); // Adds this queen to the checking pieces bitboard
+                                        checkingPieceBB = Constants.primitiveBitboards[pos]; // Adds this queen to the checking pieces bitboard
                                     }
                                     checkRayBB |= rayBB;
                                     rayBB |= cRayPoint;
@@ -379,7 +380,7 @@ namespace Chess.EngineUtility
                         underQueenAttackBB |= rayBB;
                     }
                 }
-                remainingPieces ^= BitboardUtility.GenerateShift(1, pos); // Removes this queen from the remaining pieces bitboard
+                remainingPieces ^= Constants.primitiveBitboards[pos]; // Removes this queen from the remaining pieces bitboard
             }
             #endregion
 
@@ -388,6 +389,8 @@ namespace Chess.EngineUtility
             underKingAttackBB = PrecomputedMoveData.kingAttacks[attKingIndex]; // Adds attacks of this knight to the knight attacks bitboard
             #endregion
 
+            // Calculates the all piecesBB
+            allPiecesBB = position.bitboard.pieces[6] | position.bitboard.pieces[13];
             // Calculates under attack bitboard
             underAttackBB = underPawnAttackBB | underKnightAttackBB | underBishopAttackBB | underRookAttackBB | underQueenAttackBB | underKingAttackBB;
         }
@@ -1152,6 +1155,80 @@ namespace Chess.EngineUtility
 
         #endregion
 
+        #region Non-Quiet move generation for not pinned pieces
+
+        private void GenNonQuietMovesForPawnPushesNotPinned(ulong remainingMove, ushort from, bool includeChecks)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                ulong toBB = Constants.primitiveBitboards[to];
+                bool doesCheckKing = includeChecks ? DoesRevealCheck(from, to) || ((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & defKingBB) != 0 : false;
+                if (doesCheckKing && Mathf.Abs(to - from) == 16) // Its a double pawn push
+                {
+                    if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
+                    }
+                }
+                else
+                {
+                    if ((promotionRankMask & toBB) == 0)
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.knightPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.bishopPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.rookPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.queenPromotion));
+                    }
+                    else
+                    {
+                        if (doesCheckKing)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                        }
+                    }
+                }
+                remainingMove ^= toBB;
+            }
+        }
+
+        private void GenNonQuietMovesForKnightNotPinned(ulong remainingMove, ushort from, bool includeChecks)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This knight move is not capering an opponent piece
+                {
+                    if (includeChecks && ((PrecomputedMoveData.knightAttacks[from] & defKingBB) != 0 || DoesRevealCheck(from, to)))
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                    }
+                }
+                else // This knight move is capturing an opponents piece
+                {
+                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                }
+                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
+            }
+        }
+
+        private void GenNonQuietMovesForBishopNotPinned(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+            
+        }
+
+        private void GenNonQuietMovesForRookNotPinned(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+
+        }
+
+        private void GenNonQuietMovesForQueenNotPinned(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+
+        }
+
+        #endregion
+
         #region Move generation for pinned pieces
 
         private void GenMovesForPawnPushesPinned(ulong remainingMove, ushort from, byte pinDir)
@@ -1442,9 +1519,11 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        #region Gin direction
+        #region Support for move generation
 
-        // Returns the absolute value of a pin directions relative to the friendly king
+        #region Pin direction
+
+        // Returns the absolute value of a pin directions relative to the friendly king, assumes the pieces are on the same ray
         private byte GetPinDirection(ushort pinnedPieceIndex)
         {
             if (Constants.indexToRankFileTable[pinnedPieceIndex][0] == Constants.indexToRankFileTable[defKingIndex][0]) // Same file, vertical pin
@@ -1466,26 +1545,130 @@ namespace Chess.EngineUtility
             }
         }
 
-        // Returns the absolute value of a pin directions relative to pinnedToIndex
-        private byte GetPinDirection(ushort pinnedPieceIndex, ushort pinnedToIndex)
+        // Returns the index of the direction corresponding to the Constants.directionOffsets, returns 16 is the pinFrom and pinTarget are not on the same ray
+        private byte GetPinDirectionIndex(ushort pinFrom, ushort pinTarget)
         {
-            if (Constants.indexToRankFileTable[pinnedPieceIndex][0] == Constants.indexToRankFileTable[pinnedToIndex][0]) // Same file, vertical pin
+            if (Constants.indexToRankFileTable[pinFrom][0] == Constants.indexToRankFileTable[pinTarget][0]) // Same file, vertical pin
             {
-                return 8; // Returns the pin direction offset
+                if (Constants.indexToRankFileTable[pinFrom][0] - Constants.indexToRankFileTable[pinTarget][0] > 0) // Decides the direction of the pin
+                {
+                    return 1; // -8 Returns the pin direction offset
+                }
+                else
+                {
+                    return 0; // 8 Returns the pin direction offset
+                }
             }
-            else if (Constants.indexToRankFileTable[pinnedPieceIndex][1] == Constants.indexToRankFileTable[pinnedToIndex][1]) // Same rank, horizontal pin
+            else if (Constants.indexToRankFileTable[pinFrom][1] == Constants.indexToRankFileTable[pinTarget][1]) // Same rank, horizontal pin
             {
-                return 1; // Returns the pin direction offset
+                if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
+                {
+                    return 2; // -1 Returns the pin direction offset
+                }
+                else
+                {
+                    return 3; // 1 Returns the pin direction offset
+                }
             }
-            else if ((Constants.indexToRankFileTable[pinnedPieceIndex][0] - Constants.indexToRankFileTable[pinnedToIndex][0]) ==
-                      Constants.indexToRankFileTable[pinnedPieceIndex][1] - Constants.indexToRankFileTable[pinnedToIndex][1]) // Diagonal pin with positive gradient
+            else if ((Constants.indexToRankFileTable[pinFrom][0] - Constants.indexToRankFileTable[pinTarget][0]) ==
+                      Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1]) // Diagonal pin with positive gradient
             {
-                return 9; // Returns the pin direction offset
+                if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
+                {
+                    return 7; // -9 Returns the pin direction offset
+                }
+                else
+                {
+                    return 6; // 9 Returns the pin direction offset
+                }
             }
-            else // Diagonal pin with negative gradient
+            else if ((Constants.indexToRankFileTable[pinFrom][0] - Constants.indexToRankFileTable[pinTarget][0]) ==
+                      -(Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1])) // Diagonal pin with negative gradient
             {
-                return 7; // Returns the pin direction offset
+                if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
+                {
+                    return 4; // 7 Returns the pin direction offset
+                }
+                else
+                {
+                    return 5; // -7 Returns the pin direction offset
+                }
             }
+            else // No pin, the pieces are not on the same ray
+            {
+                return 10; // Code for no pin direction
+            }
+        }
+
+        #endregion
+
+        #region Reveals check
+
+        // Returns true is a given move reveal a check
+        private bool DoesRevealCheck(ushort from, ushort to)
+        {
+            // Gets the pin direction between the moved piece (original location) and defending king
+            byte pinIndex = GetPinDirectionIndex(from, defKingIndex);
+            if (pinIndex != 10 && pinIndex != GetPinDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
+            {
+                if (pinIndex < 4)
+                {
+                    return DoesRayHitTarget(pinIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                }
+                else
+                {
+                    return DoesRayHitTarget(pinIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Do sliding pieces check the ping after moving
+
+        private bool DoesBishopCheckAfterMove(ushort from, ushort to)
+        {
+            return false;
+        }
+        private bool DoesRookCheckAfterMove(ushort from, ushort to)
+        {
+            return false;
+        }
+
+        private bool DoesQueenCheckAfterMove(ushort from, ushort to)
+        {
+            return false;
+        }
+
+        #endregion
+
+        #region Does ray hit a target
+
+        // Returns true if the ray this the target directly
+        private bool DoesRayHitTarget(short reyDirectionIndex, ushort from, ulong targetBB)
+        {
+            // For each square to the edge or till the ray is blocked
+            for (ushort i = 1; i < Constants.squaresToEdge[reyDirectionIndex][from] +1; i++)
+            {
+                // Calculates the current position along the ray
+                int currentRayPosition = from + i * Constants.directionOffsets[reyDirectionIndex];
+                if ((allPiecesBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Rays intersected with some other piece
+                {
+                    if ((targetBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Ray intersected with the target
+                    {
+                        return true;
+                    }
+                    else // Ray was blocked before it reached the target
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false; // The ray was never block by any pieces (including the target)
         }
 
         #endregion
@@ -1494,13 +1677,15 @@ namespace Chess.EngineUtility
 
         #region Square under attack
 
-        // Returns true if the square if under attack
+        // Returns true if the square if under attack, this function is not used directly by the move generator
         public bool SquareAttackedBy(Position position, byte genForColorIndex, byte square)
         {
             InitSearch(position, genForColorIndex);
             CalculateBitBoards();
             return (underAttackBB & Constants.primitiveBitboards[square]) != 0;
         }
+
+        #endregion
 
         #endregion
     }
