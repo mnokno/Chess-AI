@@ -52,7 +52,7 @@ namespace Chess.EngineUtility
             else
             {
                 // Generates non-quiet moves
-                GenerateNonQuietMoves(includeChecks, includeCastling);
+                GenerateQuiescenceMoves(includeChecks, includeCastling);
             }
 
             // Returns list containing generated moves
@@ -61,7 +61,7 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        #region Utilities
+        #region Generators
 
         // Sets parameters to initial values for the search
         private void InitSearch(Position position, byte genForColorIndex)
@@ -416,7 +416,7 @@ namespace Chess.EngineUtility
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
                         if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This pawn is not pinned
                         {
-                            GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
+                            GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
                             GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -509,13 +509,13 @@ namespace Chess.EngineUtility
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
                         if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This pawn is not pinned
                         {
-                            GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from);
+                            GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from);
                             GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & position.bitboard.pieces[6 + 7 * genForColorIndexInverse], from);
                         }
                         else // This pawn is pinned
                         {
                             byte pinDir = GetPinDirection(from);
-                            GenMovesForPawnPushesPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from, pinDir);
+                            GenPawnPushes_Pinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from, pinDir);
                             GenMovesForPawnCapturePinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & position.bitboard.pieces[6 + 7 * genForColorIndexInverse], from, pinDir);
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -636,7 +636,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each friendly knight
                     {
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
+                        GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
                         GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -714,7 +714,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each friendly knight
                     {
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from);
+                        GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & ~(position.bitboard.pieces[6] | position.bitboard.pieces[13]), from);
                         GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & position.bitboard.pieces[6 + 7 * genForColorIndexInverse], from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -786,7 +786,7 @@ namespace Chess.EngineUtility
         }
 
         // Generates all non-quiet moves, has option to exclude quiet moves
-        private void GenerateNonQuietMoves(bool includeChecks, bool includeCastling)
+        private void GenerateQuiescenceMoves(bool includeChecks, bool includeCastling)
         {
             if (inDoubleCheck) // If the king is in a double check only king moves have potential to be legal
             {
@@ -806,7 +806,7 @@ namespace Chess.EngineUtility
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
                         if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This pawn is not pinned
                         {
-                            GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
+                            GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
                             GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -909,7 +909,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each friendly knight
                     {
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenMovesForPawnPushesNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
+                        GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
                         GenMovesForPawnCaptureNotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -992,38 +992,11 @@ namespace Chess.EngineUtility
             }
         }
 
-        #region Move generation for not pinned pieces
+        #endregion
 
-        private void GenMovesForPawnPushesNotPinned(ulong remainingMove, ushort from)
-        {
-            while (remainingMove != 0)
-            {
-                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
-                ulong toBB = Constants.primitiveBitboards[to];
-                if (Mathf.Abs(to - from) == 16) // Its a double pawn push
-                {
-                    if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
-                    {
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
-                    }
-                }
-                else
-                {
-                    if ((promotionRankMask & toBB) == 0)
-                    {
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.knightPromotion));
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.bishopPromotion));
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.rookPromotion));
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.queenPromotion));
-                    }
-                    else
-                    {
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                    }
-                }
-                remainingMove ^= toBB;
-            }
-        }
+        #region Utilities
+
+        #region Move generation for not pinned pieces
 
         private void GenMovesForPawnCaptureNotPinned(ulong remainingMove, ushort from)
         {
@@ -1230,30 +1203,6 @@ namespace Chess.EngineUtility
         #endregion
 
         #region Move generation for pinned pieces
-
-        private void GenMovesForPawnPushesPinned(ulong remainingMove, ushort from, byte pinDir)
-        {
-            if (pinDir == 8)
-            {
-                while (remainingMove != 0)
-                {
-                    ushort to = (ushort)BitOps.BitScanForward(remainingMove);
-                    ulong toBB = BitboardUtility.GenerateShift(1, to);
-                    if (Mathf.Abs(to - from) == 16) // Its a double pawn push
-                    {
-                        if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
-                        {
-                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
-                        }
-                    }
-                    else // Its impossible to push a pawn to promotion if its pinned, so there is no need to check for it
-                    {
-                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                    }
-                    remainingMove ^= toBB;
-                }
-            }
-        }
 
         private void GenMovesForPawnCapturePinned(ulong remainingMove, ushort from, byte pinDir)
         {
@@ -1519,6 +1468,145 @@ namespace Chess.EngineUtility
 
         #endregion
 
+        #region Pawn Pushes
+
+        // Generates pawn pushes (only works if the pawn is not pinned)
+        private void GenPawnPushes_NotPinned(ulong remainingMove, ushort from)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                ulong toBB = Constants.primitiveBitboards[to];
+                if (Mathf.Abs(to - from) == 16) // Its a double pawn push
+                {
+                    if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
+                    }
+                }
+                else
+                {
+                    if ((promotionRankMask & toBB) == 0)
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.knightPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.bishopPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.rookPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.queenPromotion));
+                    }
+                    else
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                    }
+                }
+                remainingMove ^= toBB;
+            }
+        }
+
+        // Generated pawn pushes (works when the pawn is pinned)
+        private void GenPawnPushes_Pinned(ulong remainingMove, ushort from, byte pinDir)
+        {
+            if (pinDir == 8)
+            {
+                while (remainingMove != 0)
+                {
+                    ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                    if (Mathf.Abs(to - from) == 16) // Its a double pawn push
+                    {
+                        if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
+                        }
+                    }
+                    else // Its impossible to push a pawn to promotion if its pinned, so there is no need to check for it
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                    }
+                    remainingMove ^= Constants.primitiveBitboards[to];
+                }
+            }
+        }
+
+        // Generates non-quiet pawn pushes (only works if the pawn is not pinned)
+        private void GenPawnPushes_NotPinnedQuiescence(ulong remainingMove, ushort from, bool includeChecks)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                ulong toBB = Constants.primitiveBitboards[to];
+                if (Mathf.Abs(to - from) == 16) // Its a double pawn push
+                {
+                    if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
+                    {
+                        if (includeChecks)
+                        {
+                            // The double pawn push is revealing or checking the king
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if ((promotionRankMask & toBB) == 0)
+                    {
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.knightPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.bishopPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.rookPromotion));
+                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.queenPromotion));
+                    }
+                    else
+                    {
+                        if (includeChecks)
+                        {
+                            // The pawn push is revealing or checking the king
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                            }  
+                        }
+                        
+                    }
+                }
+                remainingMove ^= toBB;
+            }
+        }
+
+        // Generated non-quiet pawn pushes (works when the pawn is pinned)
+        private void GenPawnPushes_PinnedQuiescence(ulong remainingMove, ushort from, byte pinDir, bool includeChecks)
+        {
+            // This pawn cant promote since its pinned so the only other non-quiet moves would be checks
+            if (includeChecks)
+            {
+                if (pinDir == 8)
+                {
+                    while (remainingMove != 0)
+                    {
+                        ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                        // This pawn push or double pawn push is checking the king or reveling a check
+                        if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                        {
+                            if (Mathf.Abs(to - from) == 16) // Its a double pawn push
+                            {
+                                if (position.squareCentric.pieces[from + 8 - 16 * genForColorIndex] == (byte)SquareCentric.PieceType.Empty)
+                                {
+                                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
+                                }
+                            }
+                            else // Its impossible to push a pawn to promotion if its pinned, so there is no need to check for it
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                            }
+                        }
+                        remainingMove ^= Constants.primitiveBitboards[to];
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Support for move generation
 
         #region Pin direction
@@ -1546,7 +1634,7 @@ namespace Chess.EngineUtility
         }
 
         // Returns the index of the direction corresponding to the Constants.directionOffsets, returns 16 is the pinFrom and pinTarget are not on the same ray
-        private byte GetPinDirectionIndex(ushort pinFrom, ushort pinTarget)
+        private byte GetRayDirectionIndex(ushort pinFrom, ushort pinTarget)
         {
             if (Constants.indexToRankFileTable[pinFrom][0] == Constants.indexToRankFileTable[pinTarget][0]) // Same file, vertical pin
             {
@@ -1608,16 +1696,16 @@ namespace Chess.EngineUtility
         private bool DoesRevealCheck(ushort from, ushort to)
         {
             // Gets the pin direction between the moved piece (original location) and defending king
-            byte pinDirectionIndex = GetPinDirectionIndex(from, defKingIndex);
-            if (pinDirectionIndex != 10 && pinDirectionIndex != GetPinDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
+            byte rayDirectionIndex = GetRayDirectionIndex(from, defKingIndex);
+            if (rayDirectionIndex != 10 && rayDirectionIndex != GetRayDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
             {
-                if (pinDirectionIndex < 4)
+                if (rayDirectionIndex < 4)
                 {
-                    return DoesRayHitTarget(pinDirectionIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(rayDirectionIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
                 }
                 else
                 {
-                    return DoesRayHitTarget(pinDirectionIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(rayDirectionIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
                 }
             }
             else
@@ -1635,7 +1723,7 @@ namespace Chess.EngineUtility
             // Checks if the bishop in the new position has potential to check the king
             if ((PrecomputedMoveData.bishopAttacks[to] & defKingBB) != 0)
             {
-                return false;
+                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
             }
             else // This piece does not have potential to 
             {
@@ -1647,7 +1735,7 @@ namespace Chess.EngineUtility
             // Checks if the rook in the new position has potential to check the king
             if ((PrecomputedMoveData.rookAttacks[to] & defKingBB) != 0)
             {
-                return false;
+                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
             }
             else // This piece does not have potential to 
             {
@@ -1660,7 +1748,7 @@ namespace Chess.EngineUtility
             // Checks if the queen in the new position has potential to check the king
             if ((PrecomputedMoveData.queenAttacks[to] & defKingBB) != 0)
             {
-                return false;
+                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
             }
             else // This piece does not have potential to 
             {
