@@ -494,7 +494,7 @@ namespace Chess.EngineUtility
                             ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & ~pinRayBB; // Only pawns from this bit board can perform this en-peasant capture
                             if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
                             {
-                                GenEnPassant(eligiblePawns);
+                                GenEnPassantMoves(eligiblePawns);
                             }
                         }
                     }
@@ -612,7 +612,7 @@ namespace Chess.EngineUtility
                         ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])); // Only pawns from this bit board can perform this en-peasant capture
                         if (eligiblePawns != 0) // There is at lest one pawn that is not pinned and can perform this en-passant capture
                         {
-                            GenEnPassant(eligiblePawns);
+                            GenEnPassantMoves(eligiblePawns);
                         }
                     }
                     #endregion
@@ -701,7 +701,7 @@ namespace Chess.EngineUtility
                             ulong eligiblePawns = position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile]); // Only pawns from this bit board can perform this en-peasant capture
                             if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
                             {
-                                GenEnPassant(eligiblePawns);
+                                GenEnPassantMoves(eligiblePawns);
                             }
                         }
                     }
@@ -768,7 +768,7 @@ namespace Chess.EngineUtility
                         ulong eligiblePawns = position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile]); // Only pawns from this bit board can perform this en-peasant capture
                         if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
                         {
-                            GenEnPassant(eligiblePawns);
+                            GenEnPassantMoves(eligiblePawns);
                         }
                     }
                     #endregion
@@ -794,67 +794,6 @@ namespace Chess.EngineUtility
         #endregion
 
         #region Utilities
-
-        #region En-Passant move generation
-
-        private void GenEnPassant(ulong eligiblePawns)
-        {
-            // Generates the en-passant move if its legal
-            while (eligiblePawns != 0)
-            {
-                ushort from = (ushort)BitOps.BitScanForward(eligiblePawns);
-                GenSingleEnPassant(from);
-                eligiblePawns ^= Constants.primitiveBitboards[from];
-            }
-        }
-
-        private void GenSingleEnPassant(ushort from)
-        {
-            // Checks if the en passant move is legal
-            ushort to = (ushort)(genForColorIndex == 0 ? 40 + position.enPassantTargetFile : 16 + position.enPassantTargetFile); // The destination of the pawn performing the ep-capture
-            ulong afterEnPassantBlockers = (position.bitboard.pieces[6] | position.bitboard.pieces[13]) ^ (Constants.primitiveBitboards[from] | Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile] | Constants.primitiveBitboards[to]); // State of the blockers after en-passant capture
-            for (int i = 0; i < 4; i++) // Check for orthogonal exposer checks
-            {
-                for (int j = 1; j < Constants.squaresToEdge[i][defKingIndex] + 1; j++) // For each square to edge
-                {
-                    ulong rayPoint = Constants.primitiveBitboards[defKingIndex + j * Constants.directionOffsets[i]]; // Currently checked point on the ray
-                    if ((afterEnPassantBlockers & rayPoint) != 0) // The check ray has been blacked
-                    {
-                        if (((position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]) & rayPoint) == 0)
-                        {
-                            break; // The ray is blacked by a non-checking piece
-                        }
-                        else
-                        {
-                            return; // The ray is blacked by a checking piece
-                        }
-                    }
-                }
-            }
-            for (int i = 4; i < 8; i++) // Check for diagonal exposer checks
-            {
-                for (int j = 1; j < Constants.squaresToEdge[i][defKingIndex] + 1; j++) // For each square to edge
-                {
-                    ulong rayPoint = Constants.primitiveBitboards[defKingIndex + j * Constants.directionOffsets[i]]; // Currently checked point on the ray
-                    if ((afterEnPassantBlockers & rayPoint) != 0) // The check ray has been blacked
-                    {
-                        if (((position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]) & rayPoint) == 0)
-                        {
-                            break; // The ray is blacked by a non-checking piece
-                        }
-                        else
-                        {
-                            return; // The ray is blacked by a checking piece
-                        }
-                    }
-                }
-            }
-
-            // Adds the move
-            legalMoves.Add(Move.GenMove(from, to, Move.Flag.epCapture));
-        }
-
-        #endregion
 
         #region Move generations
 
@@ -1579,6 +1518,65 @@ namespace Chess.EngineUtility
         #endregion
 
         #region En-Passant Moves
+
+        // Generates en-passant moves for all eligible pawns
+        private void GenEnPassantMoves(ulong eligiblePawns)
+        {
+            // Generates the en-passant move if its legal
+            while (eligiblePawns != 0)
+            {
+                ushort from = (ushort)BitOps.BitScanForward(eligiblePawns);
+                GenEnPassantSingle(from);
+                eligiblePawns ^= Constants.primitiveBitboards[from];
+            }
+        }
+
+        // Generates en-passant move for a single pawn
+        private void GenEnPassantSingle(ushort from)
+        {
+            // Checks if the en passant move is legal
+            ushort to = (ushort)(genForColorIndex == 0 ? 40 + position.enPassantTargetFile : 16 + position.enPassantTargetFile); // The destination of the pawn performing the ep-capture
+            ulong afterEnPassantBlockers = (position.bitboard.pieces[6] | position.bitboard.pieces[13]) ^ (Constants.primitiveBitboards[from] | Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile] | Constants.primitiveBitboards[to]); // State of the blockers after en-passant capture
+            for (int i = 0; i < 4; i++) // Check for orthogonal exposer checks
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][defKingIndex] + 1; j++) // For each square to edge
+                {
+                    ulong rayPoint = Constants.primitiveBitboards[defKingIndex + j * Constants.directionOffsets[i]]; // Currently checked point on the ray
+                    if ((afterEnPassantBlockers & rayPoint) != 0) // The check ray has been blacked
+                    {
+                        if (((position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]) & rayPoint) == 0)
+                        {
+                            break; // The ray is blacked by a non-checking piece
+                        }
+                        else
+                        {
+                            return; // The ray is blacked by a checking piece
+                        }
+                    }
+                }
+            }
+            for (int i = 4; i < 8; i++) // Check for diagonal exposer checks
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][defKingIndex] + 1; j++) // For each square to edge
+                {
+                    ulong rayPoint = Constants.primitiveBitboards[defKingIndex + j * Constants.directionOffsets[i]]; // Currently checked point on the ray
+                    if ((afterEnPassantBlockers & rayPoint) != 0) // The check ray has been blacked
+                    {
+                        if (((position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]) & rayPoint) == 0)
+                        {
+                            break; // The ray is blacked by a non-checking piece
+                        }
+                        else
+                        {
+                            return; // The ray is blacked by a checking piece
+                        }
+                    }
+                }
+            }
+
+            // Adds the move
+            legalMoves.Add(Move.GenMove(from, to, Move.Flag.epCapture));
+        }
 
         #endregion
 
