@@ -447,7 +447,7 @@ namespace Chess.EngineUtility
                         {
                             if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
                             {
-                                GenMovesForBishopNotPinned(permittedMoves, from);
+                                GenBishopMoves_NotPinned(permittedMoves, from);
                             }
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -546,14 +546,14 @@ namespace Chess.EngineUtility
                         {
                             if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
                             {
-                                GenMovesForBishopNotPinned(permittedMoves, from);
+                                GenBishopMoves_NotPinned(permittedMoves, from);
                             }
                         }
                         else // This bishop is pinned
                         {
                             if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
                             {                                
-                                GenMovesForBishopPinned(permittedMoves, from);
+                                GenBishopMoves_Pinned(permittedMoves, from);
                             }
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -661,7 +661,7 @@ namespace Chess.EngineUtility
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
                         if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
                         {
-                            GenMovesForBishopNotPinned(permittedMoves, from);
+                            GenBishopMoves_NotPinned(permittedMoves, from);
                         }                        
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -737,7 +737,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each bishop
                     {
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenMovesForBishopNotPinned(permittedMoves, from);
+                        GenBishopMoves_NotPinned(permittedMoves, from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
                     #endregion
@@ -796,36 +796,6 @@ namespace Chess.EngineUtility
         #region Utilities
 
         #region Move generation for not pinned pieces
-
-        private void GenMovesForBishopNotPinned(ulong permittedMoves, ushort from)
-        {
-            for (int i = 4; i < 8; i++)
-            {
-                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
-                {
-                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
-                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
-                    {
-                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                        {
-                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                        }
-                    }
-                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
-                    {
-                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                        {
-                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
-                        }
-                        break; // Ends this ray since it is blacked by opponents piece
-                    }
-                    else
-                    {
-                        break; // Ends this ray since it is blacked by a friendly piece
-                    }
-                }
-            }
-        }
 
         private void GenMovesForRookNotPinned(ulong permittedMoves, ushort from)
         {
@@ -890,40 +860,6 @@ namespace Chess.EngineUtility
         #endregion
 
         #region Move generation for pinned pieces
-
-        private void GenMovesForBishopPinned(ulong permittedMoves, ushort from)
-        {
-            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
-            for (int i = 4; i < 8; i++)
-            {
-                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this bishop along this pin direction
-                {
-                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
-                    {
-                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
-                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
-                        {
-                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                            {
-                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                            }
-                        }
-                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
-                        {
-                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                            {
-                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
-                            }
-                            break; // Ends this ray since it is blacked by opponents piece
-                        }
-                        else
-                        {
-                            break; // Ends this ray since it is blacked by a friendly piece
-                        }
-                    }
-                }
-            }
-        }
 
         private void GenMovesForRookPinned(ulong permittedMoves, ushort from)
         {
@@ -1325,6 +1261,7 @@ namespace Chess.EngineUtility
 
         #region Knight Moves
 
+        // Generates knight moves (only works if the knight is not pinned)
         private void GenKnightMoves_NotPinned(ulong remainingMove, ushort from)
         {
             while (remainingMove != 0)
@@ -1342,6 +1279,7 @@ namespace Chess.EngineUtility
             }
         }
 
+        // Generates non-quiet knight moves (only works if the knight is not pinned)
         private void GenKnightMoves_NotPinnedQuiescence(ulong remainingMove, ushort from, bool includeChecks)
         {
             while (remainingMove != 0)
@@ -1363,6 +1301,156 @@ namespace Chess.EngineUtility
                     legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
                 }
                 remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
+            }
+        }
+
+        #endregion
+
+        #region Bishop Moves
+
+        // Generates bishop moves (only works if the bishop is not pinned)
+        private void GenBishopMoves_NotPinned(ulong permittedMoves, ushort from)
+        {
+            for (int i = 4; i < 8; i++)
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                {
+                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                        }
+                    }
+                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                        }
+                        break; // Ends this ray since it is blacked by opponents piece
+                    }
+                    else
+                    {
+                        break; // Ends this ray since it is blacked by a friendly piece
+                    }
+                }
+            }
+        }
+
+        // Generates bishop moves (works when the bishop is pinned)
+        private void GenBishopMoves_Pinned(ulong permittedMoves, ushort from)
+        {
+            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
+            for (int i = 4; i < 8; i++)
+            {
+                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this bishop along this pin direction
+                {
+                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                    {
+                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                            }
+                        }
+                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                            }
+                            break; // Ends this ray since it is blacked by opponents piece
+                        }
+                        else
+                        {
+                            break; // Ends this ray since it is blacked by a friendly piece
+                        }
+                    }
+                }
+            }
+        }
+
+        // Generates non-quiet bishop moves (only works if the bishop is not pinned) 
+        private void GenBishopMoves_NotPinnedQuiescence(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+            for (int i = 4; i < 8; i++)
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                {
+                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            if (includeChecks)
+                            {
+                                // Checks if the bishop is checking the king after move or revealing a check
+                                if (DoesBishopCheckAfterMove(from, to) || DoesRevealCheck(from, to))
+                                {
+                                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                                }
+                            }
+                        }
+                    }
+                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                        }
+                        break; // Ends this ray since it is blacked by opponents piece
+                    }
+                    else
+                    {
+                        break; // Ends this ray since it is blacked by a friendly piece
+                    }
+                }
+            }
+        }
+
+        // Generates non-quiet bishop moves (works when the bishop is pinned)
+        private void GenBishopMoves_PinnedQuiescence(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
+            for (int i = 4; i < 8; i++)
+            {
+                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this bishop along this pin direction
+                {
+                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                    {
+                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                if (includeChecks)
+                                {
+                                    // Checks if the bishop is checking the king after move or revealing a check
+                                    if (DoesBishopCheckAfterMove(from, to) || DoesRevealCheck(from, to))
+                                    {
+                                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                                    }
+                                }
+                            }
+                        }
+                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                            }
+                            break; // Ends this ray since it is blacked by opponents piece
+                        }
+                        else
+                        {
+                            break; // Ends this ray since it is blacked by a friendly piece
+                        }
+                    }
+                }
             }
         }
 
