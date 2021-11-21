@@ -430,7 +430,7 @@ namespace Chess.EngineUtility
                         int from = BitOps.BitScanForward(remainingPieces);
                         if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This knight is not pinned
                         {
-                            GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
+                            GenKnightMoves_NotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
                         } 
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -529,7 +529,7 @@ namespace Chess.EngineUtility
                         int from = BitOps.BitScanForward(remainingPieces);
                         if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This knight is not pinned
                         {
-                            GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & ~position.bitboard.pieces[6 + 7 * genForColorIndex], (ushort)from);
+                            GenKnightMoves_NotPinned(PrecomputedMoveData.knightAttacks[from] & ~position.bitboard.pieces[6 + 7 * genForColorIndex], (ushort)from);
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -647,7 +647,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each friendly knight
                     {
                         int from = BitOps.BitScanForward(remainingPieces);
-                        GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
+                        GenKnightMoves_NotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
                     #endregion
@@ -725,7 +725,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each friendly knight
                     {
                         int from = BitOps.BitScanForward(remainingPieces);
-                        GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & ~position.bitboard.pieces[6 + 7 * genForColorIndex], (ushort)from);
+                        GenKnightMoves_NotPinned(PrecomputedMoveData.knightAttacks[from] & ~position.bitboard.pieces[6 + 7 * genForColorIndex], (ushort)from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
                     #endregion
@@ -788,208 +788,7 @@ namespace Chess.EngineUtility
         // Generates all non-quiet moves, has option to exclude quiet moves
         private void GenerateQuiescenceMoves(bool includeChecks, bool includeCastling)
         {
-            if (inDoubleCheck) // If the king is in a double check only king moves have potential to be legal
-            {
-                #region King moves
-                // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
-                #endregion
-            }
-            else if (pinsExistInPosition)
-            {
-                if (inCheck)
-                {
-                    #region Pawn moves
-                    remainingPieces = position.bitboard.pieces[0 + 7 * genForColorIndex]; // Bitboard congaing all friendly pawns
-                    while (remainingPieces != 0) // For each friendly knight
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This pawn is not pinned
-                        {
-                            GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
-                            GenPawnCapture_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
 
-                    #region Knight moves
-                    remainingPieces = position.bitboard.pieces[1 + 7 * genForColorIndex]; // Bitboard containing all friendly knight
-                    while (remainingPieces != 0) // For each friendly knight
-                    {
-                        int from = BitOps.BitScanForward(remainingPieces);
-                        if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This knight is not pinned
-                        {
-                            GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    ulong permittedMoves = checkingPieceBB | checkRayBB; // Bitboard containing move that will stop to check, used for sliding pieces move generation
-
-                    #region Bishop moves
-                    remainingPieces = position.bitboard.pieces[2 + 7 * genForColorIndex]; // Bitboard containing all friendly bishops 
-                    while (remainingPieces != 0) // For each bishop
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This bishop is not pinned
-                        {
-                            if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
-                            {
-                                GenMovesForBishopNotPinned(permittedMoves, from);
-                            }
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region Rook moves
-                    remainingPieces = position.bitboard.pieces[3 + 7 * genForColorIndex]; // Bitboard containing all friendly rooks 
-                    while (remainingPieces != 0) // For each rook
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This rook is not pinned
-                        {
-                            if ((PrecomputedMoveData.rookAttacks[from] & permittedMoves) != 0)
-                            {
-                                GenMovesForRookNotPinned(permittedMoves, from);
-                            }
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region Queen moves
-                    remainingPieces = position.bitboard.pieces[4 + 7 * genForColorIndex]; // Bitboard containing all friendly queens 
-                    while (remainingPieces != 0) // For each queen
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((Constants.primitiveBitboards[from] & pinRayBB) == 0) // This queen is not pinned
-                        {
-                            if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
-                            {
-                                GenMovesForQueenNotPinned(permittedMoves, from);
-                            }
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region En-peasant
-                    if (position.enPassantTargetFile != 8) // If an en-passant capture is possible 
-                    {
-                        if ((checkingPieceBB & Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile]) != 0)
-                        {
-                            ulong eligiblePawns = (position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile])) & ~pinRayBB; // Only pawns from this bit board can perform this en-peasant capture
-                            if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
-                            {
-                                GenEnPassant(eligiblePawns);
-                            }
-                        }
-                    }
-                    #endregion
-                }
-                else
-                {
-                    #region Castling
-                    if (includeCastling)
-                    {
-                        GenMovesForCastling();
-                    }
-                    #endregion
-                }
-            }
-            else
-            {
-                if (inCheck)
-                {
-                    #region Pawn moves (en-peasant is handled later)
-                    remainingPieces = position.bitboard.pieces[0 + 7 * genForColorIndex]; // Bitboard congaing all friendly pawns
-                    while (remainingPieces != 0) // For each friendly knight
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenPawnPushes_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnPushesWhite[from] : PrecomputedMoveData.pawnPushesBlack[from]) & checkRayBB, from);
-                        GenPawnCapture_NotPinned((genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksWhite[from] : PrecomputedMoveData.pawnAttacksBlack[from]) & checkingPieceBB, from);
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region Knight move
-                    remainingPieces = position.bitboard.pieces[1 + 7 * genForColorIndex]; // Bitboard containing all friendly knight
-                    while (remainingPieces != 0) // For each friendly knight
-                    {
-                        int from = BitOps.BitScanForward(remainingPieces);
-                        GenMovesForKnightNotPinned(PrecomputedMoveData.knightAttacks[from] & (checkingPieceBB | checkRayBB), (ushort)from);
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    ulong permittedMoves = checkingPieceBB | checkRayBB; // Bitboard containing move that will stop to check, used for sliding pieces move generation
-
-                    #region Bishop moves
-                    remainingPieces = position.bitboard.pieces[2 + 7 * genForColorIndex]; // Bitboard containing all friendly bishops 
-                    while (remainingPieces != 0) // For each bishop
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((PrecomputedMoveData.bishopAttacks[from] & permittedMoves) != 0)
-                        {
-                            GenMovesForBishopNotPinned(permittedMoves, from);
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region Rook moves
-                    remainingPieces = position.bitboard.pieces[3 + 7 * genForColorIndex]; // Bitboard containing all friendly rooks 
-                    while (remainingPieces != 0) // For each rook
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((PrecomputedMoveData.rookAttacks[from] & permittedMoves) != 0)
-                        {
-                            GenMovesForRookNotPinned(permittedMoves, from);
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region Queen moves
-                    remainingPieces = position.bitboard.pieces[4 + 7 * genForColorIndex]; // Bitboard containing all friendly queens 
-                    while (remainingPieces != 0) // For each queen
-                    {
-                        ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
-                        {
-                            GenMovesForQueenNotPinned(permittedMoves, from);
-                        }
-                        remainingPieces ^= Constants.primitiveBitboards[from];
-                    }
-                    #endregion
-
-                    #region En-peasant
-                    if (position.enPassantTargetFile != 8) // If an en-passant capture is possible 
-                    {
-                        if ((checkingPieceBB & Constants.primitiveBitboards[genForColorIndex == 0 ? 32 + position.enPassantTargetFile : 24 + position.enPassantTargetFile]) != 0)
-                        {
-                            ulong eligiblePawns = position.bitboard.pieces[0 + 7 * genForColorIndex] & (genForColorIndex == 0 ? PrecomputedMoveData.pawnAttacksBlack[40 + position.enPassantTargetFile] : PrecomputedMoveData.pawnAttacksWhite[16 + position.enPassantTargetFile]); // Only pawns from this bit board can perform this en-peasant capture
-                            if (eligiblePawns != 0) // There is at lest one pawn that can perform this en-passant capture
-                            {
-                                GenEnPassant(eligiblePawns);
-                            }
-                        }
-                    }
-                    #endregion
-                }
-                else
-                {
-                    #region Castling
-                    if (includeCastling)
-                    {
-                        GenMovesForCastling();
-                    }
-                    #endregion
-                }
-            }
         }
 
         #endregion
@@ -997,23 +796,6 @@ namespace Chess.EngineUtility
         #region Utilities
 
         #region Move generation for not pinned pieces
-
-        private void GenMovesForKnightNotPinned(ulong remainingMove, ushort from)
-        {
-            while (remainingMove != 0)
-            {
-                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
-                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This knight move is not capering an opponent piece
-                {
-                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                }
-                else // This knight move is capturing an opponents piece
-                {
-                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
-                }
-                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
-            }
-        }
 
         private void GenMovesForBishopNotPinned(ulong permittedMoves, ushort from)
         {
@@ -1338,6 +1120,8 @@ namespace Chess.EngineUtility
 
         #endregion
 
+        #region Move generations
+
         #region Pawn Pushes
 
         // Generates pawn pushes (only works if the pawn is not pinned)
@@ -1536,6 +1320,53 @@ namespace Chess.EngineUtility
                 remainingMove ^= toBB;
             }
         }
+
+        #endregion
+
+        #region Knight Moves
+
+        private void GenKnightMoves_NotPinned(ulong remainingMove, ushort from)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This knight move is not capering an opponent piece
+                {
+                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                }
+                else // This knight move is capturing an opponents piece
+                {
+                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                }
+                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
+            }
+        }
+
+        private void GenKnightMoves_NotPinnedQuiescence(ulong remainingMove, ushort from, bool includeChecks)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)BitOps.BitScanForward(remainingMove);
+                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This knight move is not capering an opponent piece
+                {
+                    if (includeChecks)
+                    {
+                        // The knight move is checking the king or revealing a check
+                        if (((PrecomputedMoveData.knightAttacks[to] & defKingBB) != 0) || DoesRevealCheck(from, to))
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                        }
+                    }
+                }
+                else // This knight move is capturing an opponents piece
+                {
+                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                }
+                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
+            }
+        }
+
+        #endregion
 
         #endregion
 
