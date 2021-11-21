@@ -479,7 +479,7 @@ namespace Chess.EngineUtility
                         {
                             if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
                             {
-                                GenMovesForQueenNotPinned(permittedMoves, from);
+                                GenQueenMoves_NotPinned(permittedMoves, from);
                             }
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -592,14 +592,14 @@ namespace Chess.EngineUtility
                         {
                             if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
                             {
-                                GenMovesForQueenNotPinned(permittedMoves, from);
+                                GenQueenMoves_NotPinned(permittedMoves, from);
                             }
                         }
                         else // This queen is pinned
                         {
                             if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
                             {
-                                GenMovesForQueenPinned(permittedMoves, from);
+                                GenQueenMoves_Pinned(permittedMoves, from);
                             }
                         }
                         remainingPieces ^= Constants.primitiveBitboards[from];
@@ -687,7 +687,7 @@ namespace Chess.EngineUtility
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
                         if ((PrecomputedMoveData.queenAttacks[from] & permittedMoves) != 0)
                         {
-                            GenMovesForQueenNotPinned(permittedMoves, from);
+                            GenQueenMoves_NotPinned(permittedMoves, from);
                         }              
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
@@ -757,7 +757,7 @@ namespace Chess.EngineUtility
                     while (remainingPieces != 0) // For each queen
                     {
                         ushort from = (ushort)BitOps.BitScanForward(remainingPieces);
-                        GenMovesForQueenNotPinned(permittedMoves, from);
+                        GenQueenMoves_NotPinned(permittedMoves, from);
                         remainingPieces ^= Constants.primitiveBitboards[from];
                     }
                     #endregion
@@ -794,78 +794,6 @@ namespace Chess.EngineUtility
         #endregion
 
         #region Utilities
-
-        #region Move generation for not pinned pieces
-
-        private void GenMovesForQueenNotPinned(ulong permittedMoves, ushort from)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
-                {
-                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
-                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
-                    {
-                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                        {
-                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                        }
-                    }
-                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
-                    {
-                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                        {
-                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
-                        }
-                        break; // Ends this ray since it is blacked by opponents piece
-                    }
-                    else
-                    {
-                        break; // Ends this ray since it is blacked by a friendly piece
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Move generation for pinned pieces
-
-        private void GenMovesForQueenPinned(ulong permittedMoves, ushort from)
-        {
-            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
-            for (int i = 0; i < 8; i++)
-            {
-                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this queen along this pin direction
-                {
-                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
-                    {
-                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
-                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
-                        {
-                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                            {
-                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
-                            }
-                        }
-                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
-                        {
-                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
-                            {
-                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
-                            }
-                            break; // Ends this ray since it is blacked by opponents piece
-                        }
-                        else
-                        {
-                            break; // Ends this ray since it is blacked by a friendly piece
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
 
         #region En-Passant move generation
 
@@ -1517,6 +1445,156 @@ namespace Chess.EngineUtility
                                 {
                                     // If the rook checks the king after move or reveals a check
                                     if (DoesRookCheckAfterMove(from, to) || DoesRevealCheck(from, to))
+                                    {
+                                        legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                                    }
+                                }
+                            }
+                        }
+                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                            }
+                            break; // Ends this ray since it is blacked by opponents piece
+                        }
+                        else
+                        {
+                            break; // Ends this ray since it is blacked by a friendly piece
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Queen Moves
+
+        // Generates rook moves for a queen, place at from square and the moves most intersect the permittedMoves bit-board (only work for not pinned queen)
+        private void GenQueenMoves_NotPinned(ulong permittedMoves, ushort from)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                {
+                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                        }
+                    }
+                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                        }
+                        break; // Ends this ray since it is blacked by opponents piece
+                    }
+                    else
+                    {
+                        break; // Ends this ray since it is blacked by a friendly piece
+                    }
+                }
+            }
+        }
+
+        // Generates rook moves for a queen, place at from square and the moves most intersect the permittedMoves bit-board (work for pinned queen)
+        private void GenQueenMoves_Pinned(ulong permittedMoves, ushort from)
+        {
+            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
+            for (int i = 0; i < 8; i++)
+            {
+                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this queen along this pin direction
+                {
+                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                    {
+                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                            }
+                        }
+                        else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                            }
+                            break; // Ends this ray since it is blacked by opponents piece
+                        }
+                        else
+                        {
+                            break; // Ends this ray since it is blacked by a friendly piece
+                        }
+                    }
+                }
+            }
+        }
+
+        // Generates non-quiet rook moves for a queen, place at from square and the moves most intersect the permittedMoves bit-board (only work for not pinned queen)
+        private void GenQueenMoves_NotPinnedQuiescence(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                {
+                    ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                    if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            if (includeChecks)
+                            {
+                                // This queen move is checking the king or revealing a check
+                                if (DoesQueenCheckAfterMove(from, to) || DoesRevealCheck(from, to))
+                                {
+                                    legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
+                                }
+                            }
+                        }
+                    }
+                    else if (position.squareCentric.colors[to] == genForColorIndexInverse)
+                    {
+                        if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                        {
+                            legalMoves.Add(Move.GenMove(from, to, Move.Flag.capture));
+                        }
+                        break; // Ends this ray since it is blacked by opponents piece
+                    }
+                    else
+                    {
+                        break; // Ends this ray since it is blacked by a friendly piece
+                    }
+                }
+            }
+        }
+
+        // Generates non-quiet rook moves for a queen, place at from square and the moves most intersect the permittedMoves bit-board (work for pinned queen)
+        private void GenQueenMoves_PinnedQuiescence(ulong permittedMoves, ushort from, bool includeChecks)
+        {
+            byte pinDir = GetPinDirection(from); // Gets the absolute value of a pin direction
+            for (int i = 0; i < 8; i++)
+            {
+                if (Mathf.Abs(Constants.directionOffsets[i]) == pinDir) // This direction will slide this queen along this pin direction
+                {
+                    for (int j = 1; j < Constants.squaresToEdge[i][from] + 1; j++)
+                    {
+                        ushort to = (ushort)(from + j * Constants.directionOffsets[i]);
+                        if (position.squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty)
+                        {
+                            if ((permittedMoves & Constants.primitiveBitboards[to]) != 0)
+                            {
+                                if (includeChecks)
+                                {
+                                    // This queen move is checking the king or revealing a check
+                                    if (DoesQueenCheckAfterMove(from, to) || DoesRevealCheck(from, to))
                                     {
                                         legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
                                     }
