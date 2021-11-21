@@ -402,7 +402,7 @@ namespace Chess.EngineUtility
             {
                 #region King moves
                 // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                GenKingMoves(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
                 #endregion
             }
             else if (pinsExistInPosition)
@@ -618,13 +618,13 @@ namespace Chess.EngineUtility
                     #endregion
 
                     #region Castling
-                    GenMovesForCastling();
+                    GeCastlingMoves();
                     #endregion
                 }
 
                 #region King moves
                 // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                GenKingMoves(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
                 #endregion
             }
             else
@@ -774,13 +774,13 @@ namespace Chess.EngineUtility
                     #endregion
 
                     #region Castling
-                    GenMovesForCastling();
+                    GeCastlingMoves();
                     #endregion
                 }
 
                 #region King moves
                 // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                GenMovesForKing(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                GenKingMoves(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
                 #endregion
             }
         }
@@ -852,70 +852,6 @@ namespace Chess.EngineUtility
 
             // Adds the move
             legalMoves.Add(Move.GenMove(from, to, Move.Flag.epCapture));
-        }
-
-        #endregion
-
-        #region Move generation for independent pieces (king, castling)
-
-        // King cant be pinned so only one implementation of this function is required
-        private void GenMovesForKing(ulong remainingMove)
-        {
-            while (remainingMove != 0)
-            {
-                ushort to = (ushort)(BitOps.BitScanForward(remainingMove));
-                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This king move is not capering an opponent piece
-                {
-                    legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.quietMove));
-                }
-                else // This king move is capturing an opponents piece
-                {
-                    legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.capture));
-                }
-                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
-            }
-        }
-
-        // Pins don't effect castling (int this implementation)
-        private void GenMovesForCastling()
-        {
-            if (position.castlingRights != 0)
-            {
-                if (genForColorIndex == 0)
-                {
-                    if ((position.castlingRights & 0b1000) != 0) // White queen side
-                    {
-                        if (((Constants.castleNotAttackedMask[0] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[0] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
-                        {
-                            legalMoves.Add(Move.GenMove(4, 2, Move.Flag.queenCastle));
-                        }
-                    }
-                    if ((position.castlingRights & 0b0100) != 0) // White king side
-                    {
-                        if (((Constants.castleNotAttackedMask[1] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[1] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
-                        {
-                            legalMoves.Add(Move.GenMove(4, 6, Move.Flag.kingCastle));
-                        }
-                    }
-                }
-                else
-                {
-                    if ((position.castlingRights & 0b0010) != 0) // Black queen side
-                    {
-                        if (((Constants.castleNotAttackedMask[2] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[2] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
-                        {
-                            legalMoves.Add(Move.GenMove(60, 58, Move.Flag.queenCastle));
-                        }
-                    }
-                    if ((position.castlingRights & 0b0001) != 0) // Black king side
-                    {
-                        if (((Constants.castleNotAttackedMask[3] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[3] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
-                        {
-                            legalMoves.Add(Move.GenMove(60, 62, Move.Flag.kingCastle));
-                        }
-                    }
-                }
-            }
         }
 
         #endregion
@@ -1612,6 +1548,78 @@ namespace Chess.EngineUtility
                         else
                         {
                             break; // Ends this ray since it is blacked by a friendly piece
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region King Moves
+
+        // King cant be pinned so only one implementation of this function is required
+        private void GenKingMoves(ulong remainingMove)
+        {
+            while (remainingMove != 0)
+            {
+                ushort to = (ushort)(BitOps.BitScanForward(remainingMove));
+                if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) == 0) // This king move is not capering an opponent piece
+                {
+                    legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.quietMove));
+                }
+                else // This king move is capturing an opponents piece
+                {
+                    legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.capture));
+                }
+                remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
+            }
+        }
+
+        #endregion
+
+        #region En-Passant Moves
+
+        #endregion
+
+        #region Castling Moves
+
+        // Pins don't effect castling (in this implementation)
+        private void GeCastlingMoves()
+        {
+            if (position.castlingRights != 0)
+            {
+                if (genForColorIndex == 0)
+                {
+                    if ((position.castlingRights & 0b1000) != 0) // White queen side
+                    {
+                        if (((Constants.castleNotAttackedMask[0] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[0] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
+                        {
+                            legalMoves.Add(Move.GenMove(4, 2, Move.Flag.queenCastle));
+                        }
+                    }
+                    if ((position.castlingRights & 0b0100) != 0) // White king side
+                    {
+                        if (((Constants.castleNotAttackedMask[1] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[1] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
+                        {
+                            legalMoves.Add(Move.GenMove(4, 6, Move.Flag.kingCastle));
+                        }
+                    }
+                }
+                else
+                {
+                    if ((position.castlingRights & 0b0010) != 0) // Black queen side
+                    {
+                        if (((Constants.castleNotAttackedMask[2] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[2] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
+                        {
+                            legalMoves.Add(Move.GenMove(60, 58, Move.Flag.queenCastle));
+                        }
+                    }
+                    if ((position.castlingRights & 0b0001) != 0) // Black king side
+                    {
+                        if (((Constants.castleNotAttackedMask[3] & underAttackBB) == 0) && ((Constants.castleEmptyMasks[3] & (position.bitboard.pieces[6] | position.bitboard.pieces[13])) == 0))
+                        {
+                            legalMoves.Add(Move.GenMove(60, 62, Move.Flag.kingCastle));
                         }
                     }
                 }
