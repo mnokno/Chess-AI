@@ -20,7 +20,7 @@ namespace Chess.UI
 
         private ColorSet squareColours; // Stores color set for this square
         private ColorSet annotationColors; // Stores color set for this squares annotation
-        private GameObject quad; // Stores reference to a quad that represents this square
+        public GameObject quad; // Stores reference to a quad that represents this square
         private GameObject legalCaptureSprite; // Stores reference to a legalCaptureSprite game object (sprite)
         private GameObject legalNonCaptureSprite; // Stores reference to a legalNonCaptureSprite game object (sprite)
         private List<GameObject> annotations = new List<GameObject>(); // Stores references to all annotations on this square
@@ -241,6 +241,12 @@ namespace Chess.UI
                     annotation.GetComponent<Text>().color = annotationColors.normal;
                 }
             }
+        }
+
+        // Resets the square colors
+        public void ResetColor()
+        {
+            quad.GetComponent<Renderer>().material.color = squareColours.normal; // Sets color for this game object
         }
 
         #endregion

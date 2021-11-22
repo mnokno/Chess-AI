@@ -333,6 +333,10 @@ namespace Chess.UI
             lastMoveSquares[1] = parrentBoard.squares[to];
             lastMoveSquares[0].Highlighted(true);
             lastMoveSquares[1].Highlighted(true);
+
+            // TESTING 
+            ShowQuiescenceMoves();
+            // END TESTING
         }
 
         // Plays a sound for the made move, call after the local position has been updated
@@ -541,58 +545,27 @@ namespace Chess.UI
 
         #endregion
 
-        // Used to visually test functions
+        // Testing
         #region Testing
 
-        // Used to test precomputed tables
-        private List<Square> highlightedSquares = new List<Square>();
-        public void DisplayFromPrecomputedTable(int squareIndex)
+        public void ShowQuiescenceMoves()
         {
-            // Dehighlight protrusively highlighted squares
-            foreach(Square s in highlightedSquares)
+            Debug.Log(SquareCentricUtility.FormateSquareCentric(localPosition.squareCentric));
+            ushort[] nonQuietMoves = moveGenerator.GenerateLegalMoves(localPosition, (byte)(localPosition.sideToMove ? 0 : 1), includeQuiet:false).ToArray();
+            ushort[] nonQuietNonCheckMoves = moveGenerator.GenerateLegalMoves(localPosition, (byte)(localPosition.sideToMove ? 0 : 1), includeQuiet: false, includeChecks: false).ToArray();
+            bool[] visited = new bool[64];
+            
+            foreach(Square square in parrentBoard.squares)
             {
-                s.Highlighted(false);
+                square.ResetColor();
             }
-            highlightedSquares.Clear();
-
-            // Destroys all existing pieces
-            for(int i = 0; i < parrentBoard.pieces.Length; i++)
+            
+            foreach(ushort move in nonQuietMoves)
             {
-                if (parrentBoard.pieces[i] != null)
-                {
-                    parrentBoard.pieces[i].Destroy(animate:false);
-                    parrentBoard.pieces[i] = null;
-                }
-            }
-
-            // Creates on piece to on the clicked square
-            Chess.EngineUtility.Position p = new Chess.EngineUtility.Position();
-            int file = squareIndex % 8;
-            int rank = (squareIndex - file) / 8;
-            parrentBoard.pieces[squareIndex] = new Piece(parrentBoard, new Piece.PieceType() {color=Piece.Color.White, type=Piece.Type.King }, file, rank);
-
-            // MOVE ARRAYS
-            // Highlights squares from tree table 
-            //foreach (byte b in ChessEngineUtility.PrecomputedMoveData.kingMoves[squareIndex])
-            //{
-            //    parrentBoard.squares[b].Highlighted(true);
-            //    highlightedSquares.Add(parrentBoard.squares[b]);
-            //}
-
-            // ATTACK BITBOARDS
-            // string uAsString = Convert.ToString((long)ChessEngineUtility.PrecomputedMoveData.pawnAttacksBlack[squareIndex], 2);
-            string uAsString = Convert.ToString((long)p.bitboard.pieces[6], 2);
-            for (int i = 0; i < uAsString.Length; i++)
-            {
-                if(uAsString[uAsString.Length-i-1] == '1')
-                {
-                    parrentBoard.squares[i].Highlighted(true);
-                    highlightedSquares.Add(parrentBoard.squares[i]);
-                }
+                parrentBoard.squares[Move.GetTo(move)].quad.GetComponent<MeshRenderer>().material.color = Color.white;
             }
         }
 
         #endregion
     }
-
 }
