@@ -16,6 +16,7 @@ namespace Chess.EngineUtility
         private byte defKingIndex; // Index of the defending side's king
         private ulong defKingBB; // Bitboard contacting the defending king
         private byte attKingIndex; // Index of the attacking side's kink
+        private ulong attKingBB; // Bitboard contacting the attacking king
         private bool pinsExistInPosition; // True if there is at lest one absolute pin in the position
 
         public ulong underPawnAttackBB; // Bitboard containing squares attacked by the opponents pawns
@@ -75,6 +76,7 @@ namespace Chess.EngineUtility
             this.defKingIndex = (byte)BitOps.BitScanForward(position.bitboard.pieces[5 + 7 * this.genForColorIndex]);
             this.defKingBB = this.position.bitboard.pieces[5 + 7 * genForColorIndex];
             this.attKingIndex = (byte)BitOps.BitScanForward(position.bitboard.pieces[5 + 7 * this.genForColorIndexInverse]);
+            this.attKingBB = this.position.bitboard.pieces[5 + 7 * genForColorIndexInverse];
             this.pinsExistInPosition = false;
 
             this.underPawnAttackBB = 0;
@@ -1269,7 +1271,7 @@ namespace Chess.EngineUtility
                         if (includeChecks)
                         {
                             // The double pawn push is revealing or checking the king
-                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                             {
                                 legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
                             }
@@ -1290,7 +1292,7 @@ namespace Chess.EngineUtility
                         if (includeChecks)
                         {
                             // The pawn push is revealing or checking the king
-                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                             {
                                 legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
                             }  
@@ -1314,7 +1316,7 @@ namespace Chess.EngineUtility
                     {
                         ushort to = (ushort)BitOps.BitScanForward(remainingMove);
                         // This pawn push or double pawn push is checking the king or reveling a check
-                        if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & defKingBB) != 0 || DoesRevealCheck(from, to))
+                        if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                         {
                             if (Mathf.Abs(to - from) == 16) // Its a double pawn push
                             {
@@ -1429,7 +1431,7 @@ namespace Chess.EngineUtility
                     if (includeChecks)
                     {
                         // The knight move is checking the king or revealing a check
-                        if (((PrecomputedMoveData.knightAttacks[to] & defKingBB) != 0) || DoesRevealCheck(from, to))
+                        if (((PrecomputedMoveData.knightAttacks[to] & attKingBB) != 0) || DoesRevealCheck(from, to))
                         {
                             legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
                         }
@@ -1868,8 +1870,8 @@ namespace Chess.EngineUtility
                             {
                                 if (includeChecks)
                                 {
-                                    // This queen move is checking the king or revealing a check
-                                    if (DoesQueenCheckAfterMove(from, to) || DoesRevealCheck(from, to))
+                                    // This queen move is checking the king
+                                    if (DoesQueenCheckAfterMove(from, to))
                                     {
                                         legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
                                     }
@@ -2068,12 +2070,12 @@ namespace Chess.EngineUtility
             }
         }
 
-        // Returns the index of the direction corresponding to the Constants.directionOffsets, returns 16 is the pinFrom and pinTarget are not on the same ray
+        // Returns the index of the direction corresponding to the Constants.directionOffsets, returns 10 is the pinFrom and pinTarget are not on the same ray
         private byte GetRayDirectionIndex(ushort pinFrom, ushort pinTarget)
         {
             if (Constants.indexToRankFileTable[pinFrom][0] == Constants.indexToRankFileTable[pinTarget][0]) // Same file, vertical pin
             {
-                if (Constants.indexToRankFileTable[pinFrom][0] - Constants.indexToRankFileTable[pinTarget][0] > 0) // Decides the direction of the pin
+                if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
                 {
                     return 1; // -8 Returns the pin direction offset
                 }
@@ -2084,7 +2086,7 @@ namespace Chess.EngineUtility
             }
             else if (Constants.indexToRankFileTable[pinFrom][1] == Constants.indexToRankFileTable[pinTarget][1]) // Same rank, horizontal pin
             {
-                if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
+                if (Constants.indexToRankFileTable[pinFrom][0] - Constants.indexToRankFileTable[pinTarget][0] > 0) // Decides the direction of the pin
                 {
                     return 2; // -1 Returns the pin direction offset
                 }
@@ -2110,11 +2112,11 @@ namespace Chess.EngineUtility
             {
                 if (Constants.indexToRankFileTable[pinFrom][1] - Constants.indexToRankFileTable[pinTarget][1] > 0) // Decides the direction of the pin
                 {
-                    return 4; // 7 Returns the pin direction offset
+                    return 5; // -7 Returns the pin direction offset
                 }
                 else
                 {
-                    return 5; // -7 Returns the pin direction offset
+                    return 4; // 7 Returns the pin direction offset
                 }
             }
             else // No pin, the pieces are not on the same ray
@@ -2131,16 +2133,16 @@ namespace Chess.EngineUtility
         private bool DoesRevealCheck(ushort from, ushort to)
         {
             // Gets the pin direction between the moved piece (original location) and defending king
-            byte rayDirectionIndex = GetRayDirectionIndex(from, defKingIndex);
-            if (rayDirectionIndex != 10 && rayDirectionIndex != GetRayDirectionIndex(to, defKingIndex)) // Checks if its possible for a check to be revealed
+            byte rayDirectionIndex = GetRayDirectionIndex(attKingIndex, from);
+            if (rayDirectionIndex != 10 && rayDirectionIndex != GetRayDirectionIndex(attKingIndex, to)) // Checks if its possible for a check to be revealed
             {
                 if (rayDirectionIndex < 4)
                 {
-                    return DoesRayHitTarget(rayDirectionIndex, defKingIndex, position.bitboard.pieces[3 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[3 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]);
                 }
                 else
                 {
-                    return DoesRayHitTarget(rayDirectionIndex, defKingIndex, position.bitboard.pieces[2 + 7 * genForColorIndexInverse] | position.bitboard.pieces[4 + 7 * genForColorIndexInverse]);
+                    return DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[2 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]);
                 }
             }
             else
@@ -2156,9 +2158,9 @@ namespace Chess.EngineUtility
         private bool DoesBishopCheckAfterMove(ushort from, ushort to)
         {
             // Checks if the bishop in the new position has potential to check the king
-            if ((PrecomputedMoveData.bishopAttacks[to] & defKingBB) != 0)
+            if ((PrecomputedMoveData.bishopAttacks[to] & attKingBB) != 0)
             {
-                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
+                return DoesRayHitTarget(GetRayDirectionIndex(to, attKingIndex), to, attKingBB);
             }
             else // This piece does not have potential to 
             {
@@ -2168,9 +2170,9 @@ namespace Chess.EngineUtility
         private bool DoesRookCheckAfterMove(ushort from, ushort to)
         {
             // Checks if the rook in the new position has potential to check the king
-            if ((PrecomputedMoveData.rookAttacks[to] & defKingBB) != 0)
+            if ((PrecomputedMoveData.rookAttacks[to] & attKingBB) != 0)
             {
-                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
+                return DoesRayHitTarget(GetRayDirectionIndex(to, attKingIndex), to, attKingBB);
             }
             else // This piece does not have potential to 
             {
@@ -2181,9 +2183,9 @@ namespace Chess.EngineUtility
         private bool DoesQueenCheckAfterMove(ushort from, ushort to)
         {
             // Checks if the queen in the new position has potential to check the king
-            if ((PrecomputedMoveData.queenAttacks[to] & defKingBB) != 0)
+            if ((PrecomputedMoveData.queenAttacks[to] & attKingBB) != 0)
             {
-                return DoesRayHitTarget(GetRayDirectionIndex(to, defKingIndex), to, defKingBB);
+                return DoesRayHitTarget(GetRayDirectionIndex(to, attKingIndex), to, attKingBB);
             }
             else // This piece does not have potential to 
             {

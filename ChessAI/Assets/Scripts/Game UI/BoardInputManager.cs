@@ -550,7 +550,6 @@ namespace Chess.UI
 
         public void ShowQuiescenceMoves()
         {
-            Debug.Log(SquareCentricUtility.FormateSquareCentric(localPosition.squareCentric));
             ushort[] nonQuietMoves = moveGenerator.GenerateLegalMoves(localPosition, (byte)(localPosition.sideToMove ? 0 : 1), includeQuiet:false).ToArray();
             ushort[] nonQuietNonCheckMoves = moveGenerator.GenerateLegalMoves(localPosition, (byte)(localPosition.sideToMove ? 0 : 1), includeQuiet: false, includeChecks: false).ToArray();
             bool[] visited = new bool[64];
