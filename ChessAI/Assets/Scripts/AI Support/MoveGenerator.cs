@@ -2138,11 +2138,25 @@ namespace Chess.EngineUtility
             {
                 if (rayDirectionIndex < 4)
                 {
-                    return DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[3 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]);
+                    if (DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[3 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]))
+                    {
+                        return DoesRayHitTarget(rayDirectionIndex, attKingIndex, Constants.primitiveBitboards[from]);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    return DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[2 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]);
+                    if (DoesRayHitTarget(rayDirectionIndex, from, position.bitboard.pieces[2 + 7 * genForColorIndex] | position.bitboard.pieces[4 + 7 * genForColorIndex]))
+                    {
+                        return DoesRayHitTarget(rayDirectionIndex, attKingIndex, Constants.primitiveBitboards[from]);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             else
@@ -2204,7 +2218,7 @@ namespace Chess.EngineUtility
             for (ushort i = 1; i < Constants.squaresToEdge[reyDirectionIndex][from] +1; i++)
             {
                 // Calculates the current position along the ray
-                int currentRayPosition = from + i * Constants.directionOffsets[reyDirectionIndex];
+                int currentRayPosition = from + (i * Constants.directionOffsets[reyDirectionIndex]);
                 if ((allPiecesBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Rays intersected with some other piece
                 {
                     if ((targetBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Ray intersected with the target

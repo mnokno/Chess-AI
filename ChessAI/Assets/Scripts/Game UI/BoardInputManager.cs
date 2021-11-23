@@ -561,7 +561,20 @@ namespace Chess.UI
             
             foreach(ushort move in nonQuietMoves)
             {
-                parrentBoard.squares[Move.GetTo(move)].quad.GetComponent<MeshRenderer>().material.color = Color.white;
+                parrentBoard.squares[Move.GetTo(move)].quad.GetComponent<MeshRenderer>().material.color = new Color(0.8f, 0.8f, 0.8f, 1f);
+                visited[Move.GetTo(move)] = true;
+            }
+            foreach (ushort move in nonQuietNonCheckMoves)
+            {
+                if (visited[Move.GetTo(move)] == true)
+                {
+                    parrentBoard.squares[Move.GetTo(move)].quad.GetComponent<MeshRenderer>().material.color = Color.gray;
+                }
+                else
+                {
+                    parrentBoard.squares[Move.GetTo(move)].quad.GetComponent<MeshRenderer>().material.color = Color.blue;
+                }
+                
             }
         }
 
