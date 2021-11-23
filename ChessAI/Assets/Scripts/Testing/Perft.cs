@@ -28,20 +28,16 @@ namespace Chess.EngineTests
 
         // Flags
         bool countMoveTypes;
-        bool includeQuiet;
-        bool includeChecks;
 
         #endregion
 
         #region Core functions
 
         // Public test function
-        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool onMainThread, bool includeQuiet = true, bool includeChecks = true)
+        public void Test(FEN fen, int initialDept, int destinationDept, bool divide, bool countMoveTypes, bool onMainThread)
         {
             // Saves the flags
             this.countMoveTypes = countMoveTypes;
-            this.includeQuiet = includeQuiet;
-            this.includeChecks = includeChecks;
 
             // Loads the position from a FEN string
             position.LoadFEN(fen);
@@ -60,10 +56,6 @@ namespace Chess.EngineTests
         // Public bulk test
         public void BulkTest(bool onMainThread)
         {
-            // Updates the flags
-            includeQuiet = true;
-            includeChecks = true;
-
             // Runs the bulk Test
             if (onMainThread)
             {
@@ -72,6 +64,23 @@ namespace Chess.EngineTests
             else
             {
                 Task.Run(() => StartBulkTest()); // New thread option
+            }
+        }
+
+        // Public quiescence test
+        public void QuiescenceTest(FEN fen, int initialDept, int destinationDept, bool includeChecks, bool onMainThread)
+        {
+            // Loads the position from a FEN string
+            position.LoadFEN(fen);
+
+            // Runs the test
+            if (onMainThread)
+            {
+                StartQuiescenceTest(initialDept, destinationDept, includeChecks); // Main thread option
+            }
+            else
+            {
+                Task.Run(() => StartQuiescenceTest(initialDept, destinationDept, includeChecks)); // New thread option
             }
         }
 
@@ -138,11 +147,33 @@ namespace Chess.EngineTests
             Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds / 1000f} seconds");
         }
 
+        // Private function for running a quiescence test
+        private void StartQuiescenceTest(int initialDept, int destinationDept, bool includeChecks)
+        {
+            // Creates and start the timer
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+            countMoveTypes = true;
+
+            // Runs perft for each depth
+            for (int i = initialDept; i <= destinationDept; i++)
+            {
+                // Initiates move type counters
+                InitMoveTypeCount();
+
+                // Logs the results
+                Debug.Log($"Dept: {i} -- Nodes: {PerftQuiescenceTest(i, includeChecks)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+            }
+
+            // Stops the timer and logs the time elapsed
+            stopwatch.Stop();
+            Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds / 1000f} seconds");
+        }
+
         // Private recursive pert functions
         private long PerftTest(int dept, bool divide)
         {
-            List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1), includeQuiet: includeQuiet, includeChecks: includeChecks);
-            //List<ushort> legalMoves = pseudoLegalMoveGenerator.GenerateLegalMoves(position);
+            List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
             int nMoves = legalMoves.Count;
             long nodes = 0;
             long subNodes;
@@ -212,6 +243,60 @@ namespace Chess.EngineTests
                     // Updates the global count
                     nodes += subNodes;
                 }
+            }
+
+            // Returns the total number of nodes
+            return nodes;
+        }
+
+        // Private recursive pert functions
+        private long PerftQuiescenceTest(int dept, bool includeChecks)
+        {
+            List<ushort> legalMoves;
+            if (dept == 1)
+            {
+                legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1), includeQuiet: false, includeChecks: includeChecks);
+            }
+            else
+            {
+                legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
+            }
+            int nMoves = legalMoves.Count;
+            long nodes = 0;
+
+            if (countMoveTypes)
+            {
+                // Returns 1 since the end of a branch was reached
+                if (dept == 0)
+                {
+                    return 1;
+                }
+            }
+            else
+            {
+                // If the depth is 1 then the number of moves from the list is returned
+                if (dept == 1)
+                {
+                    return nMoves;
+                }
+            }
+
+
+            // If the report is not detailed
+            for (int i = 0; i < nMoves; i++)
+            {
+                // Runs PerftTest
+                position.MakeMove(legalMoves[i]);
+                nodes += PerftQuiescenceTest(dept - 1, includeChecks);
+                // Checks if move classification is enabled
+                if (countMoveTypes)
+                {
+                    if (dept == 1)
+                    {
+                        ClassifeMove(legalMoves[i]);
+                    }
+                }
+                position.UnmakeMove(legalMoves[i]);
             }
 
             // Returns the total number of nodes
