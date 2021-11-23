@@ -68,7 +68,7 @@ namespace Chess.EngineTests
         }
 
         // Public quiescence test
-        public void QuiescenceTest(FEN fen, int initialDept, int destinationDept, bool includeChecks, bool onMainThread)
+        public void QuiescenceTest(FEN fen, int initialDept, int destinationDept, bool divide, bool includeChecks, bool onMainThread)
         {
             // Loads the position from a FEN string
             position.LoadFEN(fen);
@@ -76,11 +76,11 @@ namespace Chess.EngineTests
             // Runs the test
             if (onMainThread)
             {
-                StartQuiescenceTest(initialDept, destinationDept, includeChecks); // Main thread option
+                StartQuiescenceTest(initialDept, destinationDept, divide, includeChecks); // Main thread option
             }
             else
             {
-                Task.Run(() => StartQuiescenceTest(initialDept, destinationDept, includeChecks)); // New thread option
+                Task.Run(() => StartQuiescenceTest(initialDept, destinationDept, divide, includeChecks)); // New thread option
             }
         }
 
@@ -148,22 +148,64 @@ namespace Chess.EngineTests
         }
 
         // Private function for running a quiescence test
-        private void StartQuiescenceTest(int initialDept, int destinationDept, bool includeChecks)
+        private void StartQuiescenceTest(int initialDept, int destinationDept, bool divide, bool includeChecks)
         {
             // Creates and start the timer
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
             countMoveTypes = true;
 
-            // Runs perft for each depth
-            for (int i = initialDept; i <= destinationDept; i++)
+            if (!divide)
             {
-                // Initiates move type counters
-                InitMoveTypeCount();
+                // Runs perft for each depth
+                for (int i = initialDept; i <= destinationDept; i++)
+                {
+                    // Initiates move type counters
+                    InitMoveTypeCount();
 
-                // Logs the results
-                Debug.Log($"Dept: {i} -- Nodes: {PerftQuiescenceTest(i, includeChecks)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                    // Logs the results
+                    Debug.Log($"Dept: {i} -- Nodes: {PerftQuiescenceTest(i, includeChecks)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                }
             }
+            else
+            {
+                // Runs perft for each depth
+                for (int i = initialDept - 1; i <= destinationDept - 1; i++)
+                {
+                    // Generates a list of legal moves
+                    List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
+
+                    // initializes local counters
+                    long lNodeTotal = 0;
+                    int lCaptures = 0;
+                    int lEp = 0;
+                    int lCastles = 0;
+                    int lPromations = 0;
+                    int lChecks = 0;
+                    int lCheckmates = 0;
+
+                    // Plays all the generated moves and logs the result
+                    foreach (ushort move in legalMoves)
+                    {
+                        // Initiates move type counters
+                        InitMoveTypeCount();
+                        position.MakeMove(move);
+                        long res = PerftQuiescenceTest(i, includeChecks);
+                        lNodeTotal += res;
+                        Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                        lCaptures += captures;
+                        lEp += ep;
+                        lCastles += castles;
+                        lPromations += promations;
+                        lChecks += checks;
+                        lCheckmates += checkmates;
+                        position.UnmakeMove(move);
+                    }
+
+                    Debug.Log($"Total Reports Dept: {i} -- Nodes: {lNodeTotal} -- Captures: {lCaptures}, Ep: {lEp} -- Castles: {lCastles} -- Promotions: {lPromations} -- Checks: {lChecks} -- Checkmates: {lCheckmates}");
+                }
+            }
+
 
             // Stops the timer and logs the time elapsed
             stopwatch.Stop();
