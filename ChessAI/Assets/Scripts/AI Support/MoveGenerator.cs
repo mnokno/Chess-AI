@@ -1023,7 +1023,7 @@ namespace Chess.EngineUtility
 
                     #region King moves
                     // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                    GenKingMovesQuiescence(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                    GenKingMovesQuiescence(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]), includeChecks);
                     #endregion
                 }
             }
@@ -1187,7 +1187,7 @@ namespace Chess.EngineUtility
 
                     #region King moves
                     // Moves the defended king can make to squares that are not under attack or occupied by allies pieces
-                    GenKingMovesQuiescence(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]));
+                    GenKingMovesQuiescence(PrecomputedMoveData.kingAttacks[defKingIndex] & ~(underAttackBB | position.bitboard.pieces[6 + 7 * genForColorIndex]), includeChecks);
                     #endregion
                 }
             }
@@ -1271,7 +1271,7 @@ namespace Chess.EngineUtility
                         if (includeChecks)
                         {
                             // The double pawn push is revealing or checking the king
-                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksBlack[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                             {
                                 legalMoves.Add(Move.GenMove(from, to, Move.Flag.doublePawnPush));
                             }
@@ -1292,7 +1292,7 @@ namespace Chess.EngineUtility
                         if (includeChecks)
                         {
                             // The pawn push is revealing or checking the king
-                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
+                            if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksBlack[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                             {
                                 legalMoves.Add(Move.GenMove(from, to, Move.Flag.quietMove));
                             }  
@@ -1316,7 +1316,7 @@ namespace Chess.EngineUtility
                     {
                         ushort to = (ushort)BitOps.BitScanForward(remainingMove);
                         // This pawn push or double pawn push is checking the king or reveling a check
-                        if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksWhite[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
+                        if (((position.sideToMove ? PrecomputedMoveData.pawnAttacksWhite[to] : PrecomputedMoveData.pawnAttacksBlack[to]) & attKingBB) != 0 || DoesRevealCheck(from, to))
                         {
                             if (Mathf.Abs(to - from) == 16) // Its a double pawn push
                             {
@@ -1918,7 +1918,7 @@ namespace Chess.EngineUtility
         }
 
         // Generates non quiet king moves
-        private void GenKingMovesQuiescence(ulong remainingMove)
+        private void GenKingMovesQuiescence(ulong remainingMove, bool includeChecks)
         {
             while (remainingMove != 0)
             {
@@ -1926,6 +1926,13 @@ namespace Chess.EngineUtility
                 if ((Constants.primitiveBitboards[to] & position.bitboard.pieces[6 + 7 * genForColorIndexInverse]) != 0) // This king move is capturing an opponents piece
                 {
                     legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.capture));
+                }
+                else if (includeChecks)
+                {
+                    if (DoesRevealCheck(defKingIndex, to))
+                    {
+                        legalMoves.Add(Move.GenMove(defKingIndex, to, Move.Flag.quietMove));
+                    }
                 }
                 remainingMove ^= Constants.primitiveBitboards[to]; // Removes this move form remaining moves bitboard
             }

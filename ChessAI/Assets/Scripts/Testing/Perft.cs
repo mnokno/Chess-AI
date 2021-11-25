@@ -172,7 +172,7 @@ namespace Chess.EngineTests
                         lNodeTotal += res;
                         if (countMoveTypes)
                         {
-                            Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                            Debug.Log($"{(Squares)Move.GetFrom(move)}{(Squares)Move.GetTo(move)} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
                             lCaptures += captures;
                             lEp += ep;
                             lCastles += castles;
@@ -182,7 +182,7 @@ namespace Chess.EngineTests
                         }
                         else
                         {
-                            Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {PerftTest(i)}");
+                            Debug.Log($"{(Squares)Move.GetFrom(move)}{(Squares)Move.GetTo(move)} -- Dept: {i} -- Nodes: {PerftTest(i)}");
                         }
 
                         position.UnmakeMove(move);
@@ -250,7 +250,7 @@ namespace Chess.EngineTests
                         position.MakeMove(move);
                         long res = PerftQuiescenceTest(i, includeChecks);
                         lNodeTotal += res;
-                        Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                        Debug.Log($"{(Squares)Move.GetFrom(move)}{(Squares)Move.GetTo(move)} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
                         lCaptures += captures;
                         lEp += ep;
                         lCastles += castles;
