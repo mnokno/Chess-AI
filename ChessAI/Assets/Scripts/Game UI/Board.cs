@@ -68,10 +68,11 @@ namespace Chess.UI
 
             // TEST START
             EngineTests.Perft perftTest = new EngineTests.Perft();
-            perftTest.QuiescenceTest(new FEN(fenString), 6, 6, true, true, true);
-            perftTest.QuiescenceTest(new FEN(fenString), 1, 6, false, true, true);
+            //perftTest.QuiescenceTest(new FEN(fenString), 6, 6, true, true, true);
+            //perftTest.QuiescenceTest(new FEN(fenString), 1, 6, false, true, true);
             //perftTest.BulkTest(false);
-            //perftTest.Test(new FEN(fenString), 6, 6, false, true, true);
+            perftTest.Test(new FEN(fenString), 6, 6, true, true, true);
+            perftTest.QuiescenceTest(new FEN(fenString), 6, 6, true, true, true);
             // TEST END
         }
 

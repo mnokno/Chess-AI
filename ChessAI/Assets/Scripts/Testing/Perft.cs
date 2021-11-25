@@ -105,7 +105,7 @@ namespace Chess.EngineTests
             foreach (TestPosition testPosition in testPositions.positions)
             {
                 position.LoadFEN(new FEN(testPosition.fen));
-                long testResult = PerftTest(testPosition.depth, false);
+                long testResult = PerftTest(testPosition.depth);
                 Debug.Log($"{(testPosition.nodes == testResult ? "PASSED" : "FAILED")} --- FEN: \"{testPosition.fen}\" -- Depth: {testPosition.depth} -- ExpNodes: {testPosition.nodes} -- ResNodes: {testResult} -- TestNumber: {currentTestNumber}/{totalNumberOfTests}");
                 passed += testPosition.nodes == testResult ? 1 : 0;
                 currentTestNumber++;
@@ -126,19 +126,77 @@ namespace Chess.EngineTests
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            // Runs perft for each depth
-            for (int i = initialDept; i <= destinationDept; i++)
+            if (!divide)
             {
-                // Initiates move type counters
-                InitMoveTypeCount();
+                // Runs perft for each depth
+                for (int i = initialDept; i <= destinationDept; i++)
+                {
+                    // Initiates move type counters
+                    InitMoveTypeCount();
 
-                if (countMoveTypes)
-                {
-                    Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i, divide)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                    // Logs the results
+                    if (countMoveTypes)
+                    {
+                        Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i)} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i)}");
+                    }
                 }
-                else
+            }
+            else
+            {
+                // Runs perft for each depth
+                for (int i = initialDept - 1; i <= destinationDept - 1; i++)
                 {
-                    Debug.Log($"Dept: {i} -- Nodes: {PerftTest(i, divide)}");
+                    // Generates a list of legal moves
+                    List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
+
+                    // initializes local counters
+                    long lNodeTotal = 0;
+                    int lCaptures = 0;
+                    int lEp = 0;
+                    int lCastles = 0;
+                    int lPromations = 0;
+                    int lChecks = 0;
+                    int lCheckmates = 0;
+
+                    // Plays all the generated moves and logs the result
+                    foreach (ushort move in legalMoves)
+                    {
+                        // Initiates move type counters
+                        InitMoveTypeCount();
+                        position.MakeMove(move);
+                        long res = PerftTest(i);
+                        lNodeTotal += res;
+                        if (countMoveTypes)
+                        {
+                            Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {res} -- Captures: {captures}, Ep: {ep} -- Castles: {castles} -- Promotions: {promations} -- Checks: {checks} -- Checkmates: {checkmates}");
+                            lCaptures += captures;
+                            lEp += ep;
+                            lCastles += castles;
+                            lPromations += promations;
+                            lChecks += checks;
+                            lCheckmates += checkmates;
+                        }
+                        else
+                        {
+                            Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])} -- Dept: {i} -- Nodes: {PerftTest(i)}");
+                        }
+
+                        position.UnmakeMove(move);
+                    }
+
+                    if (countMoveTypes)
+                    {
+                        Debug.Log($"Total Reports Dept: {i + 1} -- Nodes: {lNodeTotal} -- Captures: {lCaptures}, Ep: {lEp} -- Castles: {lCastles} -- Promotions: {lPromations} -- Checks: {lChecks} -- Checkmates: {lCheckmates}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Total Reports Dept: {i + 1} -- Nodes: {lNodeTotal}");
+                    }
+                    
                 }
             }
 
@@ -202,7 +260,7 @@ namespace Chess.EngineTests
                         position.UnmakeMove(move);
                     }
 
-                    Debug.Log($"Total Reports Dept: {i} -- Nodes: {lNodeTotal} -- Captures: {lCaptures}, Ep: {lEp} -- Castles: {lCastles} -- Promotions: {lPromations} -- Checks: {lChecks} -- Checkmates: {lCheckmates}");
+                    Debug.Log($"Total Reports Dept: {i + 1} -- Nodes: {lNodeTotal} -- Captures: {lCaptures}, Ep: {lEp} -- Castles: {lCastles} -- Promotions: {lPromations} -- Checks: {lChecks} -- Checkmates: {lCheckmates}");
                 }
             }
 
@@ -213,12 +271,11 @@ namespace Chess.EngineTests
         }
 
         // Private recursive pert functions
-        private long PerftTest(int dept, bool divide)
+        private long PerftTest(int dept)
         {
             List<ushort> legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
             int nMoves = legalMoves.Count;
             long nodes = 0;
-            long subNodes;
 
             if (countMoveTypes)
             {
@@ -231,7 +288,7 @@ namespace Chess.EngineTests
             else
             {
                 // If the depth is 1 then the number of moves from the list is returned
-                if (dept == 1 && !divide)
+                if (dept == 1)
                 {
                     return nMoves;
                 }
@@ -243,48 +300,20 @@ namespace Chess.EngineTests
 
 
             // If the report is not detailed
-            if (!divide)
+            for (int i = 0; i < nMoves; i++)
             {
-                for (int i = 0; i < nMoves; i++)
+                // Runs PerftTest
+                position.MakeMove(legalMoves[i]);
+                nodes += PerftTest(dept - 1);
+                // Checks if move classification is enabled
+                if (countMoveTypes)
                 {
-                    // Runs PerftTest
-                    position.MakeMove(legalMoves[i]);
-                    nodes += PerftTest(dept - 1, false);
-                    // Checks if move classification is enabled
-                    if (countMoveTypes)
+                    if (dept == 1)
                     {
-                        if (dept == 1)
-                        {
-                            ClassifeMove(legalMoves[i]);
-                        }
+                        ClassifeMove(legalMoves[i]);
                     }
-                    position.UnmakeMove(legalMoves[i]);
                 }
-            }
-            else // The report is detailed
-            {
-                for (int i = 0; i < nMoves; i++)
-                {
-                    // Saves the result of a PerftTest
-                    position.MakeMove(legalMoves[i]);
-                    subNodes = PerftTest(dept - 1, false);
-                    // Checks if move classification is enabled
-                    if (countMoveTypes)
-                    {
-                        // Classifies the move that was made
-                        if (dept == 0)
-                        {
-                            ClassifeMove(legalMoves[i]);
-                        }
-                    }
-                    position.UnmakeMove(legalMoves[i]);
-
-                    // Logs the resoles of the sub branch test
-                    Debug.Log($"{(Squares)Move.GetFrom(legalMoves[i])}{(Squares)Move.GetTo(legalMoves[i])}: {subNodes}");
-
-                    // Updates the global count
-                    nodes += subNodes;
-                }
+                position.UnmakeMove(legalMoves[i]);
             }
 
             // Returns the total number of nodes
@@ -320,6 +349,10 @@ namespace Chess.EngineTests
                 if (dept == 1)
                 {
                     return nMoves;
+                }
+                else if (dept == 0)
+                {
+                    return 1;
                 }
             }
 
