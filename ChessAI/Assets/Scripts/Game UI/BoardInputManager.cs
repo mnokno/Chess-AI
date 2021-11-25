@@ -335,7 +335,7 @@ namespace Chess.UI
             lastMoveSquares[1].Highlighted(true);
 
             // TESTING 
-            ShowQuiescenceMoves();
+            // ShowQuiescenceMoves();
             // END TESTING
         }
 
