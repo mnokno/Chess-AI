@@ -84,7 +84,21 @@ namespace Chess.EngineTests
             }
         }
 
-        // Start a bulk test
+        // Public quiescence bulk test
+        public void BulkQuiescenceTest(bool onMainThread)
+        {
+            // Runs the quiescence bulk Test
+            if (onMainThread)
+            {
+                StartQuiescenceBulkTest(); // Main thread option
+            }
+            else
+            {
+                Task.Run(() => StartQuiescenceBulkTest()); // New thread option
+            }
+        }
+
+        // Starts a bulk test
         private void StartBulkTest()
         {
             // Creates and start the timer
@@ -199,6 +213,100 @@ namespace Chess.EngineTests
                     
                 }
             }
+
+            // Stops the timer and logs the time elapsed
+            stopwatch.Stop();
+            Debug.Log($"Elapsed time is {stopwatch.ElapsedMilliseconds / 1000f} seconds");
+        }
+
+        // Starts a quiescence bulk test
+        private void StartQuiescenceBulkTest()
+        {
+            // Enables move type counting
+            countMoveTypes = true;
+
+            // Creates and start the timer
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
+            // Reads the .json file to a string
+            string json = File.ReadAllText(Application.streamingAssetsPath + "/QPerft Testing Position.json");
+            // Converts the jsonString to an array of objects
+            QTestPositionCollection qTestPositions = JsonUtility.FromJson<QTestPositionCollection>(json);
+
+            // Counters
+            int passedWithChecks = 0;
+            int passedWithOutChecks = 0;
+            int currentTestNumber = 1;
+            int totalTestsCount = 0;;
+            int totalNumberOfTests = qTestPositions.positions.Length;
+
+            // Runs the perft test for each positions
+            foreach (QTestPosition qTestPosition in qTestPositions.positions)
+            {
+                // Runs the test for each sub-depth 
+                for (int i = 1; i < qTestPosition.depth + 1; i++)
+                {
+                    // Loads the potion
+                    position.LoadFEN(new FEN(qTestPosition.fen));
+                    // Initiates move type counters
+                    InitMoveTypeCount();
+                    // Generates the expected results using normal move generator
+                    long expTestResult = PerftTest(i);
+                    int expCaptures = captures;
+                    int expEp = ep;
+                    int expCastles = castles;
+                    int expPromations = promations;
+                    int expChecks = checks;
+                    int excCheckmates = checkmates;
+
+                    // Acts as reseting counters
+                    InitMoveTypeCount();
+                    // Generates the resoles using quintiles move generator with checks
+                    long testResultChecks = PerftQuiescenceTest(i, true);
+                    int resCapturesChecks = captures;
+                    int resEpChecks = ep;
+                    int resCastlesChecks = castles;
+                    int resPromationsChecks = promations;
+                    int resChecksChecks = checks;
+                    int resCheckmatesChecks = checkmates;
+                    // Checks if the test was passed
+                    bool passedChecks = (testResultChecks <= expTestResult)
+                                     && (resCapturesChecks == expCaptures)
+                                     && (resEpChecks == expEp)
+                                     && (resCastlesChecks == expCastles)
+                                     && (resPromationsChecks == expPromations)
+                                     && (resChecksChecks == expChecks)
+                                     && (resCheckmatesChecks == excCheckmates);
+                    // Logs this test results
+                    Debug.Log($"{(passedChecks ? "PASSED" : "FAILED")} --- Mode: Checks Included --- FEN: \"{qTestPosition.fen}\" -- Depth: {i} -- TestPositionNumber: {currentTestNumber}/{totalNumberOfTests}");
+                    passedWithChecks += passedChecks ? 1 : 0;
+
+                    // Acts as reseting counters
+                    InitMoveTypeCount();
+                    // Generates the resoles using quintiles move generator without checks (no checks)
+                    long testResultNoChecks = PerftQuiescenceTest(i, false);
+                    // Checks if the test was passed
+                    bool passedNoChecks = (testResultNoChecks <= testResultChecks)
+                                     && (captures == expCaptures)
+                                     && (ep == expCaptures)
+                                     && (castles == expCaptures)
+                                     && (promations == expCaptures)
+                                     && (checks <= resChecksChecks)
+                                     && (checkmates <= resCheckmatesChecks);
+                    Debug.Log($"{(passedChecks ? "PASSED" : "FAILED")} --- Mode: Checks Excluded --- FEN: \"{qTestPosition.fen}\" -- Depth: {i} -- TestPositionNumber: {currentTestNumber}/{totalNumberOfTests}");
+                    passedWithOutChecks += passedChecks ? 1 : 0;
+
+                    // Updates total test count
+                    totalTestsCount++;
+                }
+                // Updates the test number
+                currentTestNumber++;
+            }
+
+            // Logs the bulk result
+            Debug.Log($"PASSED WITHOUT CHECKS TESTS: {passedWithOutChecks}/{totalTestsCount}");
+            Debug.Log($"PASSED WITH CHECKS TESTS: {passedWithChecks}/{totalTestsCount}");
 
             // Stops the timer and logs the time elapsed
             stopwatch.Stop();
@@ -462,6 +570,20 @@ namespace Chess.EngineTests
         {
             public int depth;
             public long nodes;
+            public string fen;
+        }
+
+        // Used to parse .json test data
+        [Serializable]
+        private struct QTestPositionCollection
+        {
+            public QTestPosition[] positions;
+        }
+        // Used to parse .json test data
+        [Serializable]
+        private struct QTestPosition
+        {
+            public int depth;
             public string fen;
         }
 
