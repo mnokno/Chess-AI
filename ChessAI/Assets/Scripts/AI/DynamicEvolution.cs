@@ -13,16 +13,18 @@ namespace Chess.Engine
         public Position position;
         public static StaticEvaluation staticEvaluation = new StaticEvaluation();
         public static MoveGenerator moveGenerator = new MoveGenerator();
+        private ChessEngine chessEngine;
 
         #endregion
 
         #region Core
 
-        public int Evaluate(Position position, int searchDepth) 
+        public int Evaluate(Position position, int searchDepth, ChessEngine chessEngine) 
         {
             // Updates position for evaluation
             this.position = position;
-
+            // Saves reference to chess engine
+            this.chessEngine = chessEngine;
             // Returns evaluation
             return AlphaBetaEvaluation(-65536, 65536, searchDepth);
         }
@@ -37,6 +39,7 @@ namespace Chess.Engine
             if (depth == 0)
             {
                 //return staticEvaluation.Evaluate(position);
+                chessEngine.nodes++;
                 return QuiesceAlphaBetaEvaluation(alpha, beta, 0);
             }
 
@@ -48,10 +51,12 @@ namespace Chess.Engine
             {
                 if (position.PlayerInCheck())
                 {
+                    chessEngine.nodes++;
                     return int.MinValue;
                 }
                 else
                 {
+                    chessEngine.nodes++;
                     return 0;
                 }
             }
@@ -65,6 +70,7 @@ namespace Chess.Engine
 
                 if (eval >= beta)
                 {
+                    chessEngine.nodes++;
                     return beta;
                 }
                 if (eval > alpha)
@@ -74,6 +80,7 @@ namespace Chess.Engine
             }
 
             // If beta was never returned alpha is returned
+            chessEngine.nodes++;
             return alpha;
         }
 
@@ -84,6 +91,7 @@ namespace Chess.Engine
 
             if (staticScore >= beta) // Fail soft
             {
+                chessEngine.nodes++;
                 return beta;
             }
             if (staticScore > alpha) // Fail hard
@@ -101,6 +109,7 @@ namespace Chess.Engine
 
                 if (eval >= beta)
                 {
+                    chessEngine.nodes++;
                     return beta;
                 }
                 if (eval > alpha)
@@ -108,6 +117,7 @@ namespace Chess.Engine
                     alpha = eval;
                 }
             }
+            chessEngine.nodes++;
             return alpha;
         }
 

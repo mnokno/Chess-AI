@@ -9,9 +9,16 @@ namespace Chess.Engine
     {
         // Class variables
         #region Class variables
-
+        
+        // Chess engine connections references
         public Position centralPosition;
         public MoveGenerator moveGenerator;
+
+        // Counters
+        public int eval = 0;
+        public long nodes = 0;
+        // Timer
+        public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
         #endregion
 
@@ -44,6 +51,14 @@ namespace Chess.Engine
         // Calculates and returns the best move
         public ushort CalculateBestMove()
         {
+            // Resets counters
+            eval = 0;
+            nodes = 0;
+
+            // Starts a timer
+            stopwatch.Restart();
+            stopwatch.Start();
+
             // Generates all legal moves
             List<ushort> moves = GenerateLegalMoves((byte)(centralPosition.sideToMove ? 0 : 1));
             // Creates variables to keep track of the best move, invalidism is used as a control with the worst score possible
@@ -55,7 +70,7 @@ namespace Chess.Engine
             {
                 centralPosition.MakeMove(move); // Makes the move
                 DynamicEvolution dynamicEvolution = new DynamicEvolution(); // Creates new evaluator
-                int score = dynamicEvolution.Evaluate(centralPosition, 3); // Evaluates the position/this move
+                int score = dynamicEvolution.Evaluate(centralPosition, 3, this); // Evaluates the position/this move
 
                 // Checks if the evaluated move is better then the best found move
                 if (score < bestScore)
@@ -66,7 +81,13 @@ namespace Chess.Engine
        
                 centralPosition.UnmakeMove(move); // Unmakes the tested move
             }
-            return bestMove; // Returns the best move
+
+            // Stops the timer
+            stopwatch.Stop();
+            // Saves the evaluation
+            eval = bestScore;
+            // Returns the best move
+            return bestMove;
         }
 
         #endregion

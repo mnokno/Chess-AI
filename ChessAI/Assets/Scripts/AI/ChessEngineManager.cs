@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Chess.UI;
 using Chess.EngineUtility;
+using System.Threading.Tasks;
 
 namespace Chess.Engine
 {
@@ -11,8 +12,20 @@ namespace Chess.Engine
         // Class variables
         #region
 
+        // Chess engine manager connections references
         public ChessEngine chessEngine;
         public BoardInputManager inputManager;
+
+        // Info labels
+        public TMPro.TextMeshProUGUI evlaText;
+        public TMPro.TextMeshProUGUI nodesText;
+        public TMPro.TextMeshProUGUI timeText;
+        // Used to stop updating info on the labels
+        public bool updateLables = true;
+
+        // Used to play an AI move once its calculated
+        public bool calculated = false;
+        public ushort moveToPlay = 0;
 
         #endregion
 
@@ -23,6 +36,13 @@ namespace Chess.Engine
         void Awake()
         {
             chessEngine = new ChessEngine();
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            StartCoroutine("UpdateInfo");
+            StartCoroutine("CheckForAIMove");
         }
 
         #endregion
@@ -40,11 +60,6 @@ namespace Chess.Engine
         public void MakeMove(ushort move)
         {
             chessEngine.centralPosition.MakeMove(move);
-
-            #region TESTING
-            DynamicEvolution dynamicEvolution = new DynamicEvolution();
-            FindObjectOfType<TMPro.TextMeshProUGUI>().text = $"Eval: {dynamicEvolution.Evaluate(chessEngine.centralPosition, 2)}";
-            #endregion
         }
 
         // Makes an AI generated move
@@ -58,7 +73,7 @@ namespace Chess.Engine
             else
             {
                 // Makes calculated AI move
-                MakeCalculatedAIMove();
+                Task.Run(() => MakeCalculatedAIMove());
             }
         }
 
@@ -78,11 +93,72 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove()
         {
             // Calculates the best move
-            ushort bestMove = chessEngine.CalculateBestMove();
+            moveToPlay = chessEngine.CalculateBestMove();
+            // Sets a flag
+            calculated = true;
+        }
 
-            // Plays the move that the AI thinks is best
-            MakeMove(bestMove);
-            inputManager.MakeAIMove(Move.GetFrom(bestMove), Move.GetTo(bestMove));
+        #endregion
+
+        // Updates search info
+        #region Info Update
+
+        public IEnumerator UpdateInfo()
+        {
+            while (updateLables)
+            {
+                // Updates info
+                evlaText.text = $"Eval: {chessEngine.eval}";
+                nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
+                timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
+
+                // Wait till next info update
+                yield return new WaitForSeconds(1f / 60f);
+            }
+        }
+
+        public string FormatNodeCount(long nodeCount)
+        {
+            if (nodeCount < 1000)
+            {
+                return nodeCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            else if (nodeCount < 1000000)
+            {
+                return nodeCount.ToString("0,.#K", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            else if (nodeCount < 1000000000)
+            {
+                return nodeCount.ToString("0,,.##M", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                return nodeCount.ToString("0,,,.###B", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
+        #endregion
+
+        // Checks if an AI move was calculated
+        #region Play AI move if ready
+
+        public IEnumerator CheckForAIMove()
+        {
+            while (updateLables)
+            {
+                // Updates info
+                if (calculated)
+                {
+                    // Plays the move that the AI thinks is best
+                    MakeMove(moveToPlay);
+                    inputManager.MakeAIMove(Move.GetFrom(moveToPlay), Move.GetTo(moveToPlay));
+                    // Resets the flag
+                    calculated = false;
+                }
+
+                // Wait till next info update
+                yield return new WaitForSeconds(1f / 60f);
+            }
         }
 
         #endregion
