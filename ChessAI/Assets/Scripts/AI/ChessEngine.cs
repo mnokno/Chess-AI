@@ -17,6 +17,7 @@ namespace Chess.Engine
         // Counters
         public int eval = 0;
         public long nodes = 0;
+        public byte maxDepth = 0;
         // Timer
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -54,6 +55,7 @@ namespace Chess.Engine
             // Resets counters
             eval = 0;
             nodes = 0;
+            maxDepth = 0;
 
             // Starts a timer
             stopwatch.Restart();
@@ -70,7 +72,7 @@ namespace Chess.Engine
             {
                 centralPosition.MakeMove(move); // Makes the move
                 DynamicEvolution dynamicEvolution = new DynamicEvolution(); // Creates new evaluator
-                int score = dynamicEvolution.Evaluate(centralPosition, 3, this); // Evaluates the position/this move
+                int score = dynamicEvolution.Evaluate(centralPosition, 5, this); // Evaluates the position/this move
 
                 // Checks if the evaluated move is better then the best found move
                 if (score < bestScore)

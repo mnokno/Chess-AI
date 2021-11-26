@@ -45,6 +45,8 @@ namespace Chess.Engine
 
             // Generates list of all legal moves
             List<ushort> moves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1));
+            MoveOrdering moveOrdering = new MoveOrdering(position);
+            moveOrdering.OrderMoves(moves, moveGenerator);
 
             // Detects checkmates and stalemate
             if (moves.Count == 0)
@@ -86,6 +88,11 @@ namespace Chess.Engine
 
         private int QuiesceAlphaBetaEvaluation(int alpha, int beta, int iteration)
         {
+            // Updates counter for info display
+            if ((iteration + 5) > chessEngine.maxDepth)
+            {
+                chessEngine.maxDepth = (byte)(iteration + 5);
+            }
             // Calculates a static score since a player does not have to make a bad capture, instead of a bad capture a static score is used
             int staticScore = staticEvaluation.Evaluate(position); 
 
@@ -101,7 +108,10 @@ namespace Chess.Engine
 
             // Generates all legal moves
             List<ushort> moves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1), includeQuiet: false, includeChecks: (iteration < iterationCheckCap));
-            foreach(ushort move in moves)
+            MoveOrdering moveOrdering = new MoveOrdering(position);
+            moveOrdering.OrderMoves(moves, moveGenerator);
+
+            foreach (ushort move in moves)
             {
                 position.MakeMove(move);
                 int eval = -QuiesceAlphaBetaEvaluation(-beta, -alpha, (iteration + 1));

@@ -13,7 +13,7 @@ namespace Chess.Engine
         public Position position; // Position to be evaluated
 
         // Stores values associated with piece types [pawn, knight, bishop, rook, queen, king]
-        public int[] pieceValues = new int[6] { 100, 300, 300, 500, 900, 50000 };
+        public static int[] pieceValues = new int[6] { 100, 300, 300, 500, 900, 50000 };
 
         #endregion
 
@@ -56,6 +56,20 @@ namespace Chess.Engine
 
             // Returns evaluation score
             return eval;
+        }
+
+        #endregion
+
+        #region Enums
+
+        public enum PieceType
+        {
+            Pawn = 0,
+            Knight = 1,
+            Bishop = 2,
+            Rook = 3,
+            Queen = 4,
+            King = 5,
         }
 
         #endregion

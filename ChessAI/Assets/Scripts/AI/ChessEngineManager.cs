@@ -20,6 +20,8 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI evlaText;
         public TMPro.TextMeshProUGUI nodesText;
         public TMPro.TextMeshProUGUI timeText;
+        public TMPro.TextMeshProUGUI baseDepthText;
+        public TMPro.TextMeshProUGUI maxDepthText;
         // Used to stop updating info on the labels
         public bool updateLables = true;
 
@@ -111,6 +113,8 @@ namespace Chess.Engine
                 evlaText.text = $"Eval: {chessEngine.eval}";
                 nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
+                baseDepthText.text = "Base Depth: 5";
+                maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
 
                 // Wait till next info update
                 yield return new WaitForSeconds(1f / 60f);
