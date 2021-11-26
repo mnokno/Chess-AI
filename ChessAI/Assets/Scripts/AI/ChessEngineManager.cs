@@ -41,16 +41,17 @@ namespace Chess.Engine
 
             #region TESTING
             DynamicEvolution dynamicEvolution = new DynamicEvolution();
-            FindObjectOfType<TMPro.TextMeshProUGUI>().text = $"Eval: {dynamicEvolution.Evaluate(chessEngine.centralPosition, 1)}";
+            FindObjectOfType<TMPro.TextMeshProUGUI>().text = $"Eval: {dynamicEvolution.Evaluate(chessEngine.centralPosition, 2)}";
             #endregion
         }
 
         public void MakeAIMove()
         {
-            Invoke("MakeAIMoveR", 1f);
+            MakeCalculatedAIMove();
+            //Invoke("MakeRandomAIMove", 1f);
         }
 
-        public void MakeAIMoveR()
+        public void MakeRandomAIMove()
         {
             // Generates all legal moves
             List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
@@ -59,6 +60,32 @@ namespace Chess.Engine
 
             MakeMove(move);
             inputManager.MakeAIMove(Move.GetFrom(move), Move.GetTo(move));
+        }
+
+        public void MakeCalculatedAIMove()
+        {
+            // Generates all legal moves
+            List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
+            // Creates variables to keep track of the best move
+            ushort bestMove = moves[0];
+            int bestScore = int.MaxValue;
+
+            foreach(ushort move in moves)
+            {
+                chessEngine.centralPosition.MakeMove(move);
+                DynamicEvolution dynamicEvolution = new DynamicEvolution();
+                int score = dynamicEvolution.Evaluate(chessEngine.centralPosition, 3);
+                if (score < bestScore)
+                {
+                    bestMove = move;
+                    bestScore = score;
+                }
+                chessEngine.centralPosition.UnmakeMove(move);
+            }
+
+            // Plays the move that the AI thinks is best
+            MakeMove(bestMove);
+            inputManager.MakeAIMove(Move.GetFrom(bestMove), Move.GetTo(bestMove));
         }
 
         #endregion

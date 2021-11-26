@@ -71,7 +71,7 @@ namespace Chess.EngineUtility
             }
             else
             {
-                return SquareAttackedBy(BitOps.BitScanForward(bitboard.pieces[11]), 0);
+                return SquareAttackedBy(BitOps.BitScanForward(bitboard.pieces[12]), 0);
             }
         }
 

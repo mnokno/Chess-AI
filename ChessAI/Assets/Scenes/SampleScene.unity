@@ -709,7 +709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fenString: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-  whiteBottom: 1
+  whiteBottom: 0
   hvh: 1
   whiteHumman: 1
   whiteToMove: 1
