@@ -30,11 +30,13 @@ namespace Chess.Engine
         // Class utilities
         #region Utilities
 
+        // Returns a list of all legal moves
         public List<ushort> GetLegalMoves()
         {
             return chessEngine.moveGenerator.GenerateLegalMoves(chessEngine.centralPosition, (byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
         }
 
+        // Makes a move (it could be a human or AI chosen move)
         public void MakeMove(ushort move)
         {
             chessEngine.centralPosition.MakeMove(move);
@@ -45,43 +47,38 @@ namespace Chess.Engine
             #endregion
         }
 
-        public void MakeAIMove()
+        // Makes an AI generated move
+        public void MakeAIMove(bool random = false)
         {
-            MakeCalculatedAIMove();
-            //Invoke("MakeRandomAIMove", 1f);
+            if (random)
+            {
+                // Makes random AI move
+                MakeRandomAIMove();
+            }
+            else
+            {
+                // Makes calculated AI move
+                MakeCalculatedAIMove();
+            }
         }
 
-        public void MakeRandomAIMove()
+        // Control for the chess AI
+        private void MakeRandomAIMove()
         {
             // Generates all legal moves
             List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
             // Choses a random move
             ushort move = moves[Random.Range(0, moves.Count - 1)];
-
+            // Plays the move
             MakeMove(move);
             inputManager.MakeAIMove(Move.GetFrom(move), Move.GetTo(move));
         }
 
-        public void MakeCalculatedAIMove()
+        // Makes a calculated move
+        private void MakeCalculatedAIMove()
         {
-            // Generates all legal moves
-            List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
-            // Creates variables to keep track of the best move
-            ushort bestMove = moves[0];
-            int bestScore = int.MaxValue;
-
-            foreach(ushort move in moves)
-            {
-                chessEngine.centralPosition.MakeMove(move);
-                DynamicEvolution dynamicEvolution = new DynamicEvolution();
-                int score = dynamicEvolution.Evaluate(chessEngine.centralPosition, 3);
-                if (score < bestScore)
-                {
-                    bestMove = move;
-                    bestScore = score;
-                }
-                chessEngine.centralPosition.UnmakeMove(move);
-            }
+            // Calculates the best move
+            ushort bestMove = chessEngine.CalculateBestMove();
 
             // Plays the move that the AI thinks is best
             MakeMove(bestMove);

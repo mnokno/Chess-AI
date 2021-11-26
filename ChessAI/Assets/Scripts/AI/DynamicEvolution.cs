@@ -79,16 +79,19 @@ namespace Chess.Engine
 
         private int QuiesceAlphaBetaEvaluation(int alpha, int beta, int iteration)
         {
-            int stand_pat = staticEvaluation.Evaluate(position);
-            if (stand_pat >= beta)
+            // Calculates a static score since a player does not have to make a bad capture, instead of a bad capture a static score is used
+            int staticScore = staticEvaluation.Evaluate(position); 
+
+            if (staticScore >= beta) // Fail soft
             {
                 return beta;
             }
-            if (stand_pat > alpha)
+            if (staticScore > alpha) // Fail hard
             {
-                alpha = stand_pat;
+                alpha = staticScore;
             }
 
+            // Generates all legal moves
             List<ushort> moves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1), includeQuiet: false, includeChecks: (iteration < iterationCheckCap));
             foreach(ushort move in moves)
             {
