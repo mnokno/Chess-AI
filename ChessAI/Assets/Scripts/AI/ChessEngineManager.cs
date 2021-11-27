@@ -110,10 +110,10 @@ namespace Chess.Engine
             while (updateLables)
             {
                 // Updates info
-                evlaText.text = $"Eval: {chessEngine.eval}";
+                evlaText.text = $"Eval: {chessEngine.eval / 100f}";
                 nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
-                baseDepthText.text = "Base Depth: 5";
+                baseDepthText.text = "Base Depth: 4";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
 
                 // Wait till next info update

@@ -9,8 +9,8 @@ namespace Chess.EngineUtility
 
         private Position position; // Position for which the moves are generated for
         private List<ushort> legalMoves; // List used to store generated legal moves
-        private bool inCheck; // true if the king is checked by at least one pieces
-        private bool inDoubleCheck; // true if the king is checked by at least two pieces
+        public bool inCheck; // true if the king is checked by at least one pieces
+        public bool inDoubleCheck; // true if the king is checked by at least two pieces
         private byte genForColorIndex; // Index of the player that the moves are generated for | 0=white, 1=black
         private byte genForColorIndexInverse; // Index of the player that is attacking the player that the moves are generated for | 0=white, 1=black
         private byte defKingIndex; // Index of the defending side's king

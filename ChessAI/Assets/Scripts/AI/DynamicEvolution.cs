@@ -111,6 +111,11 @@ namespace Chess.Engine
             MoveOrdering moveOrdering = new MoveOrdering(position);
             moveOrdering.OrderMoves(moves, moveGenerator);
 
+            if (moveGenerator.inCheck && (moves.Count == 0))
+            {
+                return int.MinValue;
+            }
+
             foreach (ushort move in moves)
             {
                 position.MakeMove(move);
