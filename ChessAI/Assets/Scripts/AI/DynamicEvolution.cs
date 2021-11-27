@@ -26,7 +26,7 @@ namespace Chess.Engine
             // Saves reference to chess engine
             this.chessEngine = chessEngine;
             // Returns evaluation
-            return AlphaBetaEvaluation(-65536, 65536, searchDepth);
+            return AlphaBetaEvaluation(-65536 * 8, 65536 * 8, searchDepth);
         }
 
         #endregion
