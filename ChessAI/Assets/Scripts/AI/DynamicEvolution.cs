@@ -26,7 +26,7 @@ namespace Chess.Engine
             // Saves reference to chess engine
             this.chessEngine = chessEngine;
             // Returns evaluation
-            return AlphaBetaEvaluation(-65536 * 8, 65536 * 8, searchDepth);
+            return AlphaBetaEvaluation(Constants.negativeInfinity, Constants.positiveInfinity, searchDepth);
         }
 
         #endregion
@@ -54,7 +54,7 @@ namespace Chess.Engine
                 if (position.PlayerInCheck())
                 {
                     chessEngine.nodes++;
-                    return int.MinValue;
+                    return Constants.negativeInfinity;
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace Chess.Engine
 
             if (moveGenerator.inCheck && (moves.Count == 0))
             {
-                return int.MinValue;
+                return Constants.negativeInfinity;
             }
 
             foreach (ushort move in moves)

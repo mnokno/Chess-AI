@@ -18,6 +18,7 @@ namespace Chess.Engine
         public int eval = 0;
         public long nodes = 0;
         public byte maxDepth = 0;
+        public string moveString = "";
         // Timer
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -64,8 +65,8 @@ namespace Chess.Engine
             // Generates all legal moves
             List<ushort> moves = GenerateLegalMoves((byte)(centralPosition.sideToMove ? 0 : 1));
             // Creates variables to keep track of the best move, invalidism is used as a control with the worst score possible
-            ushort bestMove = 0; // Invalid move (if never gets returned)
-            int bestScore = int.MaxValue; // worst possible score
+            ushort bestMove = 0; // Invalid move (gets returned when a side is in a checkmate)
+            int bestScore = Constants.positiveInfinity; // worst possible score
 
             // tests each generated move
             foreach (ushort move in moves)
@@ -86,8 +87,9 @@ namespace Chess.Engine
 
             // Stops the timer
             stopwatch.Stop();
-            // Saves the evaluation
+            // Saves the evaluation, and move made
             eval = bestScore;
+            moveString = ((SquareCentric.Squares)Move.GetFrom(bestMove)).ToString() + ((SquareCentric.Squares)Move.GetTo(bestMove)).ToString(); 
             // Returns the best move
             return bestMove;
         }

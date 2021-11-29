@@ -22,6 +22,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI timeText;
         public TMPro.TextMeshProUGUI baseDepthText;
         public TMPro.TextMeshProUGUI maxDepthText;
+        public TMPro.TextMeshProUGUI moveText;
         // Used to stop updating info on the labels
         public bool updateLables = true;
 
@@ -115,6 +116,7 @@ namespace Chess.Engine
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
                 baseDepthText.text = "Base Depth: 4";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
+                moveText.text = $"Move: {chessEngine.moveString}";
 
                 // Wait till next info update
                 yield return new WaitForSeconds(1f / 60f);
