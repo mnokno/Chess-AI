@@ -114,7 +114,7 @@ namespace Chess.Engine
                 evlaText.text = $"Eval: {chessEngine.eval / 100f}";
                 nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
-                baseDepthText.text = "Base Depth: 4";
+                baseDepthText.text = "Base Depth: 5";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
                 moveText.text = $"Move: {chessEngine.moveString}";
 

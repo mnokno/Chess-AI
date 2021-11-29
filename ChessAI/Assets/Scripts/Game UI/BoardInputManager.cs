@@ -31,18 +31,6 @@ namespace Chess.UI
         // Responsible for board initialization
         #region Initialization
 
-        // Start is called before the first frame update
-        private void Start()
-        {
-            // Checks if the game begins with an AI move
-            if (!parrentBoard.hvh && parrentBoard.whiteHumman != parrentBoard.whiteToMove)
-            {
-                // If so an AI move is played
-                parrentBoard.engineManager.MakeAIMove();
-                parrentBoard.whiteToMove = !parrentBoard.whiteToMove;
-            }
-        }
-
         // Awake is called before Start
         void Awake()
         {

@@ -65,6 +65,13 @@ namespace Chess.UI
             inputManager.LoadFEN(fen);
             // Loads position for the engine manager
             engineManager.chessEngine.LoadFEN(fen);
+
+            // Checks if the game begins with an AI move
+            if (!hvh && whiteHumman != whiteToMove)
+            {
+                // If so an AI move is played
+                engineManager.MakeAIMove();
+            }
         }
 
         // Generates board interface
