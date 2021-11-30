@@ -28,7 +28,7 @@ namespace Chess.EngineUtility
         #region Class utilities
 
         // Generates pseudo random numbers and writes them to a .txt file
-        private static void WriteRandomNumbers()
+        public static void WriteRandomNumbers()
         {
             pseudoRandomNumberGenerator = new System.Random(seed); // Ensures the correct seed is used
             string randomNumbers = ""; // Stores the random numbers, later written to a .txt file

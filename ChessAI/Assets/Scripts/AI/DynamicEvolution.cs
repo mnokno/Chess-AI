@@ -14,6 +14,7 @@ namespace Chess.Engine
         public static StaticEvaluation staticEvaluation = new StaticEvaluation();
         public static MoveGenerator moveGenerator = new MoveGenerator();
         private ChessEngine chessEngine;
+        public int coreDepthSearch;
 
         #endregion
 
@@ -25,6 +26,8 @@ namespace Chess.Engine
             this.position = position;
             // Saves reference to chess engine
             this.chessEngine = chessEngine;
+            // Save base depth
+            coreDepthSearch = searchDepth;
             // Returns evaluation
             return AlphaBetaEvaluation(Constants.negativeInfinity, Constants.positiveInfinity, searchDepth);
         }
@@ -35,12 +38,29 @@ namespace Chess.Engine
 
         private int AlphaBetaEvaluation(int alpha, int beta, int depth)
         {
+            // Used to store eval 
+            int score;
+            // Used to determine node type
+            TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.alphaCutoff;
+
+            // Checks if the evaluation for this position can be fetched from the transposition table
+            int transpositionScore = chessEngine.mainTranspositionTable.LookupEvaluation((byte)depth, alpha, beta);
+            if (transpositionScore != TranspositionTable.LookupFailed)
+            {
+                chessEngine.nodes++;
+                chessEngine.transpositiontableHits++;
+                return transpositionScore;
+            }
+
             // Checks if the root of the basic search was reached
             if (depth == 0)
             {
                 //return staticEvaluation.Evaluate(position);
                 chessEngine.nodes++;
-                return QuiesceAlphaBetaEvaluation(alpha, beta, 0);
+                score = QuiesceAlphaBetaEvaluation(alpha, beta, 0);
+                // Saves the result to transposition table
+                chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, score, 0);
+                return score;
             }
 
             // Generates list of all legal moves
@@ -54,11 +74,15 @@ namespace Chess.Engine
                 if (position.PlayerInCheck())
                 {
                     chessEngine.nodes++;
+                    // Saves the result to transposition table
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, Constants.negativeInfinity, 0);
                     return Constants.negativeInfinity;
                 }
                 else
                 {
                     chessEngine.nodes++;
+                    // Saves the result to transposition table
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, 0, 0);
                     return 0;
                 }
             }
@@ -72,15 +96,20 @@ namespace Chess.Engine
 
                 if (eval >= beta)
                 {
+                    // Saves the result to transposition table
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.betaCutoff, beta, move);
                     chessEngine.nodes++;
                     return beta;
                 }
                 if (eval > alpha)
                 {
+                    nodeType = TranspositionTable.NodeType.exact;
                     alpha = eval;
                 }
             }
 
+            // Saves the result to transposition table
+            chessEngine.mainTranspositionTable.AddEntry((byte)depth, nodeType, alpha, 0);
             // If beta was never returned alpha is returned
             chessEngine.nodes++;
             return alpha;

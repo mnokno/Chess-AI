@@ -23,6 +23,8 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI baseDepthText;
         public TMPro.TextMeshProUGUI maxDepthText;
         public TMPro.TextMeshProUGUI moveText;
+        public TMPro.TextMeshProUGUI transpositiontableHitsText;
+
         // Used to stop updating info on the labels
         public bool updateLables = true;
 
@@ -76,7 +78,8 @@ namespace Chess.Engine
             else
             {
                 // Makes calculated AI move
-                Task.Run(() => MakeCalculatedAIMove());
+                //Task.Run(() => MakeCalculatedAIMove());
+                MakeCalculatedAIMove();
             }
         }
 
@@ -117,6 +120,7 @@ namespace Chess.Engine
                 baseDepthText.text = "Base Depth: 5";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
                 moveText.text = $"Move: {chessEngine.moveString}";
+                transpositiontableHitsText.text = $"TT Hits: {chessEngine.transpositiontableHits}";
 
                 // Wait till next info update
                 yield return new WaitForSeconds(1f / 60f);

@@ -14,11 +14,17 @@ namespace Chess.Engine
         public Position centralPosition;
         public MoveGenerator moveGenerator;
 
+        // Transposition tables settings
+        public ulong mainTransTableSize = 640000;
+        // Transposition tables
+        public TranspositionTable mainTranspositionTable;
+
         // Counters
         public int eval = 0;
         public long nodes = 0;
         public byte maxDepth = 0;
         public string moveString = "";
+        public int transpositiontableHits = 0;
         // Timer
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -31,6 +37,7 @@ namespace Chess.Engine
         {
             centralPosition = new Position(); // Creates new central position
             moveGenerator = new MoveGenerator(); // Creates new move generators
+            mainTranspositionTable = new TranspositionTable(mainTransTableSize, centralPosition); // Creates new transposition table
         }
 
         #endregion
@@ -53,14 +60,15 @@ namespace Chess.Engine
         // Calculates and returns the best move
         public ushort CalculateBestMove()
         {
+            // Starts a timer
+            stopwatch.Restart();
+            stopwatch.Start();
+
             // Resets counters
             eval = 0;
             nodes = 0;
             maxDepth = 0;
-
-            // Starts a timer
-            stopwatch.Restart();
-            stopwatch.Start();
+            transpositiontableHits = 0;
 
             // Generates all legal moves
             List<ushort> moves = GenerateLegalMoves((byte)(centralPosition.sideToMove ? 0 : 1));

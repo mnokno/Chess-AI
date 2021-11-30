@@ -26,6 +26,9 @@ namespace Chess.EngineUtility
             // Saves parameters
             this.size = size;
             this.position = position;
+            // Initializes an empty table
+            entries = new HashEntry[size];
+            Clear();
         }
 
         #endregion
@@ -48,8 +51,13 @@ namespace Chess.EngineUtility
             // Calculates the index
             ulong index = GetIndex();
             // Only adds this entry if its evaluated to a greater depth then the currently stored location
-            if (depth > entries[index].depth)
+            if (depth >= entries[index].depth)
             {
+                if (entries[index].key == position.zobristKey)
+                {
+                    Debug.Log("Here");
+
+                }
                 entries[index] = new HashEntry(position.zobristKey, depth, nodeType, score, move);
             }
         }
@@ -77,11 +85,11 @@ namespace Chess.EngineUtility
                     }
                     else if (entry.nodeType == NodeType.alphaCutoff && entry.score <= alpha)
                     {
-                        return entry.score;
+                        return alpha;
                     }
                     else if (entry.score >= beta) // The node type has to be NodeType.betaCutoff
                     {
-                        return entry.score;
+                        return beta;
                     }
                 }
             }
@@ -110,7 +118,6 @@ namespace Chess.EngineUtility
             public readonly int score;
             public readonly ushort move;
 
-            // Struct constructor
             public HashEntry(ulong key, byte depth, NodeType nodeType, int score, ushort move)
             {
                 this.key = key;
