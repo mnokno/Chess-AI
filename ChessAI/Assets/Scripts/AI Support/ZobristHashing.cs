@@ -130,7 +130,7 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        // Incremental zobrist key update functions
+        // Incremental zobrist key update functions so
         #region Incremental update
 
         // Standard move

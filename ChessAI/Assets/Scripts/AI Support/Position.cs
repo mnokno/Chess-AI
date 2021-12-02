@@ -327,7 +327,7 @@ namespace Chess.EngineUtility
             byte capturedPiece = HistoricMove.GetCapturedPiece(moveHistoricData); // Get captured piece, set to 10 if no pieces are captured
             sideToMove = !sideToMove; // Updates side to move
 
-            boardStateHistory.Pop(); // Removes this make from the move history
+            boardStateHistory.Pop(); // Removes this move from the move history
             BitboardUtility.UnmakeMove(ref bitboard, flag, from, to, sideToMove, pieceToMove: movedPiece, pieceToTake: capturedPiece, promoteTo: promotedTo); // Unmakes the move on a bitboard
             SquareCentricUtility.UnmakeMove(ref squareCentric, flag, from, to, sideToMove, pieceToMove: movedPiece, pieceToTake: capturedPiece); // Unmakes the move on a square centric
             

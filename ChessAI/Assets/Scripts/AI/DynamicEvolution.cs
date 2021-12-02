@@ -44,7 +44,7 @@ namespace Chess.Engine
             TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.alphaCutoff;
 
             // Checks if the evaluation for this position can be fetched from the transposition table
-            int transpositionScore = chessEngine.mainTranspositionTable.LookupEvaluation((byte)depth, alpha, beta);
+            int transpositionScore = chessEngine.mainTranspositionTable.LookupEvaluation((byte)depth, alpha, beta, position.zobristKey);
             if (transpositionScore != TranspositionTable.LookupFailed)
             {
                 chessEngine.nodes++;
@@ -59,7 +59,7 @@ namespace Chess.Engine
                 chessEngine.nodes++;
                 score = QuiesceAlphaBetaEvaluation(alpha, beta, 0);
                 // Saves the result to transposition table
-                chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, score, 0);
+                chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, score, 0, position.zobristKey);
                 return score;
             }
 
@@ -75,14 +75,14 @@ namespace Chess.Engine
                 {
                     chessEngine.nodes++;
                     // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, Constants.negativeInfinity, 0);
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, Constants.negativeInfinity, 0, position.zobristKey);
                     return Constants.negativeInfinity;
                 }
                 else
                 {
                     chessEngine.nodes++;
                     // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, 0, 0);
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, 0, 0, position.zobristKey);
                     return 0;
                 }
             }
@@ -97,7 +97,7 @@ namespace Chess.Engine
                 if (eval >= beta)
                 {
                     // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.betaCutoff, beta, move);
+                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.betaCutoff, beta, move, position.zobristKey);
                     chessEngine.nodes++;
                     return beta;
                 }
@@ -109,7 +109,7 @@ namespace Chess.Engine
             }
 
             // Saves the result to transposition table
-            chessEngine.mainTranspositionTable.AddEntry((byte)depth, nodeType, alpha, 0);
+            chessEngine.mainTranspositionTable.AddEntry((byte)depth, nodeType, alpha, 0, position.zobristKey);
             // If beta was never returned alpha is returned
             chessEngine.nodes++;
             return alpha;

@@ -37,7 +37,7 @@ namespace Chess.Engine
         {
             centralPosition = new Position(); // Creates new central position
             moveGenerator = new MoveGenerator(); // Creates new move generators
-            mainTranspositionTable = new TranspositionTable(mainTransTableSize, centralPosition); // Creates new transposition table
+            mainTranspositionTable = new TranspositionTable(mainTransTableSize); // Creates new transposition table
         }
 
         #endregion

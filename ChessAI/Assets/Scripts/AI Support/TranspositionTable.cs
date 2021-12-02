@@ -12,8 +12,6 @@ namespace Chess.EngineUtility
         public HashEntry[] entries;
         // Size of the hash table
         public readonly ulong size;
-        // Reference to the board, when a new move is added this board reference is used to get the zobrist hash for the current position
-        public readonly Position position;
         // This constant is returned if evaluation lookup failed (the position was not found in the table)
         public const int LookupFailed = -2000000000;
 
@@ -21,11 +19,10 @@ namespace Chess.EngineUtility
 
         #region Constructor
 
-        public TranspositionTable(ulong size, Position position)
+        public TranspositionTable(ulong size)
         {
             // Saves parameters
             this.size = size;
-            this.position = position;
             // Initializes an empty table
             entries = new HashEntry[size];
             Clear();
@@ -46,35 +43,28 @@ namespace Chess.EngineUtility
         }
 
         // Adds entry to the hash table
-        public void AddEntry(byte depth, NodeType nodeType, int score, ushort move)
+        public void AddEntry(byte depth, NodeType nodeType, int score, ushort move, ulong zobristKey)
         {
             // Calculates the index
-            ulong index = GetIndex();
+            ulong index = zobristKey % size;
+            if (entries[index].key == zobristKey)
+            {
+                Debug.Log($"Key collision TYPE 1, {entries[index].depth < depth}");
+            }
             // Only adds this entry if its evaluated to a greater depth then the currently stored location
             if (depth >= entries[index].depth)
             {
-                if (entries[index].key == position.zobristKey)
-                {
-                    Debug.Log("Here");
-
-                }
-                entries[index] = new HashEntry(position.zobristKey, depth, nodeType, score, move);
+                entries[index] = new HashEntry(zobristKey, depth, nodeType, score, move);
             }
         }
 
-        // Gets entry from the hash table
-        public HashEntry GetEntry()
-        {
-            return entries[GetIndex()];
-        }
-
-        public int LookupEvaluation(byte depth, int alpha, int beta)
+        public int LookupEvaluation(byte depth, int alpha, int beta, ulong zobristKey)
         {
             // Fetches the value from the array
-            HashEntry entry = entries[GetIndex()];
+            HashEntry entry = entries[zobristKey % size];
 
             // Checks if the correct entry was found
-            if (entry.key == position.zobristKey)
+            if (entry.key == zobristKey)
             {
                 // Check if the evaluation up to date of the stored position (the evaluation cant be used if it was evaluated at a lower depth)
                 if (entry.depth >= depth)
@@ -97,13 +87,6 @@ namespace Chess.EngineUtility
             // The lookup was failed
             return LookupFailed;
         }
-
-        // Returns index corresponding to current position on the board
-        public ulong GetIndex()
-        {
-            return position.zobristKey % size;
-        }
-
 
         #endregion
 
