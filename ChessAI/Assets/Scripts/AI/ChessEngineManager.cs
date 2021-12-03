@@ -24,6 +24,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI maxDepthText;
         public TMPro.TextMeshProUGUI moveText;
         public TMPro.TextMeshProUGUI transpositiontableHitsText;
+        public TMPro.TextMeshProUGUI zobristHashText;
 
         // Used to stop updating info on the labels
         public bool updateLables = true;
@@ -46,8 +47,11 @@ namespace Chess.Engine
         // Start is called before the first frame update
         void Start()
         {
+            // Starts coroutines
             StartCoroutine("UpdateInfo");
             StartCoroutine("CheckForAIMove");
+            // Updates display info
+            zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
         }
 
         #endregion
@@ -64,7 +68,10 @@ namespace Chess.Engine
         // Makes a move (it could be a human or AI chosen move)
         public void MakeMove(ushort move)
         {
+            // Makes the move
             chessEngine.centralPosition.MakeMove(move);
+            // Updates Zobrist Hash
+            zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
         }
 
         // Makes an AI generated move
@@ -78,8 +85,8 @@ namespace Chess.Engine
             else
             {
                 // Makes calculated AI move
-                //Task.Run(() => MakeCalculatedAIMove());
-                MakeCalculatedAIMove();
+                Task.Run(() => MakeCalculatedAIMove());
+                //MakeCalculatedAIMove();
             }
         }
 
