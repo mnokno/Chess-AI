@@ -67,11 +67,24 @@ namespace Chess.EngineUtility
             return log;
         }
 
+        // Compares tow bitboards
+        public static bool CompareBitboard(Bitboard aBB, Bitboard bBB)
+        {
+            for (int i = 0; i < aBB.pieces.Length; i++)
+            {
+                if (aBB.pieces[i] != bBB.pieces[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         #endregion
 
         // Bitboard combined move functions
         #region Bitboard combined move functions
-        
+
         /// Makes a move on a bitboard
         public static void MakeMove(ref Bitboard bitboard, ushort flag, ushort from, ushort to, bool sideToMove, byte pieceToMove=10, byte pieceToTake=10, byte promoteTo=10)
         {
