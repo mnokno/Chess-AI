@@ -61,7 +61,7 @@ namespace Chess.Engine
             {
                 //return staticEvaluation.Evaluate(position);
                 chessEngine.nodes++;
-                return QuiesceAlphaBetaEvaluation(alpha, beta, 0); ;
+                return QuiesceAlphaBetaEvaluation(alpha, beta, 0);
             }
 
             // Generates list of all legal moves
@@ -138,6 +138,7 @@ namespace Chess.Engine
             MoveOrdering moveOrdering = new MoveOrdering(position);
             moveOrdering.OrderMoves(moves, moveGenerator);
 
+            // Checks for check mates
             if (moveGenerator.inCheck && (moves.Count == 0))
             {
                 return Constants.negativeInfinity;

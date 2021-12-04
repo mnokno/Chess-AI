@@ -106,7 +106,7 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove()
         {
             // Calculates the best move
-            moveToPlay = chessEngine.CalculateBestMove(10);
+            moveToPlay = chessEngine.CalculateBestMove(5);
             // Sets a flag
             calculated = true;
         }

@@ -99,7 +99,6 @@ namespace Chess.Engine
             // Stops the timer
             stopwatch.Stop();
             // Returns the best move found
-            Debug.Log("GERE");
             return bestMove;
         }
 
@@ -125,6 +124,12 @@ namespace Chess.Engine
             // tests each generated move
             foreach (ushort move in moves)
             {
+                // Check if the search was canceled
+                if (cancelSearch)
+                {
+                    return 0;
+                }
+
                 centralPosition.MakeMove(move); // Makes the move
                 int score = dynamicEvolution.Evaluate(centralPosition, depth - 1, this); // Evaluates the position/this move
 
