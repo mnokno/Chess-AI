@@ -43,18 +43,18 @@ namespace Chess.EngineUtility
         }
 
         // Adds entry to the hash table
-        public void AddEntry(byte depth, NodeType nodeType, int score, ushort move, ulong zobristKey)
+        public void AddEntry(byte depth, NodeType nodeType, int score, ushort move, ulong zobristKey, Bitboard bitboard) // FOR TESTING , Bitboard bitboard
         {
             // Calculates the index
             ulong index = zobristKey % size;
             if (entries[index].key == zobristKey)
             {
-                Debug.Log($"Key collision TYPE 1, {entries[index].depth < depth}");
+                Debug.Log($"Key collision TYPE 1, Higher Depth: {entries[index].depth < depth}, Same Position: {BitboardUtility.CompareBitboard(bitboard, entries[index].bitboard)}");
             }
             // Only adds this entry if its evaluated to a greater depth then the currently stored location
             if (depth >= entries[index].depth)
             {
-                entries[index] = new HashEntry(zobristKey, depth, nodeType, score, move);
+                entries[index] = new HashEntry(zobristKey, depth, nodeType, score, move, bitboard); // FOR TESTING , bitboard
             }
         }
 
@@ -100,14 +100,16 @@ namespace Chess.EngineUtility
             public readonly NodeType nodeType;
             public readonly int score;
             public readonly ushort move;
+            public readonly Bitboard bitboard; // FOR TESTING
 
-            public HashEntry(ulong key, byte depth, NodeType nodeType, int score, ushort move)
+            public HashEntry(ulong key, byte depth, NodeType nodeType, int score, ushort move, Bitboard bitboard) // FOR TESTING (, Bitboard bitboard)
             {
                 this.key = key;
                 this.depth = depth;
                 this.nodeType = nodeType;
                 this.score = score;
                 this.move = move;
+                this.bitboard = bitboard; // FRO TESTING
             }
         } 
 

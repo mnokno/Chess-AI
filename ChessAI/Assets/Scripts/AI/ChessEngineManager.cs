@@ -106,7 +106,7 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove()
         {
             // Calculates the best move
-            moveToPlay = chessEngine.CalculateBestMove();
+            moveToPlay = chessEngine.CalculateBestMove(10);
             // Sets a flag
             calculated = true;
         }
@@ -124,7 +124,7 @@ namespace Chess.Engine
                 evlaText.text = $"Eval: {chessEngine.eval / 100f}";
                 nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
-                baseDepthText.text = "Base Depth: 5";
+                baseDepthText.text = $"Base Depth: {chessEngine.currentBaseDepht - 1}";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
                 moveText.text = $"Move: {chessEngine.moveString}";
                 transpositiontableHitsText.text = $"TT Hits: {chessEngine.transpositiontableHits}";

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Chess.EngineUtility;
+using System.Threading.Tasks;
+using System;
 
 namespace Chess.Engine
 {
@@ -15,9 +17,11 @@ namespace Chess.Engine
         public MoveGenerator moveGenerator;
 
         // Transposition tables settings
-        public ulong mainTransTableSize = 640000;
+        public ulong mainTransTableSize = 64000;
         // Transposition tables
         public TranspositionTable mainTranspositionTable;
+        // Creates new evaluator instance
+        public DynamicEvolution dynamicEvolution = new DynamicEvolution(); 
 
         // Counters
         public int eval = 0;
@@ -27,6 +31,12 @@ namespace Chess.Engine
         public int transpositiontableHits = 0;
         // Timer
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
+        // Used for progressive depth search
+        public ushort bestMove = ushort.MaxValue; // Set initially to an invalid move
+        public ushort previousBestMove = ushort.MaxValue; // Set initially to an invalid move
+        public byte currentBaseDepht = 0;
+        private bool cancelSearch = false;
 
         #endregion
 
@@ -57,19 +67,55 @@ namespace Chess.Engine
             centralPosition.LoadFEN(fen);
         }
 
-        // Calculates and returns the best move
-        public ushort CalculateBestMove()
+        // Calculate best move in the given time limit 
+        public ushort CalculateBestMove(float timeLimit)
         {
+            // Resets flag, and parameters
+            cancelSearch = false;
+            currentBaseDepht = 1;
+            // Schedules task cancellation
+            CancelSearch(timeLimit);
             // Starts a timer
             stopwatch.Restart();
             stopwatch.Start();
-
             // Resets counters
             eval = 0;
             nodes = 0;
             maxDepth = 0;
             transpositiontableHits = 0;
 
+            while (!cancelSearch)
+            {
+                // Calculates best move at current depth
+                ushort move = CalculateBestMove(currentBaseDepht);
+                if (!cancelSearch)
+                {
+                    previousBestMove = bestMove;
+                    bestMove = move;
+                    currentBaseDepht++;
+                }
+            }
+
+            // Stops the timer
+            stopwatch.Stop();
+            // Returns the best move found
+            Debug.Log("GERE");
+            return bestMove;
+        }
+
+        // Stops the search
+        public async void CancelSearch(float delay)
+        {
+            // Waits the time delay
+            await Task.Delay(TimeSpan.FromSeconds(delay));
+            // Cancels the search
+            dynamicEvolution.CancelSearch();
+            cancelSearch = true;
+        }
+
+        // Calculates and returns the best move, depth need to be at least 1
+        private ushort CalculateBestMove(byte depth)
+        {
             // Generates all legal moves
             List<ushort> moves = GenerateLegalMoves((byte)(centralPosition.sideToMove ? 0 : 1));
             // Creates variables to keep track of the best move, invalidism is used as a control with the worst score possible
@@ -80,8 +126,7 @@ namespace Chess.Engine
             foreach (ushort move in moves)
             {
                 centralPosition.MakeMove(move); // Makes the move
-                DynamicEvolution dynamicEvolution = new DynamicEvolution(); // Creates new evaluator
-                int score = dynamicEvolution.Evaluate(centralPosition, 4, this); // Evaluates the position/this move
+                int score = dynamicEvolution.Evaluate(centralPosition, depth - 1, this); // Evaluates the position/this move
 
                 // Checks if the evaluated move is better then the best found move
                 if (score < bestScore)
@@ -93,8 +138,6 @@ namespace Chess.Engine
                 centralPosition.UnmakeMove(move); // Unmakes the tested move
             }
 
-            // Stops the timer
-            stopwatch.Stop();
             // Saves the evaluation, and move made
             eval = bestScore;
             moveString = ((SquareCentric.Squares)Move.GetFrom(bestMove)).ToString() + ((SquareCentric.Squares)Move.GetTo(bestMove)).ToString(); 

@@ -9,12 +9,17 @@ namespace Chess.Engine
     {
         #region Class variables
 
+        // Checks after this depth will not be examined in quiesce search
         public int iterationCheckCap = 10;
+        // Position to be evaluated
         public Position position;
         public static StaticEvaluation staticEvaluation = new StaticEvaluation();
         public static MoveGenerator moveGenerator = new MoveGenerator();
         private ChessEngine chessEngine;
+        // Depth for which all the node are search
         public int coreDepthSearch;
+        // Used to cancel a search
+        private bool cancelSearch = false;
 
         #endregion
 
@@ -28,8 +33,15 @@ namespace Chess.Engine
             this.chessEngine = chessEngine;
             // Save base depth
             coreDepthSearch = searchDepth;
+            // Retest cancellation flag
+            cancelSearch = false;
             // Returns evaluation
             return AlphaBetaEvaluation(Constants.negativeInfinity, Constants.positiveInfinity, searchDepth);
+        }
+
+        public void CancelSearch()
+        {
+            cancelSearch = true;
         }
 
         #endregion
@@ -38,18 +50,10 @@ namespace Chess.Engine
 
         private int AlphaBetaEvaluation(int alpha, int beta, int depth)
         {
-            // Used to store eval 
-            int score;
-            // Used to determine node type
-            TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.alphaCutoff;
-
-            // Checks if the evaluation for this position can be fetched from the transposition table
-            int transpositionScore = chessEngine.mainTranspositionTable.LookupEvaluation((byte)depth, alpha, beta, position.zobristKey);
-            if (transpositionScore != TranspositionTable.LookupFailed)
+            // Checks if the search was canceled
+            if (cancelSearch)
             {
-                chessEngine.nodes++;
-                chessEngine.transpositiontableHits++;
-                return transpositionScore;
+                return 0;
             }
 
             // Checks if the root of the basic search was reached
@@ -57,10 +61,7 @@ namespace Chess.Engine
             {
                 //return staticEvaluation.Evaluate(position);
                 chessEngine.nodes++;
-                score = QuiesceAlphaBetaEvaluation(alpha, beta, 0);
-                // Saves the result to transposition table
-                chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, score, 0, position.zobristKey);
-                return score;
+                return QuiesceAlphaBetaEvaluation(alpha, beta, 0); ;
             }
 
             // Generates list of all legal moves
@@ -74,15 +75,11 @@ namespace Chess.Engine
                 if (position.PlayerInCheck())
                 {
                     chessEngine.nodes++;
-                    // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, Constants.negativeInfinity, 0, position.zobristKey);
                     return Constants.negativeInfinity;
                 }
                 else
                 {
                     chessEngine.nodes++;
-                    // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.exact, 0, 0, position.zobristKey);
                     return 0;
                 }
             }
@@ -96,20 +93,15 @@ namespace Chess.Engine
 
                 if (eval >= beta)
                 {
-                    // Saves the result to transposition table
-                    chessEngine.mainTranspositionTable.AddEntry((byte)depth, TranspositionTable.NodeType.betaCutoff, beta, move, position.zobristKey);
                     chessEngine.nodes++;
                     return beta;
                 }
                 if (eval > alpha)
                 {
-                    nodeType = TranspositionTable.NodeType.exact;
                     alpha = eval;
                 }
             }
 
-            // Saves the result to transposition table
-            chessEngine.mainTranspositionTable.AddEntry((byte)depth, nodeType, alpha, 0, position.zobristKey);
             // If beta was never returned alpha is returned
             chessEngine.nodes++;
             return alpha;
@@ -117,6 +109,12 @@ namespace Chess.Engine
 
         private int QuiesceAlphaBetaEvaluation(int alpha, int beta, int iteration)
         {
+            // Checks if the search was canceled
+            if (cancelSearch)
+            {
+                return 0;
+            }
+
             // Updates counter for info display
             if ((iteration + 5) > chessEngine.maxDepth)
             {

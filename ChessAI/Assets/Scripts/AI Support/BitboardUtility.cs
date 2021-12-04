@@ -67,7 +67,7 @@ namespace Chess.EngineUtility
             return log;
         }
 
-        // Compares tow bitboards
+        // Compares two bitboards
         public static bool CompareBitboard(Bitboard aBB, Bitboard bBB)
         {
             for (int i = 0; i < aBB.pieces.Length; i++)
