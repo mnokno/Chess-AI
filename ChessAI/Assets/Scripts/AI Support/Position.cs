@@ -45,6 +45,7 @@ namespace Chess.EngineUtility
         /// General use functions
         #region General
 
+        // Loads a fen
         public void LoadFEN(FEN fen)
         {
             // Loads information from the FEN string
@@ -75,12 +76,127 @@ namespace Chess.EngineUtility
             }
         }
 
+        // Returns true if a given square is attacked by a givenA side
         public bool SquareAttackedBy(int attackedSquare, int attackerColor)
         {
             PseudoLegalMoveGenerator pseudoLegalMoveGenerator = new PseudoLegalMoveGenerator();
             return pseudoLegalMoveGenerator.SquareAttackedBy(this, attackedSquare, attackerColor);
         }
         #endregion
+
+        // Converts and returns the move history into PGN (Portable Game Notation)
+        public string GetPGN()
+        {
+            // Creates a string that will be progressively created
+            string PGN = "";
+
+            // Adds each move from historicMoveData stack to PGN
+
+
+            // Returns the PGN
+            return PGN;
+        }
+
+        // Returns a FEN string of this position
+        public string GetFEN()
+        {
+            // Creates a string that will be progressively created
+            string FEN = "";
+
+            // Adds position to the FEN string
+            for (int i = 0; i < 8; i++) // For each rank
+            {
+                int blackSpotsCount = 0;
+                string rank = "";
+                for (int j = 0; j < 8; j++) // For each file in that rank
+                {
+                    int currentIndex = ((7 - i) * 8) + j;
+                    if (squareCentric.pieces[currentIndex] == (byte)SquareCentric.PieceType.Empty)
+                    {
+                        blackSpotsCount++;
+                    }
+                    else
+                    {
+                        // Appends black spaces (if there are any)
+                        if (blackSpotsCount != 0)
+                        {
+                            rank += blackSpotsCount.ToString();
+                            blackSpotsCount = 0;
+                        }
+
+                        // Adds the piece symbol
+                        char pieceSymbol;
+                        switch (squareCentric.pieces[currentIndex])
+                        {
+                            case (byte)SquareCentric.PieceType.Pawn:
+                                pieceSymbol = 'p';
+                                break;
+                            case (byte)SquareCentric.PieceType.Knight:
+                                pieceSymbol = 'n';
+                                break;
+                            case (byte)SquareCentric.PieceType.Bishop:
+                                pieceSymbol = 'b';
+                                break;
+                            case (byte)SquareCentric.PieceType.Rook:
+                                pieceSymbol = 'r';
+                                break;
+                            case (byte)SquareCentric.PieceType.Queen:
+                                pieceSymbol = 'q';
+                                break;
+                            default:
+                                pieceSymbol = 'k';
+                                break;
+                        }
+                        pieceSymbol = squareCentric.colors[currentIndex] == (byte)SquareCentric.SquareColor.White ? char.ToUpper(pieceSymbol) : char.ToLower(pieceSymbol);
+                        rank += pieceSymbol.ToString();
+                    }
+                    
+                    // If the rank does not end with a piece
+                    if (j == 7 && blackSpotsCount != 0)
+                    {
+                        rank += blackSpotsCount.ToString();
+                        blackSpotsCount = 0;
+                    }
+                }
+                FEN += rank;
+                FEN += i != 7 ? "/" : "";
+            }
+
+            // Adds side to move
+            FEN += sideToMove ? " w" : " b";
+
+            // Adds castling rights
+            if (castlingRights == 0)
+            {
+                FEN += " -";
+            }
+            else
+            {
+                FEN += " " + ((castlingRights & 0b0100) != 0 ? "K" : "")
+                           + ((castlingRights & 0b1000) != 0 ? "Q" : "") 
+                           + ((castlingRights & 0b0001) != 0 ? "k" : "")
+                           + ((castlingRights & 0b0010) != 0 ? "q" : "");
+            }
+            
+            // Adds en-passant target square
+            if (enPassantTargetFile == 8)
+            {
+                FEN += " -";
+            }
+            else
+            {
+                FEN += sideToMove ? $" {5 * 8 + enPassantTargetFile}" : $" {2 * 8 + enPassantTargetFile}";
+            }
+
+            // Adds half-move clock
+            FEN += $" {halfmoveClock}";
+
+            // Adds full-move counter
+            FEN += $" {historicMoveData.Count}";
+
+            // Return the FEN
+            return FEN;
+        }
 
         /// Used to make and unmake a move
         #region Move

@@ -25,6 +25,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI moveText;
         public TMPro.TextMeshProUGUI transpositiontableHitsText;
         public TMPro.TextMeshProUGUI zobristHashText;
+        public TMPro.TextMeshProUGUI FENText;
 
         // Used to stop updating info on the labels
         public bool updateLables = true;
@@ -52,6 +53,8 @@ namespace Chess.Engine
             StartCoroutine("CheckForAIMove");
             // Updates display info
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
+            // Updates FEN info
+            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
         }
 
         #endregion
@@ -72,6 +75,8 @@ namespace Chess.Engine
             chessEngine.centralPosition.MakeMove(move);
             // Updates Zobrist Hash
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
+            // Updates FEN info
+            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
         }
 
         // Makes an AI generated move
