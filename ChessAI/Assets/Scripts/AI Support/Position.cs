@@ -92,7 +92,6 @@ namespace Chess.EngineUtility
 
             // Adds each move from historicMoveData stack to PGN
 
-
             // Returns the PGN
             return PGN;
         }
