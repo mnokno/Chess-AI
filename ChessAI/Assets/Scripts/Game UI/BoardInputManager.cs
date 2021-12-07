@@ -56,6 +56,12 @@ namespace Chess.UI
         // Update is called once per frame
         void Update()
         {
+            // Exits full screen move
+            if (Input.GetKeyDown(KeyCode.F)) 
+            {
+                Screen.fullScreen = !Screen.fullScreen;
+            }
+
             // Snaps the piece to the mouse location if in dragging mode
             if (movementState == MousePieceMovementState.Dragging)
             {
