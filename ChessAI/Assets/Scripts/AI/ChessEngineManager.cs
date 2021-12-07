@@ -23,6 +23,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI baseDepthText;
         public TMPro.TextMeshProUGUI maxDepthText;
         public TMPro.TextMeshProUGUI moveText;
+        public TMPro.TextMeshProUGUI gameStateText;
         public TMPro.TextMeshProUGUI transpositiontableHitsText;
         public TMPro.TextMeshProUGUI zobristHashText;
         public TMPro.TextMeshProUGUI FENText;
@@ -77,6 +78,8 @@ namespace Chess.Engine
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
             // Updates FEN info
             FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+            // Updates game state
+            gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState.ToString()}";
         }
 
         // Makes an AI generated move

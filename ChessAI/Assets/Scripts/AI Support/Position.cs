@@ -7,7 +7,7 @@ namespace Chess.EngineUtility
 {
     public class Position
     {
-        /// Class variables
+        // Class variables
         #region Class variables
 
         public Bitboard bitboard; // Bitboard board representation for the current position
@@ -18,18 +18,20 @@ namespace Chess.EngineUtility
         public byte enPassantTargetFile; // 0..7 represent a target file, 8 means no target square
         public byte halfmoveClock; // If >= 100 then its draw due to fifty-move rule, resets to 0 after pawn pushes and captures
 
+        public GameState gameState; // Represents the state of the position (on going, someone won, its a draw)
         public ulong zobristKey; // Zobrist key for this position
         public Stack<ulong> boardStateHistory = new Stack<ulong>(); // Stack filled with zobrist keys used to determine three fold rule
         public Stack<uint> historicMoveData = new Stack<uint>(); // Stores information used to unmake a move that can't be restored from a child position
 
         #endregion
 
-        /// Responsible for square initialization
+        // Responsible for square initialization
         #region Initialization
 
-        /// Class constructor
+        // Class constructor
         public Position()
         {
+            this.gameState = GameState.OnGoing;
             this.bitboard = new Bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             this.squareCentric = new SquareCentric("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             this.sideToMove = true;
@@ -42,7 +44,7 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        /// General use functions
+        // General use functions
         #region General
 
         // Loads a fen
@@ -197,10 +199,10 @@ namespace Chess.EngineUtility
             return FEN;
         }
 
-        /// Used to make and unmake a move
+        // Used to make and unmake a move
         #region Move
 
-        /// Makes a move
+        // Makes a move
         public void MakeMove(ushort move)
         {
             // Converts move into parts
@@ -422,11 +424,32 @@ namespace Chess.EngineUtility
                 }
             }
 
+            // Checks for draws
+            if (halfmoveClock >= 100) // Checks fifty move rule
+            {
+                gameState = GameState.FiftyMoveRule;
+            }
+            else if (boardStateHistory.Contains(zobristKey)) // Check for a repetition draw
+            {
+                byte counter = 0;
+                foreach(ulong positionKey in boardStateHistory)
+                {
+                    if (zobristKey == positionKey)
+                    {
+                        counter++;
+                    }
+                }
+                if (counter >= 2)
+                {
+                    gameState = GameState.ThreefoldRepetition;
+                }
+            }
+
             boardStateHistory.Push(zobristKey); // boardStateHistory
             sideToMove = !sideToMove; // Updates side to move
         }
 
-        /// Unmakes a move
+        // Unmakes a move
         public void UnmakeMove(ushort move)
         {
             // Reads historic data
@@ -450,14 +473,15 @@ namespace Chess.EngineUtility
             enPassantTargetFile = HistoricMove.GetEnPassantTargetFile(moveHistoricData); // Updates enPassantTargetFile
             halfmoveClock = HistoricMove.GetHalfmoveClock(moveHistoricData); // Updates halfmoveClock
             zobristKey = boardStateHistory.Peek(); // Updates zobristKey
+            gameState = GameState.OnGoing; // Updates game state
         }
 
         #endregion
 
-        /// Helper functions
+        // Helper functions
         #region Helper functions
 
-        /// Returns piece type to Promote to specified by the flag, returns 10 if its not a proration move
+        // Returns piece type to Promote to specified by the flag, returns 10 if its not a proration move
         public static byte GetPromoteTo(ushort flag)
         {
             if (flag < 8)
@@ -476,22 +500,33 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        /// Structures and enumerations used by this class
+        // Structures and enumerations used by this class
         #region Structures and enumerations
 
-        /// Maps castling direction to a number
+        // Maps castling direction to a number
         public enum CastlingDirection
         {
             QueenSide,
             KingSide
         }
 
-        /// Maps player/piece color to a number
+        // Maps player/piece color to a number
         public enum PlayerColor
         {
             White,
             Black
         }
+
+        // Used to represent the game state
+        public enum GameState
+        {
+            OnGoing = 0,
+            Checkmate = 1,
+            ThreefoldRepetition = 2,
+            FiftyMoveRule = 3,
+            Stalemate = 4
+        }
+
 
         #endregion
     }

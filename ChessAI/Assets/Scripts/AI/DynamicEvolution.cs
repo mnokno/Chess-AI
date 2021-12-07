@@ -56,8 +56,8 @@ namespace Chess.Engine
                 return 0;
             }
 
-            // Detects 50 moves rule
-            if (position.halfmoveClock == 50) 
+            // Checks for draws
+            if (position.gameState != Position.GameState.OnGoing)
             {
                 return 0;
             }
@@ -81,11 +81,13 @@ namespace Chess.Engine
                 if (position.PlayerInCheck())
                 {
                     chessEngine.nodes++;
+                    position.gameState = Position.GameState.Checkmate;
                     return Constants.negativeInfinity;
                 }
                 else
                 {
                     chessEngine.nodes++;
+                    position.gameState = Position.GameState.Stalemate;
                     return 0;
                 }
             }
