@@ -25,7 +25,7 @@ namespace Chess.Engine
 
         #region Core
 
-        public int Evaluate(Position position, int searchDepth, ChessEngine chessEngine) 
+        public int Evaluate(Position position, int searchDepth, ChessEngine chessEngine, int alpha = Constants.negativeInfinity, int beta = Constants.positiveInfinity) 
         {
             // Updates position for evaluation
             this.position = position;
@@ -36,7 +36,7 @@ namespace Chess.Engine
             // Retest cancellation flag
             cancelSearch = false;
             // Returns evaluation
-            return AlphaBetaEvaluation(Constants.negativeInfinity, Constants.positiveInfinity, searchDepth);
+            return AlphaBetaEvaluation(alpha, beta, searchDepth);
         }
 
         public void CancelSearch()
@@ -52,6 +52,12 @@ namespace Chess.Engine
         {
             // Checks if the search was canceled
             if (cancelSearch)
+            {
+                return 0;
+            }
+
+            // Detects 50 moves rule
+            if (position.halfmoveClock == 50) 
             {
                 return 0;
             }

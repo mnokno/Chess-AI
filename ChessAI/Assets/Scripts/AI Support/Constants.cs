@@ -9,8 +9,8 @@ namespace Chess.EngineUtility
         // Class variables
         #region Class variables
 
-        public static readonly int positiveInfinity = 50000000; // Used as infinity but not int.MaxValue to avoid overflows to the signed bit
-        public static readonly int negativeInfinity = -50000000; // Used as -infinity but not int.MaxValue overflows to the signed bit
+        public const int positiveInfinity = 50000000; // Used as infinity but not int.MaxValue to avoid overflows to the signed bit
+        public const int negativeInfinity = -50000000; // Used as -infinity but not int.MaxValue overflows to the signed bit
 
         public static readonly int[] directionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 }; // First 4 are orthogonal, last 4 are diagonals (N, S, W, E, NW, SE, NE, SW)
         public static readonly byte[][] squaresToEdge = new byte[8][]; // Stores number of squares to the edge, use [[N, S, W, E, NW, SE, NE, SW].IndexOf(N)][FromSquareIndex] to retrieve the value

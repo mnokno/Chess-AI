@@ -131,7 +131,7 @@ namespace Chess.Engine
                 }
 
                 centralPosition.MakeMove(move); // Makes the move
-                int score = dynamicEvolution.Evaluate(centralPosition, depth - 1, this); // Evaluates the position/this move
+                int score = dynamicEvolution.Evaluate(centralPosition, depth - 1, this, beta: bestScore); // Evaluates the position/this move
 
                 // Checks if the evaluated move is better then the best found move
                 if (score < bestScore)
