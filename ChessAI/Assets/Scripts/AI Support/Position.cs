@@ -498,7 +498,7 @@ namespace Chess.EngineUtility
                 }
             }
         }
-
+        
         // Returns piece type to Promote to specified by the flag, returns 10 if its not a proration move
         public static byte GetPromoteTo(ushort flag)
         {
