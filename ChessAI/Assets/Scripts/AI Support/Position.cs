@@ -524,7 +524,8 @@ namespace Chess.EngineUtility
             Checkmate = 1,
             ThreefoldRepetition = 2,
             FiftyMoveRule = 3,
-            Stalemate = 4
+            Stalemate = 4,
+            InsufficientMaterial = 5
         }
 
 
