@@ -487,9 +487,9 @@ namespace Chess.EngineUtility
         // Changes game state to insufficient material if the material is insufficient
         public void CheckForInsufficientMaterial()
         {
-            if ((bitboard.pieces[0] | bitboard.pieces[7]) != 0) // if there are no pawns
+            if ((bitboard.pieces[0] | bitboard.pieces[7]) == 0) // if there are no pawns
             {
-                if ((bitboard.pieces[3] | bitboard.pieces[10] | bitboard.pieces[4] | bitboard.pieces[11]) != 0) // if there are rooks or queens
+                if ((bitboard.pieces[3] | bitboard.pieces[10] | bitboard.pieces[4] | bitboard.pieces[11]) == 0) // if there are rooks or queens
                 {
                     if (BitOps.PopulationCount(bitboard.pieces[1] | bitboard.pieces[8] | bitboard.pieces[2] | bitboard.pieces[9]) < 2) // If there is less then two knight and bishops
                     {
