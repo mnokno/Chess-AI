@@ -75,7 +75,7 @@ namespace Chess.Engine
             // Calculates and returns evaluation score
             return PieceSquareTables.CalculateScore(midGameWeight, endGameWeight, position);
         }
-
+        
         // Calculates game phase
         public void CalculateGamePhase()
         {
