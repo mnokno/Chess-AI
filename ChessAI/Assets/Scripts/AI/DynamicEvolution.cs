@@ -20,15 +20,12 @@ namespace Chess.Engine
         public int coreDepthSearch;
         // Used to cancel a search
         private bool cancelSearch = false;
-        // Mate search
-        private bool mateSearch = false;
-        private int fastestMateFound = -1;
 
         #endregion
 
         #region Core
 
-        public int Evaluate(Position position, int searchDepth, ChessEngine chessEngine, int alpha = Constants.negativeInfinity, int beta = Constants.positiveInfinity) 
+        public int Evaluate(Position position, int searchDepth, ChessEngine chessEngine, int alpha = Constants.negativeInfinity, int beta = Constants.positiveInfinity)
         {
             // Updates position for evaluation
             this.position = position;
@@ -38,8 +35,6 @@ namespace Chess.Engine
             coreDepthSearch = searchDepth;
             // Retest cancellation flag and counters
             cancelSearch = false;
-            mateSearch = false;
-            fastestMateFound = -1;
             // Returns evaluation
             return AlphaBetaEvaluation(alpha, beta, searchDepth);
         }
@@ -60,12 +55,6 @@ namespace Chess.Engine
             {
                 return 0;
             }
-
-            // Checks if mate search if enabled
-            //if (mateSearch && (fastestMateFound <= coreDepthSearch - depth))
-            //{
-            //    return Constants.positiveInfinity;
-            //}
 
             // Checks for draws
             if (position.gameState != Position.GameState.OnGoing)
@@ -91,8 +80,6 @@ namespace Chess.Engine
             {
                 if (position.PlayerInCheck())
                 {
-                    mateSearch = true;
-                    fastestMateFound = (coreDepthSearch - depth);
                     chessEngine.nodes++;
                     position.gameState = Position.GameState.Checkmate;
                     return Constants.negativeInfinity;
@@ -136,12 +123,6 @@ namespace Chess.Engine
                 return 0;
             }
 
-            // Checks if mate search if enabled
-            //if (mateSearch && (fastestMateFound <= iteration + coreDepthSearch))
-            //{
-            //    return Constants.positiveInfinity;
-            //}
-
             // Updates counter for info display
             if ((iteration + coreDepthSearch) > chessEngine.maxDepth)
             {
@@ -168,8 +149,6 @@ namespace Chess.Engine
             // Checks for check mates
             if (moveGenerator.inCheck && (moves.Count == 0))
             {
-                mateSearch = true;
-                fastestMateFound = iteration + coreDepthSearch;
                 chessEngine.nodes++;
                 position.gameState = Position.GameState.Checkmate;
                 return Constants.negativeInfinity;

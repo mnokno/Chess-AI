@@ -1662,7 +1662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b90b82c8100c145b72a362699b90fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fenString: 8/1p6/1P4k1/8/5Q1P/6K1/8/8 w - - 0 1
+  fenString: 8/1p6/1P4k1/8/7P/6K1/8/2q5 w - - 0 1
   whiteBottom: 1
   hvh: 0
   whiteHumman: 1
