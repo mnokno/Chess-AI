@@ -118,7 +118,7 @@ namespace Chess.Engine
             // Generates all legal moves
             List<ushort> moves = GenerateLegalMoves((byte)(centralPosition.sideToMove ? 0 : 1));
             // Creates variables to keep track of the best move, invalidism is used as a control with the worst score possible
-            ushort bestMove = 0; // Invalid move (gets returned when a side is in a checkmate)
+            ushort bestMove = moves.Count != 0 ? moves[0] : (ushort)0; // Invalid move (gets returned when a side is in a checkmate)
             int bestScore = Constants.positiveInfinity; // worst possible score
 
             // tests each generated move

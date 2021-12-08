@@ -74,6 +74,18 @@ namespace Chess.Engine
         {
             // Makes the move
             chessEngine.centralPosition.MakeMove(move);
+            // Updates game state
+            if(chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1)).Count == 0)
+            {
+                if (chessEngine.centralPosition.PlayerInCheck())
+                {
+                    chessEngine.centralPosition.gameState = Position.GameState.Checkmate;
+                }
+                else
+                {
+                    chessEngine.centralPosition.gameState = Position.GameState.Stalemate;
+                }
+            }
             // Updates detailed display
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
             FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
@@ -89,16 +101,19 @@ namespace Chess.Engine
         // Makes an AI generated move
         public void MakeAIMove(bool random = false)
         {
-            if (random)
+            if (chessEngine.centralPosition.gameState == Position.GameState.OnGoing)
             {
-                // Makes random AI move
-                MakeRandomAIMove();
-            }
-            else
-            {
-                // Makes calculated AI move
-                Task.Run(() => MakeCalculatedAIMove());
-                //MakeCalculatedAIMove();
+                if (random)
+                {
+                    // Makes random AI move
+                    MakeRandomAIMove();
+                }
+                else
+                {
+                    // Makes calculated AI move
+                    Task.Run(() => MakeCalculatedAIMove());
+                    //MakeCalculatedAIMove();
+                }
             }
         }
 

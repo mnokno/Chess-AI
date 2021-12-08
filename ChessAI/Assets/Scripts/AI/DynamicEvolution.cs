@@ -20,6 +20,9 @@ namespace Chess.Engine
         public int coreDepthSearch;
         // Used to cancel a search
         private bool cancelSearch = false;
+        // Mate search
+        private bool mateSearch = false;
+        private int fastestMateFound = -1;
 
         #endregion
 
@@ -33,8 +36,10 @@ namespace Chess.Engine
             this.chessEngine = chessEngine;
             // Save base depth
             coreDepthSearch = searchDepth;
-            // Retest cancellation flag
+            // Retest cancellation flag and counters
             cancelSearch = false;
+            mateSearch = false;
+            fastestMateFound = -1;
             // Returns evaluation
             return AlphaBetaEvaluation(alpha, beta, searchDepth);
         }
@@ -55,6 +60,12 @@ namespace Chess.Engine
             {
                 return 0;
             }
+
+            // Checks if mate search if enabled
+            //if (mateSearch && (fastestMateFound <= coreDepthSearch - depth))
+            //{
+            //    return Constants.positiveInfinity;
+            //}
 
             // Checks for draws
             if (position.gameState != Position.GameState.OnGoing)
@@ -80,6 +91,8 @@ namespace Chess.Engine
             {
                 if (position.PlayerInCheck())
                 {
+                    mateSearch = true;
+                    fastestMateFound = (coreDepthSearch - depth);
                     chessEngine.nodes++;
                     position.gameState = Position.GameState.Checkmate;
                     return Constants.negativeInfinity;
@@ -123,10 +136,16 @@ namespace Chess.Engine
                 return 0;
             }
 
+            // Checks if mate search if enabled
+            //if (mateSearch && (fastestMateFound <= iteration + coreDepthSearch))
+            //{
+            //    return Constants.positiveInfinity;
+            //}
+
             // Updates counter for info display
-            if ((iteration + 5) > chessEngine.maxDepth)
+            if ((iteration + coreDepthSearch) > chessEngine.maxDepth)
             {
-                chessEngine.maxDepth = (byte)(iteration + 5);
+                chessEngine.maxDepth = (byte)(iteration + coreDepthSearch);
             }
             // Calculates a static score since a player does not have to make a bad capture, instead of a bad capture a static score is used
             int staticScore = staticEvaluation.Evaluate(position); 
@@ -149,6 +168,10 @@ namespace Chess.Engine
             // Checks for check mates
             if (moveGenerator.inCheck && (moves.Count == 0))
             {
+                mateSearch = true;
+                fastestMateFound = iteration + coreDepthSearch;
+                chessEngine.nodes++;
+                position.gameState = Position.GameState.Checkmate;
                 return Constants.negativeInfinity;
             }
 
