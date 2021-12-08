@@ -74,12 +74,16 @@ namespace Chess.Engine
         {
             // Makes the move
             chessEngine.centralPosition.MakeMove(move);
-            // Updates Zobrist Hash
+            // Updates detailed display
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
-            // Updates FEN info
             FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
-            // Updates game state
             gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState.ToString()}";
+            // If the game is over the result is displayed
+            if (chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
+            {
+                // Updates and shows the display
+                FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay(chessEngine.centralPosition, true);
+            }
         }
 
         // Makes an AI generated move

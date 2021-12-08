@@ -32,7 +32,7 @@ namespace Chess.UI
 
         #endregion
 
-        #region Display update
+        #region Display update options
 
         // Updates the main display
         public void UpdateMainDisplay(string newMainDisplayText, bool showDisplay)
@@ -64,6 +64,55 @@ namespace Chess.UI
             // Updates display info
             mainText.text = newMainDisplayText;
             subText.text = newSubDisplayText;
+            // Shows the display
+            if (showDisplay)
+            {
+                Fade(true);
+            }
+        }
+
+        // Updates the display base state of the given position
+        public void UpdateDisplay(EngineUtility.Position position, bool showDisplay)
+        {
+            // Creates string used to store display info
+            string newMainDisplayText;
+            string newSubDisplayText;
+
+            // Decides on the content of the display info
+            if (position.gameState == EngineUtility.Position.GameState.Checkmate)
+            {
+                newMainDisplayText = position.sideToMove ? "Black Won" : "White Won";
+                newSubDisplayText = "Checkmate";
+            }
+            else if (position.gameState == EngineUtility.Position.GameState.OnGoing)
+            {
+                newMainDisplayText = "Unresolved";
+                newSubDisplayText = "The Game Ongoing";
+            }
+            else
+            {
+                newMainDisplayText = "Draw";
+                switch (position.gameState)
+                {
+                    case EngineUtility.Position.GameState.InsufficientMaterial:
+                        newSubDisplayText = "Insufficient Material";
+                        break;
+                    case EngineUtility.Position.GameState.Stalemate:
+                        newSubDisplayText = "Stalemate";
+                        break;
+                    case EngineUtility.Position.GameState.ThreefoldRepetition:
+                        newSubDisplayText = "Repetition";
+                        break;
+                    default: // EngineUtility.Position.GameState.FiftyMoveRule
+                        newSubDisplayText = "Fifty Move Rule";
+                        break;
+                }
+            }
+
+            // Updates display information
+            mainText.text = newMainDisplayText;
+            subText.text = newSubDisplayText;
+
             // Shows the display
             if (showDisplay)
             {
