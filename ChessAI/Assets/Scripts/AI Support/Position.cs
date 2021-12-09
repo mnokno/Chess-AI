@@ -23,6 +23,9 @@ namespace Chess.EngineUtility
         public Stack<ulong> boardStateHistory = new Stack<ulong>(); // Stack filled with zobrist keys used to determine three fold rule
         public Stack<uint> historicMoveData = new Stack<uint>(); // Stores information used to unmake a move that can't be restored from a child position
 
+        private string initialFEN; // The FEN string loaded to this position
+        private string initialPNG; // The PNG string loaded to this position
+
         #endregion
 
         // Responsible for square initialization
@@ -93,6 +96,10 @@ namespace Chess.EngineUtility
             string PGN = "";
 
             // Adds each move from historicMoveData stack to PGN
+            for (int i = 0; i < historicMoveData.Count; i++)
+            {
+
+            }
 
             // Returns the PGN
             return PGN;
