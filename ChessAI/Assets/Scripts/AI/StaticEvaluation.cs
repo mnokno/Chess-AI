@@ -89,7 +89,7 @@ namespace Chess.Engine
             }
 
             // Calculates mid and end game weights
-            endGameWeight = (6600 - total) / 7600;
+            endGameWeight = (6600 - total) / 5000;
             midGameWeight = 1f - endGameWeight;
         } 
 

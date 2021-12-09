@@ -148,7 +148,18 @@ namespace Chess.Engine
             while (updateLables)
             {
                 // Updates info
-                evlaText.text = $"Eval: {chessEngine.eval / 100f}";
+                if (Constants.negativeInfinity + 100 > chessEngine.eval)
+                {
+                    evlaText.text = $"Eval: {Constants.negativeInfinity - chessEngine.eval}M";
+                }
+                else if (Constants.positiveInfinity - 100 < chessEngine.eval)
+                {
+                    evlaText.text = $"Eval: {Constants.positiveInfinity - chessEngine.eval}M";
+                }
+                else
+                {
+                    evlaText.text = $"Eval: {chessEngine.eval / 100f}";
+                }
                 nodesText.text = $"Nodes: {FormatNodeCount(chessEngine.nodes)}";
                 timeText.text = $"Time: {chessEngine.stopwatch.ElapsedMilliseconds / 1000f} sec";
                 baseDepthText.text = $"Base Depth: {chessEngine.currentBaseDepht - 1}";

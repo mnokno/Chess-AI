@@ -90,8 +90,10 @@ namespace Chess.Engine
                 ushort move = CalculateBestMove(currentBaseDepht);
                 if (!cancelSearch)
                 {
+                    // Saves the search results
                     previousBestMove = bestMove;
                     bestMove = move;
+                    // Updates Depth
                     currentBaseDepht++;
                 }
             }
