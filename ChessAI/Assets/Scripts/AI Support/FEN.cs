@@ -12,12 +12,13 @@ namespace Chess.EngineUtility
     {
         #region Class variables
 
-        private string piecePlacment; // <rank8>'/'<rank7>'/'<rank6>'/'<rank5>'/'<rank4>'/'<rank3>'/'<rank2>'/'<rank1>
-        private bool sideToMove; // true = white to move, false = black to move
-        private byte castlingRights; // bit 0 white queen side, bit 1 white king side, bit 2 black queen side, bit 3 black king side
-        private byte enPassantTargetFile; // 0..7 represent a target file, 8 means no target square
-        private byte halfmoveClock; // If >= 100 then its draw due to fifty-move rule, resets to 0 after pawn pushes and captures
-        private byte fullmoveCounter; // Number of full moves
+        private readonly string initialStringFEN; // The FEN string used to create this instance of FEN
+        private readonly string piecePlacment; // <rank8>'/'<rank7>'/'<rank6>'/'<rank5>'/'<rank4>'/'<rank3>'/'<rank2>'/'<rank1>
+        private readonly bool sideToMove; // true = white to move, false = black to move
+        private readonly byte castlingRights; // bit 0 white queen side, bit 1 white king side, bit 2 black queen side, bit 3 black king side
+        private readonly byte enPassantTargetFile; // 0..7 represent a target file, 8 means no target square
+        private readonly byte halfmoveClock; // If >= 100 then its draw due to fifty-move rule, resets to 0 after pawn pushes and captures
+        private readonly byte fullmoveCounter; // Number of full moves
 
         #endregion
 
@@ -26,6 +27,9 @@ namespace Chess.EngineUtility
         // Constructor
         public FEN(string FEN)
         {
+            // Saves the string
+            initialStringFEN = FEN;
+
             // Splits the FEN into 6 parts
             string[] parts = FEN.Split(' ');
 
@@ -103,6 +107,7 @@ namespace Chess.EngineUtility
 
         #region Getters
 
+        public string GetInitialStringFEN() => initialStringFEN;
         public string GetPiecePlacment() => piecePlacment;
         public bool GetSideToMove() => sideToMove;
         public byte GetCastlingRights() => castlingRights;

@@ -35,6 +35,8 @@ namespace Chess.EngineUtility
         public Position()
         {
             this.gameState = GameState.OnGoing;
+            this.initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            this.initialPNG = "";
             this.bitboard = new Bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             this.squareCentric = new SquareCentric("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             this.sideToMove = true;
@@ -53,6 +55,8 @@ namespace Chess.EngineUtility
         // Loads a fen
         public void LoadFEN(FEN fen)
         {
+            // Saves the initial FEN
+            initialFEN = fen.GetInitialStringFEN();
             // Loads information from the FEN string
             sideToMove = fen.GetSideToMove();
             castlingRights = fen.GetCastlingRights();
