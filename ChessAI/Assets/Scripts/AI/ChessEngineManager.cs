@@ -12,6 +12,9 @@ namespace Chess.Engine
         // Class variables
         #region
 
+        // Settings
+        public float timePerMove = 5f;
+
         // Chess engine manager connections references
         public ChessEngine chessEngine;
         public BoardInputManager inputManager;
@@ -27,6 +30,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI transpositiontableHitsText;
         public TMPro.TextMeshProUGUI zobristHashText;
         public TMPro.TextMeshProUGUI FENText;
+        public TMPro.TextMeshProUGUI PGNText;
 
         // Used to stop updating info on the labels
         public bool updateLables = true;
@@ -89,7 +93,8 @@ namespace Chess.Engine
             // Updates detailed display
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
             FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
-            gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState.ToString()}";
+            gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState}";
+            PGNText.text = $"PGN: {chessEngine.centralPosition.GetPGN()}";
             // If the game is over the result is displayed
             if (chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
             {
@@ -133,7 +138,7 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove()
         {
             // Calculates the best move
-            moveToPlay = chessEngine.CalculateBestMove(5);
+            moveToPlay = chessEngine.CalculateBestMove(timePerMove);
             // Sets a flag
             calculated = true;
         }

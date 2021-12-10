@@ -22,6 +22,7 @@ namespace Chess.EngineUtility
         public ulong zobristKey; // Zobrist key for this position
         public Stack<ulong> boardStateHistory = new Stack<ulong>(); // Stack filled with zobrist keys used to determine three fold rule
         public Stack<uint> historicMoveData = new Stack<uint>(); // Stores information used to unmake a move that can't be restored from a child position
+        public Stack<ushort> moves = new Stack<ushort>(); // Stack containing all the moves played on this board
 
         private string initialFEN; // The FEN string loaded to this position
         private string initialPNG; // The PNG string loaded to this position
@@ -100,9 +101,33 @@ namespace Chess.EngineUtility
             string PGN = "";
 
             // Adds each move from historicMoveData stack to PGN
-            for (int i = 0; i < historicMoveData.Count; i++)
+            Position playBackPosition = new Position();
+            playBackPosition.LoadFEN(new FEN(initialFEN));
+            ushort[] historicMovesArray = moves.ToArray();
+            for (int i = historicMovesArray.Length - 1; i >= 0; i--)
             {
+                PGN += Move.ConvertUshortToPNG(historicMovesArray[i], playBackPosition) + " ";
+                playBackPosition.MakeMove(historicMovesArray[i]);
+            }
 
+            //  Adds the end of game notation if the game has ended
+            if (playBackPosition.gameState != GameState.OnGoing)
+            {
+                if (playBackPosition.gameState == GameState.Checkmate || playBackPosition.gameState == GameState.OutOfTime)
+                {
+                    if (playBackPosition.sideToMove)
+                    {
+                        PGN += "0-1";
+                    }
+                    else
+                    {
+                        PGN += "1-0";
+                    }
+                }
+                else
+                {
+                    PGN += "1/2-1/2";
+                }
             }
 
             // Returns the PGN
@@ -225,6 +250,7 @@ namespace Chess.EngineUtility
             byte promoteTo = GetPromoteTo(flag); // Get piece to promote to, set to 10 if its not a promotion flag/move
             byte pieceToTake = (byte)(squareCentric.colors[to] == (byte)SquareCentric.SquareColor.Empty ? 10 : squareCentric.pieces[to]); // Get captured piece, set to 10 if no piece is captured
 
+            moves.Push(move); // Adds the move to the moves stack
             historicMoveData.Push(HistoricMove.GenHistoricMove(enPassantTargetFile, castlingRights, pieceToTake, halfmoveClock)); // Creates a historic record of the potion in the current sate, used later to unmake this move
             BitboardUtility.MakeMove(ref bitboard, flag, from, to, sideToMove, pieceToMove: pieceToMove, pieceToTake: pieceToTake, promoteTo: promoteTo); // Makes the move on a bitboard
             SquareCentricUtility.MakeMove(ref squareCentric, flag, from, to, sideToMove, pieceToMove: pieceToMove, promoteTo: promoteTo); // Makes the move on a square centric
@@ -466,6 +492,8 @@ namespace Chess.EngineUtility
         // Unmakes a move
         public void UnmakeMove(ushort move)
         {
+            // Removes the moves recent move from moves
+            moves.Pop();
             // Reads historic data
             uint moveHistoricData = historicMoveData.Pop();
 
@@ -554,7 +582,8 @@ namespace Chess.EngineUtility
             ThreefoldRepetition = 2,
             FiftyMoveRule = 3,
             Stalemate = 4,
-            InsufficientMaterial = 5
+            InsufficientMaterial = 5,
+            OutOfTime = 6
         }
 
         #endregion
