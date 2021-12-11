@@ -37,6 +37,74 @@ namespace Chess.EngineUtility
         // Converts a PNG move to a ushort move
         public static ushort ConvertPGNToUshort(string PNGMove, Position position)
         {
+            // If it was a castling move
+            if (PNGMove == "O-O")
+            {
+                if (position.sideToMove)
+                {
+                    return GenMove(4, 6, Flag.kingCastle);
+                }
+                else
+                {
+                    return GenMove(60, 62, Flag.kingCastle);
+                }
+            }
+            else if (PNGMove == "O-O-O")
+            {
+                if (position.sideToMove)
+                {
+                    return GenMove(4, 2, Flag.queenCastle);
+                }
+                else
+                {
+                    return GenMove(60, 58, Flag.queenCastle);
+                }
+            }
+
+            // Gets the piece type to move and piece to promote to if its a promotion move
+            char pieceToMove = '-';
+            char promoteTo = '-';
+            if (PNGMove.Contains("=")) // Its a promotion pawn move
+            {
+                pieceToMove = 'P';
+                promoteTo = PNGMove[PNGMove.Length - 1] == '+' ? PNGMove[PNGMove.Length - 2] : PNGMove[PNGMove.Length - 1];
+            }
+            else if (PNGMove == PNGMove.ToLower()) // Its a non-promotion pawn move
+            {
+                pieceToMove = 'P';
+            }
+            else // Its not a pawn move
+            {
+                pieceToMove = PNGMove[0];
+            }
+
+            // Gets the square that the piece is being move to
+            int toSquareDataOffset = (PNGMove.Contains("+") ? 1 : 0) + (PNGMove.Contains("=") ? 2 : 0);
+            SquareCentric.Squares to = (SquareCentric.Squares)Enum.Parse(typeof(SquareCentric.Squares), (PNGMove[PNGMove.Length - toSquareDataOffset - 2].ToString() + PNGMove[PNGMove.Length - toSquareDataOffset - 1].ToString()).ToString());
+
+            // Gets the square from which the piece will be moved from
+            int fromSquareDataOffset = (char.IsUpper(PNGMove[0]) ? 1 : 0);
+            char fileConstrain = '-';
+            char rankConstrain = '-';
+            if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 == 1)
+            {
+                char constrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
+                if ("abcdefgh".Contains(constrain.ToString()))
+                {
+                    fileConstrain = constrain;
+                }
+                else
+                {
+                    rankConstrain = constrain;
+                }
+            }
+            else if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 == 2)
+            {
+                fileConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 4];
+                rankConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
+            }
+
+            Debug.Log($"From: {fileConstrain.ToString() + rankConstrain.ToString()}, To: {to}, PieceToMove: {pieceToMove}, promoteTo: {promoteTo}");
             return 0;
         }
 

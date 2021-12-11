@@ -72,6 +72,14 @@ namespace Chess.UI
                 // If so an AI move is played
                 engineManager.MakeAIMove();
             }
+            Move.ConvertPGNToUshort("Nff3", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("N4f3+", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d3+", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d3", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d4+", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d4", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d3=Q", engineManager.chessEngine.centralPosition);
+            Move.ConvertPGNToUshort("d4=N+", engineManager.chessEngine.centralPosition);
         }
 
         // Generates board interface
