@@ -51,6 +51,20 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
+            // TESTING START
+            string PGN = "d4 Nh6 d5 e5 dxe6";
+            //string PGN = "d4 Nf6 d5 Nxd5";
+            string[] PGNMoves = PGN.Split(' ');
+            Position positionTest = new Position();
+            for (int i = 0; i < PGNMoves.Length; i++)
+            {
+                ushort move = Move.ConvertPGNToUshort(PGNMoves[i], positionTest);
+                Debug.Log(Move.Format(move));
+                positionTest.MakeMove(move);
+            }
+            fenString = positionTest.GetFEN();
+            // TESTING END
+
             // Disables/hides the board preview area
             GetComponentInParent<SpriteRenderer>().enabled = false;
             // Generates the chess board
@@ -72,14 +86,6 @@ namespace Chess.UI
                 // If so an AI move is played
                 engineManager.MakeAIMove();
             }
-            Move.ConvertPGNToUshort("Nff3", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("N4f3+", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d3+", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d3", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d4+", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d4", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d3=Q", engineManager.chessEngine.centralPosition);
-            Move.ConvertPGNToUshort("d4=N+", engineManager.chessEngine.centralPosition);
         }
 
         // Generates board interface

@@ -92,9 +92,9 @@ namespace Chess.EngineUtility
             to = (SquareCentric.Squares)Enum.Parse(typeof(SquareCentric.Squares), (PNGMove[PNGMove.Length - toSquareDataOffset - 2].ToString() + PNGMove[PNGMove.Length - toSquareDataOffset - 1].ToString()).ToString());
 
             // Gets the constraints square from which the piece will be moved from
-            if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 == 1)
+            if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 - (isCapture ? 1 : 0) == 1)
             {
-                char constrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
+                char constrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3 - (isCapture ? 1 : 0)];
                 if ("abcdefgh".Contains(constrain.ToString()))
                 {
                     fileConstrain = constrain;
@@ -104,10 +104,10 @@ namespace Chess.EngineUtility
                     rankConstrain = constrain;
                 }
             }
-            else if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 == 2)
+            else if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 - (isCapture ? 1 : 0) == 2)
             {
-                fileConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 4];
-                rankConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
+                fileConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 4 - (isCapture ? 1 : 0)];
+                rankConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3 - (isCapture ? 1 : 0)];
             }
 
             // Returns the index at which the ray intersected one of the targets, returns -1 if there was no intersection between the target and the ray
@@ -169,7 +169,7 @@ namespace Chess.EngineUtility
                 ulong possibleTargetsBB;
                 if (fileConstrain != '-')
                 {
-                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.fileMasks["abcdefgh".IndexOf(fileConstrain)];
+                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.fileMasks[7 - "abcdefgh".IndexOf(fileConstrain)];
                 }
                 else if (rankConstrain != '-')
                 {
@@ -392,9 +392,16 @@ namespace Chess.EngineUtility
             }
         }
 
-
         #endregion
 
+        #region Formating functions
+
+        public static string Format(ushort move)
+        {
+            return $"From: {GetFrom(move)}, To: {GetTo(move)}, Flag: {GetFlag(move)}";
+        }
+
+        #endregion
         // Structures and enumerations used by this class
         #region Structures and enumerations
 
