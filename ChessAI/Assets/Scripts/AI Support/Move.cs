@@ -65,7 +65,7 @@ namespace Chess.EngineUtility
             bool isCapture = PNGMove.Contains("x");
             char pieceToMove = '-';
             char promoteTo = '-';
-            int toSquareDataOffset = (PNGMove.Contains("+") ? 1 : 0) + (PNGMove.Contains("=") ? 2 : 0);
+            int toSquareDataOffset = (PNGMove.Contains("+") ? 1 : 0) + (PNGMove.Contains("#") ? 1 : 0) + (PNGMove.Contains("=") ? 2 : 0);
             int fromSquareDataOffset = (char.IsUpper(PNGMove[0]) ? 1 : 0);
             char fileConstrain = '-';
             char rankConstrain = '-';
@@ -77,7 +77,7 @@ namespace Chess.EngineUtility
             if (PNGMove.Contains("=")) // Its a promotion pawn move
             {
                 pieceToMove = 'P';
-                promoteTo = PNGMove[PNGMove.Length - 1] == '+' ? PNGMove[PNGMove.Length - 2] : PNGMove[PNGMove.Length - 1];
+                promoteTo = (PNGMove[PNGMove.Length - 1] == '+' || PNGMove[PNGMove.Length - 1] == '#') ? PNGMove[PNGMove.Length - 2] : PNGMove[PNGMove.Length - 1];
             }
             else if (PNGMove == PNGMove.ToLower()) // Its a non-promotion pawn move
             {
