@@ -61,9 +61,19 @@ namespace Chess.EngineUtility
                 }
             }
 
-            // Gets the piece type to move and piece to promote to if its a promotion move
+            // Local variables
+            bool isCapture = PNGMove.Contains("x");
             char pieceToMove = '-';
             char promoteTo = '-';
+            int toSquareDataOffset = (PNGMove.Contains("+") ? 1 : 0) + (PNGMove.Contains("=") ? 2 : 0);
+            int fromSquareDataOffset = (char.IsUpper(PNGMove[0]) ? 1 : 0);
+            char fileConstrain = '-';
+            char rankConstrain = '-';
+            SquareCentric.Squares to;
+            SquareCentric.Squares from;
+            ushort flag = 999;
+
+            // Gets the piece type to move and piece to promote to if its a promotion move
             if (PNGMove.Contains("=")) // Its a promotion pawn move
             {
                 pieceToMove = 'P';
@@ -79,13 +89,9 @@ namespace Chess.EngineUtility
             }
 
             // Gets the square that the piece is being move to
-            int toSquareDataOffset = (PNGMove.Contains("+") ? 1 : 0) + (PNGMove.Contains("=") ? 2 : 0);
-            SquareCentric.Squares to = (SquareCentric.Squares)Enum.Parse(typeof(SquareCentric.Squares), (PNGMove[PNGMove.Length - toSquareDataOffset - 2].ToString() + PNGMove[PNGMove.Length - toSquareDataOffset - 1].ToString()).ToString());
+            to = (SquareCentric.Squares)Enum.Parse(typeof(SquareCentric.Squares), (PNGMove[PNGMove.Length - toSquareDataOffset - 2].ToString() + PNGMove[PNGMove.Length - toSquareDataOffset - 1].ToString()).ToString());
 
-            // Gets the square from which the piece will be moved from
-            int fromSquareDataOffset = (char.IsUpper(PNGMove[0]) ? 1 : 0);
-            char fileConstrain = '-';
-            char rankConstrain = '-';
+            // Gets the constraints square from which the piece will be moved from
             if (PNGMove.Length - fromSquareDataOffset - toSquareDataOffset - 2 == 1)
             {
                 char constrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
@@ -104,8 +110,213 @@ namespace Chess.EngineUtility
                 rankConstrain = PNGMove[PNGMove.Length - toSquareDataOffset - 3];
             }
 
-            Debug.Log($"From: {fileConstrain.ToString() + rankConstrain.ToString()}, To: {to}, PieceToMove: {pieceToMove}, promoteTo: {promoteTo}");
-            return 0;
+            // Returns the index at which the ray intersected one of the targets, returns -1 if there was no intersection between the target and the ray
+            int DoesRayHitTarget(short reyDirectionIndex, ushort from, ulong targetsBB, ulong allPiecesBB)
+            {
+                // For each square to the edge or till the ray is blocked
+                for (ushort i = 1; i < Constants.squaresToEdge[reyDirectionIndex][from] + 1; i++)
+                {
+                    // Calculates the current position along the ray
+                    int currentRayPosition = from + (i * Constants.directionOffsets[reyDirectionIndex]);
+                    if ((allPiecesBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Rays intersected with some other piece
+                    {
+                        if ((targetsBB & Constants.primitiveBitboards[currentRayPosition]) != 0) // Ray intersected with the target
+                        {
+                            return currentRayPosition;
+                        }
+                        else // Ray was blocked before it reached the target
+                        {
+                            return -1;
+                        }
+                    }
+                }
+                return -1; // The ray was never block by any pieces (including the target)
+            }
+            // Converts the piece code form a char to an int that can be used to access the corresponding bitboard from pieces array, returns -1 if the piece char code is invalid
+            int GetPieceInt(char pieceChar)
+            {
+                switch (pieceChar)
+                {
+                    case ('P'):
+                        return 0;
+                    case ('N'):
+                        return 1;
+                    case ('B'):
+                        return 2;
+                    case ('R'):
+                        return 3;
+                    case ('Q'):
+                        return 4;
+                    case ('K'):
+                        return 5;
+                    default :
+                        return -1;
+                }
+            }
+
+            // Gets the square from which the piece will be moved from
+            if (pieceToMove == 'K') // There is only one king for each side
+            {
+                from = (SquareCentric.Squares)(BitOps.BitScanForward(position.bitboard.pieces[5 + (position.sideToMove ? 0 : 7)]));
+            }
+            else if (fileConstrain != '-' && rankConstrain != '-') // If the position is specified exactly
+            {
+                from = (SquareCentric.Squares)Enum.Parse(typeof(SquareCentric.Squares), (fileConstrain + rankConstrain).ToString());
+            }
+            else // The position is not specified exactly
+            {
+                // Gets a bitboard containing pieces that satisfy the constraint
+                ulong possibleTargetsBB;
+                if (fileConstrain != '-')
+                {
+                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.fileMasks["abcdefgh".IndexOf(fileConstrain)];
+                }
+                else if (rankConstrain != '-')
+                {
+                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.rankMasks[int.Parse(rankConstrain.ToString())];
+                }
+                else
+                {
+                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)];
+                }
+
+                // Choses the correct member from all the members that satisfy the constrains
+                if (BitOps.PopulationCount(possibleTargetsBB) == 1)
+                {
+                    from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB);
+                }
+                else
+                {
+                    if (pieceToMove == 'P') // Pawn
+                    {
+                        if (isCapture)
+                        {
+                            from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & (position.sideToMove ? PrecomputedMoveData.pawnAttacksBlack[(int)to] : PrecomputedMoveData.pawnAttacksWhite[(int)to]));
+                        }
+                        else
+                        {
+                            int colorOffset = position.sideToMove ? 8 : -8;
+                            if ((possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]) != 0)
+                            {
+                                from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]);
+                            }
+                            else
+                            {
+                                from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - (2 * colorOffset)]);
+                                flag = Flag.doublePawnPush;
+                            }
+                        }
+                    }
+                    else if (pieceToMove == 'N') // Knight
+                    {
+                        from = (SquareCentric.Squares)(BitOps.BitScanForward(possibleTargetsBB & PrecomputedMoveData.knightAttacks[(int)to]));
+                    }
+                    else // Bishop, Rook or Queen
+                    {
+                        short[] rayDirections;
+                        if (pieceToMove == 'B')
+                        {
+                            rayDirections = new short[] { 4, 5, 6, 7 };
+                        }
+                        else if (pieceToMove == 'R')
+                        {
+                            rayDirections = new short[] { 0, 1, 2, 3 };
+                        }
+                        else // Has to be 'Q'
+                        {
+                            rayDirections = new short[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+                        }
+
+                        from = SquareCentric.Squares.a1;
+                        ulong allPieces = position.bitboard.pieces[6] | position.bitboard.pieces[13];
+                        foreach (short direction in rayDirections)
+                        {
+                            int result = DoesRayHitTarget(direction, (ushort)to, possibleTargetsBB, allPieces);
+                            if (result != -1)
+                            {
+                                from = (SquareCentric.Squares)result;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Decides on the flag
+            if (flag != Flag.doublePawnPush)
+            {
+                if (promoteTo != '-') // Its a promotion move
+                {
+                    switch (promoteTo)
+                    {
+                        case ('N'):
+                            if (isCapture)
+                            {
+                                flag = Flag.knightPromotionCapture;
+                            }
+                            else
+                            {
+                                flag = Flag.knightPromotion;
+                            }
+                            break;
+                        case ('B'):
+                            if (isCapture)
+                            {
+                                flag = Flag.bishopPromotionCapture;
+                            }
+                            else
+                            {
+                                flag = Flag.bishopPromotion;
+                            }
+                            break;
+                        case ('R'):
+                            if (isCapture)
+                            {
+                                flag = Flag.rookPromotionCapture;
+                            }
+                            else
+                            {
+                                flag = Flag.rookPromotion;
+                            }
+                            break;
+                        default:
+                            if (isCapture)
+                            {
+                                flag = Flag.queenPromotionCapture;
+                            }
+                            else
+                            {
+                                flag = Flag.queenPromotion;
+                            }
+                            break;
+                    }
+                }
+                else if (isCapture)
+                {
+                    if (pieceToMove == 'P') // If could be an en-passant capture
+                    {
+                        if (position.squareCentric.pieces[(int)to] == (byte)SquareCentric.PieceType.Empty)
+                        {
+                            flag = Flag.epCapture;
+                        }
+                        else
+                        {
+                            flag = Flag.capture;
+                        }
+                    }
+                    else
+                    {
+                        flag = Flag.capture;
+                    }
+                }
+                else
+                {
+                    flag = Flag.quietMove;
+                }
+            }
+
+            // Converts and returns the move
+            return GenMove((ushort)from, (ushort)to, flag);
         }
 
         // Converts a ushort move to a PNG move
