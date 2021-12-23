@@ -28,7 +28,6 @@ namespace Chess.EngineUtility
                 Position playBackPosition = new Position();
                 foreach (string move in moves)
                 {
-                    Debug.Log(move);
                     playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
                 }
                 gameIndex ++; // Debug

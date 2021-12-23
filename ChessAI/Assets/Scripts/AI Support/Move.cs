@@ -38,18 +38,7 @@ namespace Chess.EngineUtility
         public static ushort ConvertPGNToUshort(string PNGMove, Position position)
         {
             // If it was a castling move
-            if (PNGMove == "O-O")
-            {
-                if (position.sideToMove)
-                {
-                    return GenMove(4, 6, Flag.kingCastle);
-                }
-                else
-                {
-                    return GenMove(60, 62, Flag.kingCastle);
-                }
-            }
-            else if (PNGMove == "O-O-O")
+            if (PNGMove.Contains("O-O-O"))
             {
                 if (position.sideToMove)
                 {
@@ -60,6 +49,18 @@ namespace Chess.EngineUtility
                     return GenMove(60, 58, Flag.queenCastle);
                 }
             }
+            else if (PNGMove.Contains("O-O"))
+            {
+                if (position.sideToMove)
+                {
+                    return GenMove(4, 6, Flag.kingCastle);
+                }
+                else
+                {
+                    return GenMove(60, 62, Flag.kingCastle);
+                }
+            }
+
 
             // Local variables
             bool isCapture = PNGMove.Contains("x");
