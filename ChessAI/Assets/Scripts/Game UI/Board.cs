@@ -54,12 +54,12 @@ namespace Chess.UI
             /// Debug
 
             Position testPostion = new Position();
-            foreach (string move in "c4 e6 Nc3 d5 d4 Nf6 cxd5 exd5 Bg5 c6 Qc2 Be7 e3 Nbd7 Bd3 h6 Bh4 Nh5 Bxe7 Qxe7 O-O-O Nb6 Nf3 Bg4 Kb1 Nf6 Rc1 Nfd7 Ka1 O-O-O Nd2 Kb8 Na4 Nxa4 Qxa4 Qh4 Rcf1 Qf6 Qc2 Rc8 Nb3 Rc7 Rc1 Rhc8 h3 Be6 Rhf1 h5 f4 g6 f5 gxf5 g4 hxg4 hxg4 Nb6 gxf5 Bd7 Nc5 Re8 Rce1 Qd6 a3 Bc8 Qf2 Nd7 e4 dxe4 Nxe4 Qf8 Rg1 Rd8 Qh2 Qh8 Qxh8 Rxh8 Rg7 Nb6 Nf6 Rd8 Rg4 c5 Ne8 Rcd7 dxc5 Rxd3 cxb6 axb6 Rf4 R8d5".Split(" "))
+            foreach (string move in "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e5 Nb3 Be6 Be3 h5 Qd2 Nbd7 Nd5 Bxd5 exd5 g6 Be2 Bg7 O-O a5 a4 O-O Bb5 Qc7 c4 b6 h3 Nc5 Nxc5 bxc5 Ra3 Nh7 Rb3 f5 Bc6 Rab8 Rb5 f4 Bf2 e4 Qc2 Qe7 Qxe4 Qxe4 fxe4 Ng5 Re1 Nf7 Rb1 Ng5 Rxa5 Rb3 Rb5 Rd3 Re1 f3 h4 Nf7 a5 Ne5 a6 Rd2 a7 fxg2 a8=Q Nf3+ Kxg2 Nxe1+ Kf1 Rxf2+".Split(" "))
             {
                 testPostion.MakeMove(Move.ConvertPGNToUshort(move, testPostion));
             }
             fenString = testPostion.GetFEN();
-            //OpeningBook.RunMe();
+            OpeningBook.RunMe();
             ///
 
             // Disables/hides the board preview area

@@ -187,55 +187,98 @@ namespace Chess.EngineUtility
                 }
                 else
                 {
-                    if (pieceToMove == 'P') // Pawn
+                    while (true)
                     {
-                        if (isCapture)
+                        if (pieceToMove == 'P') // Pawn
                         {
-                            from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & (position.sideToMove ? PrecomputedMoveData.pawnAttacksBlack[(int)to] : PrecomputedMoveData.pawnAttacksWhite[(int)to]));
-                        }
-                        else
-                        {
-                            int colorOffset = position.sideToMove ? 8 : -8;
-                            if ((possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]) != 0)
+                            if (isCapture)
                             {
-                                from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]);
+                                from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & (position.sideToMove ? PrecomputedMoveData.pawnAttacksBlack[(int)to] : PrecomputedMoveData.pawnAttacksWhite[(int)to]));
+                                if (MoveGenerator.CanPieceFromMoveTo((byte)from, (byte)to, position.sideToMove, position))
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    possibleTargetsBB &= ~Constants.primitiveBitboards[(byte)from];
+                                }
                             }
                             else
                             {
-                                from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - (2 * colorOffset)]);
-                                flag = Flag.doublePawnPush;
+                                int colorOffset = position.sideToMove ? 8 : -8;
+                                if ((possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]) != 0)
+                                {
+                                    from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - colorOffset]);
+                                    if (MoveGenerator.CanPieceFromMoveTo((byte)from, (byte)to, position.sideToMove, position))
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        possibleTargetsBB &= ~Constants.primitiveBitboards[(byte)from];
+                                    }
+                                }
+                                else
+                                {
+                                    from = (SquareCentric.Squares)BitOps.BitScanForward(possibleTargetsBB & Constants.primitiveBitboards[(int)to - (2 * colorOffset)]);
+                                    flag = Flag.doublePawnPush;
+                                    if (MoveGenerator.CanPieceFromMoveTo((byte)from, (byte)to, position.sideToMove, position))
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        possibleTargetsBB &= ~Constants.primitiveBitboards[(byte)from];
+                                    }
+                                }
                             }
                         }
-                    }
-                    else if (pieceToMove == 'N') // Knight
-                    {
-                        from = (SquareCentric.Squares)(BitOps.BitScanForward(possibleTargetsBB & PrecomputedMoveData.knightAttacks[(int)to]));
-                    }
-                    else // Bishop, Rook or Queen
-                    {
-                        short[] rayDirections;
-                        if (pieceToMove == 'B')
+                        else if (pieceToMove == 'N') // Knight
                         {
-                            rayDirections = new short[] { 4, 5, 6, 7 };
-                        }
-                        else if (pieceToMove == 'R')
-                        {
-                            rayDirections = new short[] { 0, 1, 2, 3 };
-                        }
-                        else // Has to be 'Q'
-                        {
-                            rayDirections = new short[] { 0, 1, 2, 3, 4, 5, 6, 7 };
-                        }
-
-                        from = SquareCentric.Squares.a1;
-                        ulong allPieces = position.bitboard.pieces[6] | position.bitboard.pieces[13];
-                        foreach (short direction in rayDirections)
-                        {
-                            int result = DoesRayHitTarget(direction, (ushort)to, possibleTargetsBB, allPieces);
-                            if (result != -1)
+                            from = (SquareCentric.Squares)(BitOps.BitScanForward(possibleTargetsBB & PrecomputedMoveData.knightAttacks[(int)to]));
+                            if (MoveGenerator.CanPieceFromMoveTo((byte)from, (byte)to, position.sideToMove, position))
                             {
-                                from = (SquareCentric.Squares)result;
                                 break;
+                            }
+                            else
+                            {
+                                possibleTargetsBB &= ~Constants.primitiveBitboards[(byte)from];
+                            }
+                        }
+                        else // Bishop, Rook or Queen
+                        {
+                            short[] rayDirections;
+                            if (pieceToMove == 'B')
+                            {
+                                rayDirections = new short[] { 4, 5, 6, 7 };
+                            }
+                            else if (pieceToMove == 'R')
+                            {
+                                rayDirections = new short[] { 0, 1, 2, 3 };
+                            }
+                            else // Has to be 'Q'
+                            {
+                                rayDirections = new short[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+                            }
+
+                            from = SquareCentric.Squares.a1;
+                            ulong allPieces = position.bitboard.pieces[6] | position.bitboard.pieces[13];
+                            foreach (short direction in rayDirections)
+                            {
+                                int result = DoesRayHitTarget(direction, (ushort)to, possibleTargetsBB, allPieces);
+                                if (result != -1)
+                                {
+                                    from = (SquareCentric.Squares)result;
+                                    break;
+                                }
+                            }
+                            if (MoveGenerator.CanPieceFromMoveTo((byte)from, (byte)to, position.sideToMove, position))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                possibleTargetsBB &= ~Constants.primitiveBitboards[(byte)from];
                             }
                         }
                     }

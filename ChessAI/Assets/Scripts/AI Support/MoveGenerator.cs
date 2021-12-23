@@ -2243,6 +2243,25 @@ namespace Chess.EngineUtility
 
         #endregion
 
+        #region Other
+
+        // Returns true if a move from-to is legal on the given chess positio, false otherwise
+        public static bool CanPieceFromMoveTo(byte from, byte to, bool sideToMove, Position position)
+        {
+            MoveGenerator moveGenerator = new MoveGenerator();
+            ushort[] legalMoves = moveGenerator.GenerateLegalMoves(position, (byte)(sideToMove ? 0 : 1)).ToArray();
+            foreach (ushort move in legalMoves)
+            {
+                if (Move.GetFrom(move) == from && Move.GetTo(move) == to)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        #endregion
+
         #endregion
 
         #region Square under attack
