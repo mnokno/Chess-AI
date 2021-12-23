@@ -51,7 +51,17 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            OpeningBook.RunMe();
+            /// Debug
+
+            Position testPostion = new Position();
+            foreach (string move in "c4 e6 Nc3 d5 d4 Nf6 cxd5 exd5 Bg5 c6 Qc2 Be7 e3 Nbd7 Bd3 h6 Bh4 Nh5 Bxe7 Qxe7 O-O-O Nb6 Nf3 Bg4 Kb1 Nf6 Rc1 Nfd7 Ka1 O-O-O Nd2 Kb8 Na4 Nxa4 Qxa4 Qh4 Rcf1 Qf6 Qc2 Rc8 Nb3 Rc7 Rc1 Rhc8 h3 Be6 Rhf1 h5 f4 g6 f5 gxf5 g4 hxg4 hxg4 Nb6 gxf5 Bd7 Nc5 Re8 Rce1 Qd6 a3 Bc8 Qf2 Nd7 e4 dxe4 Nxe4 Qf8 Rg1 Rd8 Qh2 Qh8 Qxh8 Rxh8 Rg7 Nb6 Nf6 Rd8 Rg4 c5 Ne8 Rcd7 dxc5 Rxd3 cxb6 axb6 Rf4 R8d5".Split(" "))
+            {
+                testPostion.MakeMove(Move.ConvertPGNToUshort(move, testPostion));
+            }
+            fenString = testPostion.GetFEN();
+            //OpeningBook.RunMe();
+            ///
+
             // Disables/hides the board preview area
             GetComponentInParent<SpriteRenderer>().enabled = false;
             // Generates the chess board

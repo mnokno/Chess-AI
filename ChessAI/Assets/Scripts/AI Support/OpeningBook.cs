@@ -20,9 +20,18 @@ namespace Chess.EngineUtility
         static OpeningBook()
         {
             string[] games = System.IO.File.ReadAllText(openingBookDirectory).Split('\n');
+            int gameIndex = 1; // Debug
             foreach (string game in games)
             {
-                Debug.Log(game);
+                Debug.Log($"Game Index: {gameIndex} ------------------------------------------------------------------------------------------------------------------");
+                string[] moves = game.Replace(" 1/2-1/2", "").Replace(" 0-1", "").Replace(" 1-0", "").Replace("\r", "").Split(" ");
+                Position playBackPosition = new Position();
+                foreach (string move in moves)
+                {
+                    Debug.Log(move);
+                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
+                }
+                gameIndex ++; // Debug
             }
         }
 

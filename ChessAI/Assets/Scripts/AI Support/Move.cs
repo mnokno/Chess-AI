@@ -173,7 +173,7 @@ namespace Chess.EngineUtility
                 }
                 else if (rankConstrain != '-')
                 {
-                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.rankMasks[int.Parse(rankConstrain.ToString())];
+                    possibleTargetsBB = position.bitboard.pieces[GetPieceInt(pieceToMove) + (position.sideToMove ? 0 : 7)] & Constants.rankMasks[int.Parse(rankConstrain.ToString()) - 1];
                 }
                 else
                 {
