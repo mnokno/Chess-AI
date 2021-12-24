@@ -9,7 +9,9 @@ namespace Chess.EngineUtility
         #region Class variables
 
         // Directory of the opening book
+        private static string openingGamesDirectory = Application.streamingAssetsPath + "/OpeningGames.txt";
         private static string openingBookDirectory = Application.streamingAssetsPath + "/OpeningBook.txt";
+        //private static string opening 
         private static Dictionary<ulong, List<Entry>> book = new Dictionary<ulong, List<Entry>>();
         // Array containing all the games from the opening book
 
@@ -19,14 +21,19 @@ namespace Chess.EngineUtility
 
         static OpeningBook()
         {
-            string[] games = System.IO.File.ReadAllText(openingBookDirectory).Split('\n');
+            string[] games = System.IO.File.ReadAllText(openingGamesDirectory).Split('\n');
             foreach (string game in games)
             {
                 string[] moves = game.Replace(" 1/2-1/2", "").Replace(" 0-1", "").Replace(" 1-0", "").Replace("\r", "").Split(" ");
                 Position playBackPosition = new Position();
+                int moveNumber = 0;
                 foreach (string move in moves)
                 {
-                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
+                    moveNumber++;
+                    if (moveNumber >= 30)
+                    {
+                        break;
+                    }
                     if (book.ContainsKey(playBackPosition.zobristKey))
                     {
                         // Gets list of all entries attached to this key
@@ -39,7 +46,7 @@ namespace Chess.EngineUtility
                         {
                             if (entries[i].move == currentlyEvaluatedMove)
                             {
-                                entries[i].IncreaseCount();
+                                entries[i] = new Entry(entries[i].key, entries[i].move, (ushort)(entries[i].count + 1));
                                 entryAllreadyExists = true;
                                 break;
                             }
@@ -54,21 +61,22 @@ namespace Chess.EngineUtility
                     {
                         // Adds this move to the book and creates a list of moves for this key
                         Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition));
-                        book[playBackPosition.zobristKey] = new List<Entry> { newEntry };
+                        book[playBackPosition.zobristKey] = new List<Entry>() { newEntry };
                     }
+                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
                 }
             }
-        }
-
-        public static void RunMe()
-        {
-            return;
         }
 
         #endregion
 
         #region Class Utility
 
+        // Saves the book to a text file
+        public static void CalculateBookToFile()
+        {
+            System.IO.File.WriteAllTextAsync(openingBookDirectory, GetStringBook());
+        }
         public static string GetStringBook()
         {
             // Converts the book from a dictiorary to a formated string
@@ -105,9 +113,11 @@ namespace Chess.EngineUtility
                 this.count = 1;
             }
 
-            public void IncreaseCount()
+            public Entry(ulong key, ushort move, ushort count)
             {
-                count++;
+                this.key = key;
+                this.move = move;
+                this.count = count;
             }
         }
 

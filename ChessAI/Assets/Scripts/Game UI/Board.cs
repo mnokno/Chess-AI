@@ -59,7 +59,7 @@ namespace Chess.UI
                 testPostion.MakeMove(Move.ConvertPGNToUshort(move, testPostion));
             }
             fenString = testPostion.GetFEN();
-            OpeningBook.RunMe();
+            OpeningBook.CalculateBookToFile();
             ///
 
             // Disables/hides the board preview area
