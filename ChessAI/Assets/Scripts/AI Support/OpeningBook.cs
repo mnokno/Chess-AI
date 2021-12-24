@@ -17,9 +17,11 @@ namespace Chess.EngineUtility
 
         #endregion
 
-        #region Class Constructor
+        #region Class Utility
 
-        static OpeningBook()
+        // Saves the book to a text file
+
+        public static void CalculateBook()
         {
             string[] games = System.IO.File.ReadAllText(openingGamesDirectory).Split('\n');
             foreach (string game in games)
@@ -68,15 +70,11 @@ namespace Chess.EngineUtility
             }
         }
 
-        #endregion
-
-        #region Class Utility
-
-        // Saves the book to a text file
-        public static void CalculateBookToFile()
+        public static void BookToFile()
         {
             System.IO.File.WriteAllTextAsync(openingBookDirectory, GetStringBook());
         }
+
         public static string GetStringBook()
         {
             // Converts the book from a dictiorary to a formated string
@@ -94,8 +92,27 @@ namespace Chess.EngineUtility
             }
 
             // Returns the formated book
-            return formatedBook;
+            return formatedBook.TrimEnd();
         }
+
+        public static void LoadBookFromFile()
+        {
+            // Reads the opening book from a text file and splits it into key - moves formate array
+            string[] openingBook = System.IO.File.ReadAllText(openingBookDirectory).Split('\n');
+
+            // Converts the openingBook arry to a book dictionary
+            foreach (string line in openingBook)
+            {
+                string[] parts = line.Split(" ");
+                List<Entry> enties = new List<Entry>();
+                for (int i = 2; i < parts.Length; i++)
+                {
+                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1])));
+                }
+                book.Add(ulong.Parse(parts[0]), enties);
+            }
+        }
+
         #endregion
 
         #region Structures
