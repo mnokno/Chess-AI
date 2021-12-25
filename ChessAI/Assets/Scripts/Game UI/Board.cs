@@ -52,7 +52,9 @@ namespace Chess.UI
         void Start()
         {
             /// Debug
-            OpeningBook.LoadBookFromFile(false);
+            ZobristHashing.WriteRandomNumbers();
+            //System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
+            //OpeningBook.LoadBookFromFile(false);
             ///
 
             // Disables/hides the board preview area

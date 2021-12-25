@@ -22,7 +22,7 @@ namespace Chess.EngineUtility
 
         static OpeningBook()
         {
-            hasLoaded = false;
+            hasLoaded = true;
         }
 
         #endregion
@@ -58,26 +58,31 @@ namespace Chess.EngineUtility
                         {
                             if (entries[i].move == currentlyEvaluatedMove)
                             {
-                                entries[i] = new Entry(entries[i].key, entries[i].move, (ushort)(entries[i].count + 1));
+                                if (entries[i].FEN != playBackPosition.GetFEN())
+                                {
+                                    Debug.Log("Colision");
+                                }
+                                entries[i] = new Entry(entries[i].key, entries[i].move, (ushort)(entries[i].count + 1), playBackPosition.GetFEN());
                                 entryAllreadyExists = true;
                                 break;
                             }
                         }
                         if (!entryAllreadyExists)
                         {
-                            Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition));
+                            Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition), playBackPosition.GetFEN());
                             entries.Add(newEntry);
                         }
                     }
                     else
                     {
                         // Adds this move to the book and creates a list of moves for this key
-                        Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition));
+                        Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition), playBackPosition.GetFEN());
                         book[playBackPosition.zobristKey] = new List<Entry>() { newEntry };
                     }
                     playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
                 }
             }
+            Debug.Log("Finished");
         }
 
         public static void BookToFile()
@@ -129,13 +134,35 @@ namespace Chess.EngineUtility
                 List<Entry> enties = new List<Entry>();
                 for (int i = 2; i < parts.Length; i++)
                 {
-                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1])));
+                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1]), ""));
                 }
                 book.Add(ulong.Parse(parts[0]), enties);
             }
 
             // Sets off teh hasLoaded falg
             hasLoaded = true;
+        }
+
+        // Resturs a randommove from the opening book, and 0 if no move was found
+        public static ushort GetMove(ulong positionKey)
+        {
+            // Chesk if the opening book has been loaded
+            if (hasLoaded)
+            {
+                book.TryGetValue(positionKey, out List<Entry> entries);
+                if (entries != null)
+                {
+                    return entries[Random.Range(0, entries.Count - 1)].move;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         #endregion
@@ -147,19 +174,22 @@ namespace Chess.EngineUtility
             public ulong key;
             public ushort move;
             public ushort count;
+            public string FEN;
 
-            public Entry(ulong key, ushort move)
+            public Entry(ulong key, ushort move, string FEN)
             {
                 this.key = key;
                 this.move = move;
                 this.count = 1;
+                this.FEN = FEN;
             }
 
-            public Entry(ulong key, ushort move, ushort count)
+            public Entry(ulong key, ushort move, ushort count, string FEN)
             {
                 this.key = key;
                 this.move = move;
                 this.count = count;
+                this.FEN = FEN;
             }
         }
 

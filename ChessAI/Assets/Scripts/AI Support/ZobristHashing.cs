@@ -11,10 +11,11 @@ namespace Chess.EngineUtility
         /// Class variables
         #region Class variables
 
-        public const int seed = 2361912; // Seed for the random number generator
+        public const int seed = 1070372; // Seed for the random number generator
         public const string randomNumberFileName = "RandomNumbers.txt"; // Assets/StreamingAssets/RandomNumbers.txt
         public static string randomNumberFilePath = Path.Combine(Application.streamingAssetsPath, randomNumberFileName); // Path to the random numbers file
         public static System.Random pseudoRandomNumberGenerator = new System.Random(seed); // Used to generate random numbers
+        public static PRNG PRNG = new PRNG(seed); // Used to generate random numbers
 
         public static readonly ulong[,,] pieces = new ulong[6, 2, 64]; // [piece type, color, square]
         public static readonly ulong sideToMove; // Side to move
@@ -31,6 +32,8 @@ namespace Chess.EngineUtility
         public static void WriteRandomNumbers()
         {
             pseudoRandomNumberGenerator = new System.Random(seed); // Ensures the correct seed is used
+            PRNG = new PRNG(seed); // Ensures the correct seed is used
+
             string randomNumbers = ""; // Stores the random numbers, later written to a .txt file
             int numbersToGenerate = (6 * 2 * 64 + 1 + castlingRights.Length + 9); // Number of random numbers that should be generated 
             while (numbersToGenerate > 0) // Generates all numbers
@@ -45,7 +48,7 @@ namespace Chess.EngineUtility
         }
 
         // Returns a queue of pseudo random numbers form the .txt file
-        private static Queue<ulong> ReadRandomNumbers()
+        public static Queue<ulong> ReadRandomNumbers()
         {
             if (!File.Exists(randomNumberFilePath)) // If the random numbers do not exits then file is created and the numbers are generated
             {
@@ -69,9 +72,10 @@ namespace Chess.EngineUtility
         // Returns a pseudo random ulong
         private static ulong RandomUnsigned64BitNumber()
         {
-            byte[] buffer = new byte[8];
-            pseudoRandomNumberGenerator.NextBytes(buffer);
-            return BitConverter.ToUInt64(buffer, 0);
+            //byte[] buffer = new byte[8];
+            //pseudoRandomNumberGenerator.NextBytes(buffer);
+            //return BitConverter.ToUInt64(buffer, 0);
+            return PRNG.NextUlong();
         }
 
         // Constructor 

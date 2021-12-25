@@ -119,8 +119,9 @@ namespace Chess.Engine
                 else
                 {
                     // Makes calculated AI move
-                    Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
-                    //MakeCalculatedAIMove();
+                    Debug.Log("Here");
+                    //Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
+                    MakeCalculatedAIMove(moveGenerationProfile);
                 }
             }
         }
@@ -147,7 +148,16 @@ namespace Chess.Engine
             }
             else
             {
-                // Fetches a move from teh opening book
+                // Fetches a move from teh opening books
+                moveToPlay = OpeningBook.GetMove(chessEngine.centralPosition.zobristKey);
+                Debug.Log(moveToPlay);
+                Debug.Log(chessEngine.centralPosition.sideToMove);
+                // Cheks if teh move is valid
+                if (moveToPlay == 0)
+                {
+                    // Calculates the best moves, since the move was not valid
+                    moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
+                }
             }
             // Sets a flag
             calculated = true;
@@ -214,7 +224,7 @@ namespace Chess.Engine
 
         public IEnumerator CheckForAIMove()
         {
-            while (updateLables)
+            while (true)
             {
                 // Updates info
                 if (calculated)
