@@ -8,12 +8,22 @@ namespace Chess.EngineUtility
     {
         #region Class variables
 
-        // Directory of the opening book
+        // Paths to files
         private static string openingGamesDirectory = Application.streamingAssetsPath + "/OpeningGames.txt";
         private static string openingBookDirectory = Application.streamingAssetsPath + "/OpeningBook.txt";
-        //private static string opening 
+        // Opening book as dictionary
         private static Dictionary<ulong, List<Entry>> book = new Dictionary<ulong, List<Entry>>();
-        // Array containing all the games from the opening book
+        // Flag to show wheter or not the book has loaded
+        public static bool hasLoaded { get; private set; }
+
+        #endregion
+
+        #region Class constructor
+
+        static OpeningBook()
+        {
+            hasLoaded = false;
+        }
 
         #endregion
 
@@ -95,7 +105,19 @@ namespace Chess.EngineUtility
             return formatedBook.TrimEnd();
         }
 
-        public static void LoadBookFromFile()
+        public static void LoadBookFromFile(bool onMainThread)
+        {
+            if (!onMainThread)
+            {
+                System.Threading.Tasks.Task.Run(() => LoadBookFromFile());
+            }
+            else
+            {
+                LoadBookFromFile();
+            }
+        }
+
+        private static void LoadBookFromFile()
         {
             // Reads the opening book from a text file and splits it into key - moves formate array
             string[] openingBook = System.IO.File.ReadAllText(openingBookDirectory).Split('\n');
@@ -111,6 +133,9 @@ namespace Chess.EngineUtility
                 }
                 book.Add(ulong.Parse(parts[0]), enties);
             }
+
+            // Sets off teh hasLoaded falg
+            hasLoaded = true;
         }
 
         #endregion

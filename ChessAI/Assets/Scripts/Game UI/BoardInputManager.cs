@@ -293,7 +293,7 @@ namespace Chess.UI
             MakeAIMove(from, to, animate:animate);
             if (!parrentBoard.hvh)
             {
-                parrentBoard.engineManager.MakeAIMove();
+                parrentBoard.engineManager.MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, 5));
             }
         }
 

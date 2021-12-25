@@ -10,10 +10,7 @@ namespace Chess.Engine
     public class ChessEngineManager : MonoBehaviour
     {
         // Class variables
-        #region
-
-        // Settings
-        public float timePerMove = 5f;
+        #region Class variables
 
         // Chess engine manager connections references
         public ChessEngine chessEngine;
@@ -60,6 +57,12 @@ namespace Chess.Engine
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
             // Updates FEN info
             FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+
+            // Ensures that the opening book has loaded
+            while (!OpeningBook.hasLoaded)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
         }
 
         #endregion
@@ -104,7 +107,7 @@ namespace Chess.Engine
         }
 
         // Makes an AI generated move
-        public void MakeAIMove(bool random = false)
+        public void MakeAIMove(MoveGenerationProfile moveGenerationProfile, bool random = false)
         {
             if (chessEngine.centralPosition.gameState == Position.GameState.OnGoing)
             {
@@ -116,7 +119,7 @@ namespace Chess.Engine
                 else
                 {
                     // Makes calculated AI move
-                    Task.Run(() => MakeCalculatedAIMove());
+                    Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
                     //MakeCalculatedAIMove();
                 }
             }
@@ -135,10 +138,17 @@ namespace Chess.Engine
         }
 
         // Makes a calculated move
-        private void MakeCalculatedAIMove()
+        private void MakeCalculatedAIMove(MoveGenerationProfile moveGenerationProfile)
         {
-            // Calculates the best move
-            moveToPlay = chessEngine.CalculateBestMove(timePerMove);
+            if (chessEngine.centralPosition.historicMoveData.Count >= moveGenerationProfile.bookLimit)
+            {
+                // Calculates the best moves
+                moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
+            }
+            else
+            {
+                // Fetches a move from teh opening book
+            }
             // Sets a flag
             calculated = true;
         }
@@ -218,6 +228,23 @@ namespace Chess.Engine
 
                 // Wait till next info update
                 yield return new WaitForSeconds(1f / 60f);
+            }
+        }
+
+        #endregion
+
+        // Structures
+        #region Structures
+
+        public struct MoveGenerationProfile
+        {
+            public byte bookLimit;
+            public float timeLimit;
+
+            public MoveGenerationProfile(byte bookLimit, float timeLimit)
+            {
+                this.bookLimit = bookLimit;
+                this.timeLimit = timeLimit;
             }
         }
 

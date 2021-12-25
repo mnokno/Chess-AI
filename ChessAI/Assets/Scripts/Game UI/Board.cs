@@ -52,14 +52,7 @@ namespace Chess.UI
         void Start()
         {
             /// Debug
-
-            Position testPostion = new Position();
-            foreach (string move in "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e5 Nb3 Be6 Be3 h5 Qd2 Nbd7 Nd5 Bxd5 exd5 g6 Be2 Bg7 O-O a5 a4 O-O Bb5 Qc7 c4 b6 h3 Nc5 Nxc5 bxc5 Ra3 Nh7 Rb3 f5 Bc6 Rab8 Rb5 f4 Bf2 e4 Qc2 Qe7 Qxe4 Qxe4 fxe4 Ng5 Re1 Nf7 Rb1 Ng5 Rxa5 Rb3 Rb5 Rd3 Re1 f3 h4 Nf7 a5 Ne5 a6 Rd2 a7 fxg2 a8=Q Nf3+ Kxg2 Nxe1+ Kf1 Rxf2+".Split(" "))
-            {
-                testPostion.MakeMove(Move.ConvertPGNToUshort(move, testPostion));
-            }
-            fenString = testPostion.GetFEN();
-            OpeningBook.LoadBookFromFile();
+            OpeningBook.LoadBookFromFile(false);
             ///
 
             // Disables/hides the board preview area
@@ -81,7 +74,7 @@ namespace Chess.UI
             if (!hvh && whiteHumman != whiteToMove)
             {
                 // If so an AI move is played
-                engineManager.MakeAIMove();
+                engineManager.MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, 5));
             }
         }
 
