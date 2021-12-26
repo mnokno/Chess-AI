@@ -61,6 +61,7 @@ namespace Chess.EngineUtility
                                 if (entries[i].FEN != playBackPosition.GetFEN())
                                 {
                                     Debug.Log("Colision");
+                                    Debug.Log(entries[i].FEN + " --- " + playBackPosition.GetFEN());
                                 }
                                 entries[i] = new Entry(entries[i].key, entries[i].move, (ushort)(entries[i].count + 1), playBackPosition.GetFEN());
                                 entryAllreadyExists = true;
@@ -79,7 +80,7 @@ namespace Chess.EngineUtility
                         Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition), playBackPosition.GetFEN());
                         book[playBackPosition.zobristKey] = new List<Entry>() { newEntry };
                     }
-                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move.Replace(" ", ""), playBackPosition));
+                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move, playBackPosition));
                 }
             }
             Debug.Log("Finished");
@@ -143,7 +144,7 @@ namespace Chess.EngineUtility
             hasLoaded = true;
         }
 
-        // Resturs a randommove from the opening book, and 0 if no move was found
+        // Resturs a random move from the opening book, and 0 if no move was found
         public static ushort GetMove(ulong positionKey)
         {
             // Chesk if the opening book has been loaded

@@ -2028,7 +2028,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f5e6c30137b4fe48919f8b21fe3b3e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timePerMove: 5
   inputManager: {fileID: 1585878160}
   evlaText: {fileID: 351377375}
   nodesText: {fileID: 1660176701}

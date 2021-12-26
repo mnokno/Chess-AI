@@ -52,8 +52,10 @@ namespace Chess.UI
         void Start()
         {
             /// Debug
-            ZobristHashing.WriteRandomNumbers();
-            //System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
+            //ZobristHashing.WriteRandomNumbers();
+            //OpeningBook.CalculateBook();
+            //OpeningBook.BookToFile();
+            System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
             //OpeningBook.LoadBookFromFile(false);
             ///
 

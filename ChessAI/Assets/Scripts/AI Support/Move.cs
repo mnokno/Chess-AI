@@ -446,6 +446,7 @@ namespace Chess.EngineUtility
         }
 
         #endregion
+
         // Structures and enumerations used by this class
         #region Structures and enumerations
 

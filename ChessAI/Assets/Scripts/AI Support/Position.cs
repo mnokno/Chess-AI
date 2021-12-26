@@ -313,6 +313,7 @@ namespace Chess.EngineUtility
                     byte oldEnPassant = enPassantTargetFile; // Saves old en passant target file
                     enPassantTargetFile = (byte)(to % 8); // Updates en-passant target file
                     ZobristHashing.UpdateEnPassantTargetFile(ref zobristKey, oldEnPassant, enPassantTargetFile); // Updates en passant target file in zobrist key
+                    ZobristHashing.Update(ref zobristKey, sideToMove, from, to, pieceToMove); // Updates position in the zobrist key
                     halfmoveClock = 0; // Resets half-move clock after pawn push  
                 }
 
