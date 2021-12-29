@@ -9,7 +9,7 @@ namespace Chess.EngineUtility
         #region Class variables
 
         // Paths to files
-        private static string openingGamesDirectory = Application.streamingAssetsPath + "/Opening/OpeningGames.pgn";
+        private static string openingGamesDirectory = Application.streamingAssetsPath + "/Opening/OpeningGames.csv";
         private static string openingBookDirectory = Application.streamingAssetsPath + "/Opening/OpeningBook.csv";
         // Opening book as dictionary
         private static Dictionary<ulong, List<Entry>> book = new Dictionary<ulong, List<Entry>>();
@@ -49,7 +49,7 @@ namespace Chess.EngineUtility
                 for (int i = 0; i < moves.Length - 1; i++)
                 {
                     moveNumber++;
-                    if (moveNumber > 40)
+                    if (moveNumber > 20)
                     {
                         break;
                     }
@@ -120,20 +120,20 @@ namespace Chess.EngineUtility
         }
 
         // Loads the opening book
-        public static void LoadBookFromFile(bool onMainThread)
+        public static void LoadBookFromCSV(bool onMainThread)
         {
             if (!onMainThread)
             {
-                System.Threading.Tasks.Task.Run(() => LoadBookFromFile());
+                System.Threading.Tasks.Task.Run(() => LoadBookFromCSV());
             }
             else
             {
-                LoadBookFromFile();
+                LoadBookFromCSV();
             }
         }
 
         // Loads the opening book from file
-        private static void LoadBookFromFile()
+        private static void LoadBookFromCSV()
         {
             // Reads the opening book from a text file and splits it into key - moves formate array
             string[] openingBook = System.IO.File.ReadAllLines(openingBookDirectory);
