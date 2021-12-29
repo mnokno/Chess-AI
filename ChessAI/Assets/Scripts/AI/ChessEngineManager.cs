@@ -177,11 +177,11 @@ namespace Chess.Engine
                 // Updates info
                 if (Constants.negativeInfinity + 100 > chessEngine.eval)
                 {
-                    evlaText.text = $"Eval: {Constants.negativeInfinity - chessEngine.eval}M";
+                    evlaText.text = $"Eval: M{Constants.negativeInfinity - chessEngine.eval}";
                 }
                 else if (Constants.positiveInfinity - 100 < chessEngine.eval)
                 {
-                    evlaText.text = $"Eval: {Constants.positiveInfinity - chessEngine.eval}M";
+                    evlaText.text = $"Eval: M{Constants.positiveInfinity - chessEngine.eval}";
                 }
                 else
                 {
