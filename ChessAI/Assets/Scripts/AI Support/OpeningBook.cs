@@ -9,8 +9,8 @@ namespace Chess.EngineUtility
         #region Class variables
 
         // Paths to files
-        private static string openingGamesDirectory = Application.streamingAssetsPath + "/OpeningGames.txt";
-        private static string openingBookDirectory = Application.streamingAssetsPath + "/OpeningBook.txt";
+        private static string openingGamesDirectory = Application.streamingAssetsPath + "/Opening/OpeningGames.pgn";
+        private static string openingBookDirectory = Application.streamingAssetsPath + "/Opening/OpeningBook.csv";
         // Opening book as dictionary
         private static Dictionary<ulong, List<Entry>> book = new Dictionary<ulong, List<Entry>>();
         // Flag to show wheter or not the book has loaded
@@ -29,20 +29,27 @@ namespace Chess.EngineUtility
 
         #region Class Utility
 
-        // Saves the book to a text file
-
-        public static void CalculateBook()
+        // Calculate the opening book from games
+        public static void CalculateBook(int gameLimit)
         {
-            string[] games = System.IO.File.ReadAllText(openingGamesDirectory).Split('\n');
+            string[] games = System.IO.File.ReadAllLines(openingGamesDirectory);
+            int gameCount = 0;
+            Position playBackPosition;
+            string[] moves;
             foreach (string game in games)
             {
-                string[] moves = game.Replace(" 1/2-1/2", "").Replace(" 0-1", "").Replace(" 1-0", "").Replace("\r", "").Split(" ");
-                Position playBackPosition = new Position();
+                gameCount++;
+                if (gameCount > gameLimit)
+                {
+                    break;
+                }
+                moves = game.Split(" ");
+                playBackPosition = new Position();
                 int moveNumber = 0;
-                foreach (string move in moves)
+                for (int i = 0; i < moves.Length - 1; i++)
                 {
                     moveNumber++;
-                    if (moveNumber >= 30)
+                    if (moveNumber > 40)
                     {
                         break;
                     }
@@ -50,67 +57,69 @@ namespace Chess.EngineUtility
                     {
                         // Gets list of all entries attached to this key
                         List<Entry> entries = book[playBackPosition.zobristKey];
-                        ushort currentlyEvaluatedMove = Move.ConvertPGNToUshort(move, playBackPosition);
+                        ushort currentlyEvaluatedMove = Move.ConvertPGNToUshort(moves[i], playBackPosition);
 
                         // Cheks if the currently evaluated move allready exists in the move list
                         bool entryAllreadyExists = false;
-                        for (int i = 0; i < entries.Count; i++)
+                        for (int j = 0; j < entries.Count; j++)
                         {
-                            if (entries[i].move == currentlyEvaluatedMove)
+                            if (entries[j].move == currentlyEvaluatedMove)
                             {
-                                if (entries[i].FEN != playBackPosition.GetFEN())
-                                {
-                                    Debug.Log("Colision");
-                                    Debug.Log(entries[i].FEN + " --- " + playBackPosition.GetFEN());
-                                }
-                                entries[i] = new Entry(entries[i].key, entries[i].move, (ushort)(entries[i].count + 1), playBackPosition.GetFEN());
+                                entries[j] = new Entry(entries[j].key, entries[j].move, (ushort)(entries[j].count + 1));
                                 entryAllreadyExists = true;
                                 break;
                             }
                         }
                         if (!entryAllreadyExists)
                         {
-                            Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition), playBackPosition.GetFEN());
+                            Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(moves[i], playBackPosition));
                             entries.Add(newEntry);
                         }
                     }
                     else
                     {
                         // Adds this move to the book and creates a list of moves for this key
-                        Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(move, playBackPosition), playBackPosition.GetFEN());
+                        Entry newEntry = new Entry(playBackPosition.zobristKey, Move.ConvertPGNToUshort(moves[i], playBackPosition));
                         book[playBackPosition.zobristKey] = new List<Entry>() { newEntry };
                     }
-                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(move, playBackPosition));
+                    playBackPosition.MakeMove(Move.ConvertPGNToUshort(moves[i], playBackPosition));
                 }
             }
-            Debug.Log("Finished");
+            // Logs a massage
+            Debug.Log($"Finished claculatig opening book, total games converted: {gameCount - 1}");
         }
 
-        public static void BookToFile()
+        // Saves the book to a data base
+        public static void BookToCSV()
         {
-            System.IO.File.WriteAllTextAsync(openingBookDirectory, GetStringBook());
-        }
+            // Creates writers
+            System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(openingBookDirectory);
+            // Clears the destination file
+            streamWriter.Write("");
+            // Writes csv headers
+            streamWriter.WriteLine("Key|Moves|Counts");
 
-        public static string GetStringBook()
-        {
-            // Converts the book from a dictiorary to a formated string
-            string formatedBook = "";
-            
             // Foreach position
-            foreach(ulong key in book.Keys)
+            foreach (ulong key in book.Keys)
             {
-                string bookLine = key.ToString() + " :";
-                foreach(Entry entry in book[key])
+                string moves = "";
+                string counts = "";
+
+                foreach (Entry entry in book[key])
                 {
-                    bookLine += " " + entry.move + "-" + entry.count;
+                    moves += entry.move + " ";
+                    counts += entry.count + " ";
                 }
-                formatedBook += bookLine + "\n";
+                streamWriter.WriteLine(key + "|" + moves.TrimEnd() + "|" + counts.TrimEnd());
             }
 
-            // Returns the formated book
-            return formatedBook.TrimEnd();
+            // Disposes of writers
+            streamWriter.Close();
+            streamWriter.Dispose();
+            Debug.Log("The opening book has been saved to csv file");
         }
 
+        // Loads the opening book
         public static void LoadBookFromFile(bool onMainThread)
         {
             if (!onMainThread)
@@ -123,10 +132,11 @@ namespace Chess.EngineUtility
             }
         }
 
+        // Loads the opening book from file
         private static void LoadBookFromFile()
         {
             // Reads the opening book from a text file and splits it into key - moves formate array
-            string[] openingBook = System.IO.File.ReadAllText(openingBookDirectory).Split('\n');
+            string[] openingBook = System.IO.File.ReadAllLines(openingBookDirectory);
 
             // Converts the openingBook arry to a book dictionary
             foreach (string line in openingBook)
@@ -135,25 +145,41 @@ namespace Chess.EngineUtility
                 List<Entry> enties = new List<Entry>();
                 for (int i = 2; i < parts.Length; i++)
                 {
-                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1]), ""));
+                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1])));
                 }
                 book.Add(ulong.Parse(parts[0]), enties);
             }
 
             // Sets off teh hasLoaded falg
             hasLoaded = true;
+            // Logs a massage
+            Debug.Log("The opening book has loaded");
         }
 
         // Resturs a random move from the opening book, and 0 if no move was found
-        public static ushort GetMove(ulong positionKey)
+        public static ushort GetMove(Position position)
         {
             // Chesk if the opening book has been loaded
             if (hasLoaded)
             {
-                book.TryGetValue(positionKey, out List<Entry> entries);
+                book.TryGetValue(position.zobristKey, out List<Entry> entries);
                 if (entries != null)
                 {
-                    return entries[Random.Range(0, entries.Count - 1)].move;
+                    // Gets a move form the opening data base
+                    ushort move = entries[Random.Range(0, entries.Count - 1)].move;
+
+                    // Check if the move if valid
+                    MoveGenerator moveGenerator = new MoveGenerator();
+                    ushort[] moves = moveGenerator.GenerateLegalMoves(position, (byte)(position.sideToMove ? 0 : 1)).ToArray();
+                    foreach (ushort legalMove in moves)
+                    {
+                        if (legalMove == move)
+                        {
+                            return move;
+                        }
+                    }
+                    // The move was not valid
+                    return 0;
                 }
                 else
                 {
@@ -168,6 +194,55 @@ namespace Chess.EngineUtility
 
         #endregion
 
+        #region Formating functions
+
+        public static void FormatLiChessEliteGames(string from, string to)
+        {
+            // Creates stream readers and writers
+            System.IO.StreamReader streamReader = new System.IO.StreamReader(Application.streamingAssetsPath + "/Opening/LichessElite/" + from);
+            System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(Application.streamingAssetsPath + "/Opening/" + to);
+            // Clears the destination file
+            streamWriter.Write("");
+
+            // Removes annoataions
+            while (!streamReader.EndOfStream)
+            {
+                string line = streamReader.ReadLine();
+                if (line != "" && line[0] != '[')
+                {
+                    string game = line;
+                    while (line[line.Length - 1] != '*' && line[line.Length - 2] != '-' && line[line.Length - 4] != '-' || line[line.Length - 1] == 'O')
+                    {
+                        line = streamReader.ReadLine();
+                        game += " " + line;
+                    }
+
+                    string[] parts = game.Split(" ");
+                    // Only conciders game thta have more then 30 move player by each side
+                    if (parts.Length > 90)
+                    {
+                        game = "";
+                        foreach (string part in parts)
+                        {
+                            if (part[part.Length - 1] != '.')
+                            {
+                                game += part + " ";
+                            }
+                        }
+                        streamWriter.WriteLine(game.TrimEnd());
+                    }
+                }
+            }
+
+            // Disposes of writers and readers
+            streamReader.Close();
+            streamReader.Dispose();
+            streamWriter.Close();
+            streamWriter.Dispose();
+        }
+
+        #endregion
+
         #region Structures
 
         public struct Entry
@@ -175,22 +250,19 @@ namespace Chess.EngineUtility
             public ulong key;
             public ushort move;
             public ushort count;
-            public string FEN;
 
-            public Entry(ulong key, ushort move, string FEN)
+            public Entry(ulong key, ushort move)
             {
                 this.key = key;
                 this.move = move;
                 this.count = 1;
-                this.FEN = FEN;
             }
 
-            public Entry(ulong key, ushort move, ushort count, string FEN)
+            public Entry(ulong key, ushort move, ushort count)
             {
                 this.key = key;
                 this.move = move;
                 this.count = count;
-                this.FEN = FEN;
             }
         }
 

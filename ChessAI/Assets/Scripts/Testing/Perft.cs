@@ -106,7 +106,7 @@ namespace Chess.EngineTests
             stopwatch.Start();
 
             // Reads the .json file to a string
-            string json = File.ReadAllText(Application.streamingAssetsPath + "/Perft Testing Position.json");
+            string json = File.ReadAllText(Application.streamingAssetsPath + "/Testing/Perft Testing Position.json");
             // Converts the jsonString to an array of objects
             TestPositionCollection testPositions = JsonUtility.FromJson<TestPositionCollection>(json);
 
@@ -230,7 +230,7 @@ namespace Chess.EngineTests
             stopwatch.Start();
 
             // Reads the .json file to a string
-            string json = File.ReadAllText(Application.streamingAssetsPath + "/QPerft Testing Position.json");
+            string json = File.ReadAllText(Application.streamingAssetsPath + "/Testing/QPerft Testing Position.json");
             // Converts the jsonString to an array of objects
             QTestPositionCollection qTestPositions = JsonUtility.FromJson<QTestPositionCollection>(json);
 

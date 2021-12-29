@@ -51,12 +51,27 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            /// Debug
-            //ZobristHashing.WriteRandomNumbers();
-            //OpeningBook.CalculateBook();
-            //OpeningBook.BookToFile();
-            System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
-            //OpeningBook.LoadBookFromFile(false);
+            /// Debugz
+            //DB.OpeningDbReader reader = new DB.OpeningDbReader();
+            //reader.OpenDB();
+            //Debug.Log(reader.TryGetRecord(1).moves);
+            //Debug.Log(reader.TryGetRecord(2).moves);
+            //reader.CloseDB();
+            //DB.OpeningDbWriter writer = new DB.OpeningDbWriter();
+            //writer.OpenDB();
+            //writer.ClearDB();
+            //writer.AddNewMove(2, 34653);
+            //writer.CloseDB();
+            //OpeningBook.FormatLiChessEliteGames("lichess_elite_2021-10.pgn", "OpeningGames.pgn");
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+            OpeningBook.CalculateBook(1000000);
+            Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
+            OpeningBook.BookToCSV();
+            stopwatch.Stop();
+            Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
+            //System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
+            //OpeningBook.LoadBookFromFile(true);
             ///
 
             // Disables/hides the board preview area
