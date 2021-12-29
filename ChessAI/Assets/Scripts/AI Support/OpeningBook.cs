@@ -137,17 +137,23 @@ namespace Chess.EngineUtility
         {
             // Reads the opening book from a text file and splits it into key - moves formate array
             string[] openingBook = System.IO.File.ReadAllLines(openingBookDirectory);
+            openingBook[0] = "";
 
             // Converts the openingBook arry to a book dictionary
             foreach (string line in openingBook)
             {
-                string[] parts = line.Split(" ");
-                List<Entry> enties = new List<Entry>();
-                for (int i = 2; i < parts.Length; i++)
+                if (line != "")
                 {
-                    enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(parts[i].Split("-")[0]), ushort.Parse(parts[i].Split("-")[1])));
+                    string[] parts = line.Split("|");
+                    string[] moves = parts[1].Split(" ");
+                    string[] counts = parts[2].Split(" ");
+                    List<Entry> enties = new List<Entry>();
+                    for (int i = 0; i < moves.Length; i++)
+                    {
+                        enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(moves[i]), ushort.Parse(counts[i])));
+                    }
+                    book.Add(ulong.Parse(parts[0]), enties);
                 }
-                book.Add(ulong.Parse(parts[0]), enties);
             }
 
             // Sets off teh hasLoaded falg

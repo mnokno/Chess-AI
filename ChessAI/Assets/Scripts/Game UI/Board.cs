@@ -52,30 +52,13 @@ namespace Chess.UI
         void Start()
         {
             /// Debugz
-            DB.OpeningDbReader reader = new DB.OpeningDbReader();
-            reader.OpenDB();
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
-            //Debug.Log(reader.TryGetRecord(13288730929044222747).moves);
-            Debug.Log(reader.TryGetRecord((ulong)15600864386571885425).isValid);
-            reader.CloseDB();
+
+            OpeningBook.LoadBookFromCSV(true);
+
             Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
             stopwatch.Stop();
-            //DB.OpeningDbWriter writer = new DB.OpeningDbWriter();
-            //writer.OpenDB();
-            //writer.ClearDB();
-            //writer.AddNewMove(2, 34653);
-            //writer.CloseDB();
-            //OpeningBook.FormatLiChessEliteGames("lichess_elite_2021-10.pgn", "OpeningGames.pgn");
-            //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            //stopwatch.Start();
-            //OpeningBook.CalculateBook(500000);
-            //Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
-            //OpeningBook.BookToCSV();
-            //stopwatch.Stop();
-            //Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
-            //System.Threading.Tasks.Task.Run(() => OpeningBook.CalculateBook());
-            //OpeningBook.LoadBookFromFile(true);
             ///
 
             // Disables/hides the board preview area
