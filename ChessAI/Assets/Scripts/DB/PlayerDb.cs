@@ -80,6 +80,7 @@ namespace Chess.DB
          * CREATE TABLE "Players" (
 	     *   "Player_ID"	INTEGER NOT NULL UNIQUE,
 	     *   "Username"	TEXT NOT NULL,
+	     *   "DefaultDifficulty"	TEXT NOT NULL,
 	     *   PRIMARY KEY("Player_ID" AUTOINCREMENT)
          *);
          */
@@ -87,11 +88,13 @@ namespace Chess.DB
         {
             public int playerID;
             public string username;
+            public string defaultDifficulty;
 
-            public PlayerRecord(int playerID, string username)
+            public PlayerRecord(int playerID, string username, string defaultDifficulty)
             {
                 this.playerID = playerID;
                 this.username = username;
+                this.defaultDifficulty = defaultDifficulty;
             }
         }
 
