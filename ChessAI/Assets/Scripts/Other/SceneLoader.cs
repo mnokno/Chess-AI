@@ -16,7 +16,7 @@ namespace Chess.UI
 
         IEnumerator Load(int scene)
         {
-            transition.SetTrigger("Start");
+            transition.SetTrigger("FadeOut");
             yield return new WaitForSecondsRealtime(1f);
             SceneManager.LoadScene(scene);
         }
@@ -28,7 +28,7 @@ namespace Chess.UI
 
         IEnumerator Load(string scene)
         {
-            transition.SetTrigger("Start");
+            transition.SetTrigger("FadeOut");
             yield return new WaitForSecondsRealtime(1f);
             Time.timeScale = 1f;
             SceneManager.LoadScene(scene);

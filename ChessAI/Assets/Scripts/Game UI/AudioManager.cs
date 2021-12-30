@@ -12,6 +12,8 @@ namespace Chess.UI
 
         public static AudioManager instance;
 
+        public bool dontDestroyOnLoad;
+
         // Awake is called before the Start
         void Awake()
         {
@@ -26,8 +28,11 @@ namespace Chess.UI
                 return;
             }
 
-            DontDestroyOnLoad(gameObject);
-
+            if (dontDestroyOnLoad)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            
             // Creates audio source for each sound
             foreach (Sound s in this.sounds)
             {

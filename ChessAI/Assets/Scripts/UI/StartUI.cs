@@ -8,17 +8,17 @@ namespace Chess.UI
     {
         public void SelectProfileBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("SelectProfileScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectScene");
         }
 
         public void CreateProfileBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("CreateProfileScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileCreationScene");
         }
 
         public void DeleteProfileBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("DeleteProfileScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileDeleteScene");
         }
 
         public void QuitBtn()

@@ -580,7 +580,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979648}
         m_TargetAssemblyTypeName: Chess.UI.StartUI, Assembly-CSharp
-        m_MethodName: DeleteProfileBtn
+        m_MethodName: CreateProfileBtn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
