@@ -225,7 +225,7 @@ namespace Chess.EngineUtility
 
                     string[] parts = game.Split(" ");
                     // Only conciders game thta have more then 30 move player by each side
-                    if (parts.Length > 90)
+                    if (parts.Length > 120)
                     {
                         game = "";
                         foreach (string part in parts)
