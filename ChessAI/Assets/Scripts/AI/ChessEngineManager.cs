@@ -34,6 +34,8 @@ namespace Chess.Engine
         // Used to play an AI move once its calculated
         public bool calculated = false;
         public ushort moveToPlay = 0;
+        // Settings
+        public bool usedOpeningBook;
 
         #endregion
 
@@ -61,7 +63,7 @@ namespace Chess.Engine
             }
 
             // Ensures that the opening book has loaded
-            while (!OpeningBook.hasLoaded)
+            while (!OpeningBook.hasLoaded && usedOpeningBook)
             {
                 System.Threading.Thread.Sleep(100);
             }

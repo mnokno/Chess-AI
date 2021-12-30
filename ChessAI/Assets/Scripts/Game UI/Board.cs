@@ -55,7 +55,7 @@ namespace Chess.UI
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            //OpeningBook.LoadBookFromCSV(true);
+            OpeningBook.LoadBookFromCSV(false);
 
             Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
             stopwatch.Stop();
