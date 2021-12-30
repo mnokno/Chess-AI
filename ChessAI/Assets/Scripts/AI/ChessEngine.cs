@@ -17,7 +17,7 @@ namespace Chess.Engine
         public MoveGenerator moveGenerator;
 
         // Transposition tables settings
-        public ulong mainTransTableSize = 64000;
+        public ulong mainTransTableSize = 640000;
         // Transposition tables
         public TranspositionTable mainTranspositionTable;
         // Creates new evaluator instance

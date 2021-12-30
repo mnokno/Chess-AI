@@ -16,6 +16,8 @@ namespace Chess.Engine
         public ChessEngine chessEngine;
         public BoardInputManager inputManager;
 
+        // Info Settings
+        public bool updateLables = true;
         // Info labels
         public TMPro.TextMeshProUGUI evlaText;
         public TMPro.TextMeshProUGUI nodesText;
@@ -28,9 +30,6 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI zobristHashText;
         public TMPro.TextMeshProUGUI FENText;
         public TMPro.TextMeshProUGUI PGNText;
-
-        // Used to stop updating info on the labels
-        public bool updateLables = true;
 
         // Used to play an AI move once its calculated
         public bool calculated = false;
@@ -50,13 +49,16 @@ namespace Chess.Engine
         // Start is called before the first frame update
         void Start()
         {
-            // Starts coroutines
-            StartCoroutine("UpdateInfo");
-            StartCoroutine("CheckForAIMove");
-            // Updates display info
-            zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
-            // Updates FEN info
-            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+            if (updateLables)
+            {
+                // Starts coroutines
+                StartCoroutine("UpdateInfo");
+                StartCoroutine("CheckForAIMove");
+                // Updates display info
+                zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
+                // Updates FEN info
+                FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+            }
 
             // Ensures that the opening book has loaded
             while (!OpeningBook.hasLoaded)
@@ -94,10 +96,13 @@ namespace Chess.Engine
                 }
             }
             // Updates detailed display
-            zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
-            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
-            gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState}";
-            PGNText.text = $"PGN: {chessEngine.centralPosition.GetPGN()}";
+            if (updateLables)
+            {
+                zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
+                FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+                gameStateText.text = $"Game State: {chessEngine.centralPosition.gameState}";
+                PGNText.text = $"PGN: {chessEngine.centralPosition.GetPGN()}";
+            }
             // If the game is over the result is displayed
             if (chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
             {
@@ -128,7 +133,6 @@ namespace Chess.Engine
                     {
                         // Fetches a move from teh opening books
                         moveToPlay = OpeningBook.GetMove(chessEngine.centralPosition);
-                        Debug.Log(moveToPlay);
                         // Cheks if teh move is valid
                         if (moveToPlay == 0)
                         {
@@ -175,13 +179,13 @@ namespace Chess.Engine
             while (updateLables)
             {
                 // Updates info
-                if (Constants.negativeInfinity + 100 > chessEngine.eval)
+                if (Constants.negativeInfinity + 1000 > chessEngine.eval)
                 {
-                    evlaText.text = $"Eval: M{Constants.negativeInfinity - chessEngine.eval}";
+                    evlaText.text = $"Eval: -M{Mathf.Abs(Constants.negativeInfinity - chessEngine.eval)}";
                 }
-                else if (Constants.positiveInfinity - 100 < chessEngine.eval)
+                else if (Constants.positiveInfinity - 1000 < chessEngine.eval)
                 {
-                    evlaText.text = $"Eval: M{Constants.positiveInfinity - chessEngine.eval}";
+                    evlaText.text = $"Eval: M{(Constants.positiveInfinity - chessEngine.eval)}";
                 }
                 else
                 {
@@ -192,7 +196,7 @@ namespace Chess.Engine
                 baseDepthText.text = $"Base Depth: {chessEngine.currentBaseDepht - 1}";
                 maxDepthText.text = $"Max Depth: {chessEngine.maxDepth}";
                 moveText.text = $"Move: {chessEngine.moveString}";
-                transpositiontableHitsText.text = $"TT Hits: {chessEngine.transpositiontableHits}";
+                transpositiontableHitsText.text = $"TT Hits: {FormatNodeCount(chessEngine.transpositiontableHits)}";
 
                 // Wait till next info update
                 yield return new WaitForSeconds(1f / 60f);

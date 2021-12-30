@@ -55,7 +55,7 @@ namespace Chess.UI
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            OpeningBook.LoadBookFromCSV(true);
+            //OpeningBook.LoadBookFromCSV(true);
 
             Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
             stopwatch.Stop();
@@ -80,7 +80,7 @@ namespace Chess.UI
             if (!hvh && whiteHumman != whiteToMove)
             {
                 // If so an AI move is played
-                engineManager.MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, 5));
+                engineManager.MakeAIMove(new ChessEngineManager.MoveGenerationProfile(0, 5));
             }
         }
 

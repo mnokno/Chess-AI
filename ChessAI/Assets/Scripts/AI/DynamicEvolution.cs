@@ -65,9 +65,9 @@ namespace Chess.Engine
             // Checks if the root of the basic search was reached
             if (depth == 0)
             {
-                //return staticEvaluation.Evaluate(position);
                 chessEngine.nodes++;
-                return QuiesceAlphaBetaEvaluation(alpha, beta, 0);
+                int eval = QuiesceAlphaBetaEvaluation(alpha, beta, 0);
+                return eval;
             }
 
             // Generates list of all legal moves

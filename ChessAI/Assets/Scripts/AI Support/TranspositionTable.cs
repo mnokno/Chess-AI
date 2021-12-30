@@ -43,19 +43,18 @@ namespace Chess.EngineUtility
         }
 
         // Adds entry to the hash table
-        public void AddEntry(byte depth, NodeType nodeType, int score, ushort move, ulong zobristKey, Bitboard bitboard) // FOR TESTING , Bitboard bitboard
+        public void AddEntry(byte depth, NodeType nodeType, int score, ulong zobristKey, Bitboard bitboard) // FOR TESTING , Bitboard bitboard
         {
             // Calculates the index
             ulong index = zobristKey % size;
             if (entries[index].key == zobristKey)
             {
-                Debug.Log($"Key collision TYPE 1, Higher Depth: {entries[index].depth < depth}, Same Position: {BitboardUtility.CompareBitboard(bitboard, entries[index].bitboard)}");
+                if (!BitboardUtility.CompareBitboard(bitboard, entries[index].bitboard))
+                {
+                    Debug.Log($"Key collision TYPE 1");
+                }
             }
-            // Only adds this entry if its evaluated to a greater depth then the currently stored location
-            if (depth >= entries[index].depth)
-            {
-                entries[index] = new HashEntry(zobristKey, depth, nodeType, score, move, bitboard); // FOR TESTING , bitboard
-            }
+            entries[index] = new HashEntry(zobristKey, depth, nodeType, score, bitboard); // FOR TESTING , bitboard
         }
 
         public int LookupEvaluation(byte depth, int alpha, int beta, ulong zobristKey)
@@ -73,14 +72,14 @@ namespace Chess.EngineUtility
                     {
                         return entry.score;
                     }
-                    else if (entry.nodeType == NodeType.alphaCutoff && entry.score <= alpha)
-                    {
-                        return alpha;
-                    }
-                    else if (entry.score >= beta) // The node type has to be NodeType.betaCutoff
-                    {
-                        return beta;
-                    }
+                    //else if (entry.nodeType == NodeType.alphaCutoff && entry.score <= alpha)
+                    //{
+                    //    return alpha;
+                    //}
+                    //else if (entry.score >= beta) // The node type has to be NodeType.betaCutoff
+                    //{
+                     //   return beta;
+                    //}
                 }
             }
 
@@ -99,16 +98,14 @@ namespace Chess.EngineUtility
             public readonly byte depth;
             public readonly NodeType nodeType;
             public readonly int score;
-            public readonly ushort move;
             public readonly Bitboard bitboard; // FOR TESTING
 
-            public HashEntry(ulong key, byte depth, NodeType nodeType, int score, ushort move, Bitboard bitboard) // FOR TESTING (, Bitboard bitboard)
+            public HashEntry(ulong key, byte depth, NodeType nodeType, int score, Bitboard bitboard) // FOR TESTING (, Bitboard bitboard)
             {
                 this.key = key;
                 this.depth = depth;
                 this.nodeType = nodeType;
                 this.score = score;
-                this.move = move;
                 this.bitboard = bitboard; // FRO TESTING
             }
         } 
