@@ -33,7 +33,7 @@ namespace Chess.UI
             }
             else if (IsUsernameTaken(inputField.text)) // Invalid username
             {
-                invalidUserName.SetMessage($"Username {inputField.text} is already taken, please chouse a different username.");
+                invalidUserName.SetMessage($"Username '{inputField.text}' is already taken, please chouse a different username.");
                 invalidUserName.Show();
             }
             else // Creates user
@@ -42,6 +42,8 @@ namespace Chess.UI
                 writer.OpenDB();
                 writer.WriteToPlayers(new PlayerDb.PlayerRecord(0, inputField.text, dropdown.value.ToString(), true));
                 writer.CloseDB();
+                PlayerPrefs.SetString("username", inputField.text);
+                FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
             }
         }
 
