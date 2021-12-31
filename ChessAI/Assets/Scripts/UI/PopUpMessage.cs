@@ -21,7 +21,6 @@ namespace Chess.UI
         // Called when the ok button is pressed
         public void OkBtn()
         {
-            Debug.Log("HERE");
             animator.SetTrigger("Hide");
             if (action != null)
             {

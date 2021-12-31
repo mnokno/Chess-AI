@@ -12,7 +12,7 @@ namespace Chess.DB
     {
         #region Class variables
 
-        protected static readonly string conn = "URI=file:" + Application.streamingAssetsPath + "/Opening/OpeningDB.db"; // Path to the opening database
+        protected static readonly string conn = "URI=file:" + Application.streamingAssetsPath + "/PlayerPlayedGames.db"; // Path to the opening database
         protected IDbConnection dbconn; // Connection to the data base
         protected IDbCommand dbcmd; // Command interface for the data base
         protected bool isOpen; // true if teh connection to the data base is open
@@ -86,15 +86,18 @@ namespace Chess.DB
          */
         public struct PlayerRecord
         {
+            
             public int playerID;
             public string username;
             public string defaultDifficulty;
+            public bool isValid;
 
-            public PlayerRecord(int playerID, string username, string defaultDifficulty)
+            public PlayerRecord(int playerID, string username, string defaultDifficulty, bool isValid)
             {
                 this.playerID = playerID;
                 this.username = username;
                 this.defaultDifficulty = defaultDifficulty;
+                this.isValid = isValid;
             }
         }
 
@@ -125,8 +128,9 @@ namespace Chess.DB
             public string timeLeft;
             public string startDate;
             public string gameTitle;
+            public bool isValid;
 
-            public SavedGameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string timeLeft, string startDate, string gameTitle)
+            public SavedGameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string timeLeft, string startDate, string gameTitle, bool isValid)
             {
                 this.gameID = gameID;
                 this.playerID = playerID;
@@ -137,6 +141,7 @@ namespace Chess.DB
                 this.timeLeft = timeLeft;
                 this.startDate = startDate;
                 this.gameTitle = gameTitle;
+                this.isValid = isValid;
             }
         }
 
@@ -168,8 +173,9 @@ namespace Chess.DB
             public string startDate;
             public string endDate;
             public string gameTitle;
+            public bool isValid;
 
-            public GameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string gameResult, string startDate, string endDate, string gameTitle)
+            public GameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string gameResult, string startDate, string endDate, string gameTitle, bool isValid)
             {
                 this.gameID = gameID;
                 this.playerID = playerID;
@@ -181,6 +187,7 @@ namespace Chess.DB
                 this.startDate = startDate;
                 this.endDate = endDate;
                 this.gameTitle = gameTitle;
+                this.isValid = isValid;
             }
         }
 
