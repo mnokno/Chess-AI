@@ -12,13 +12,6 @@ namespace Chess.UI
         public TMPro.TextMeshProUGUI messageText;
         private Action action;
 
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            animator.SetTrigger("Show");
-        }
-
         // Called when the background button is pressed
         public void BackGroundBtn()
         {
@@ -28,6 +21,7 @@ namespace Chess.UI
         // Called when the ok button is pressed
         public void OkBtn()
         {
+            Debug.Log("HERE");
             animator.SetTrigger("Hide");
             if (action != null)
             {
