@@ -6,18 +6,18 @@ using Chess.DB;
 
 namespace Chess.UI
 {
-    public class ProfileSelectionUI : MonoBehaviour
+    public class ProfileManagerUI : MonoBehaviour
     {
         // Class variables
         public RectTransform content;
         public GameObject listItemPrefab;
-        public Button selectButton;
+        public Button deleteButton;
         private GameObject currentlySelectedListItem;
 
-        // Start, called before the first frame update
+        // Start is called before the first frame update
         void Start()
         {
-            selectButton.interactable = false;
+            deleteButton.interactable = false;
             PopulateListBox();
         }
 
@@ -38,11 +38,6 @@ namespace Chess.UI
             }
         }
 
-        public void GoBackBtn()
-        {
-            FindObjectOfType<SceneLoader>().LoadScene("StartScene");
-        }
-
         public void ListItemBtn(GameObject button)
         {
             if (currentlySelectedListItem != null)
@@ -51,21 +46,24 @@ namespace Chess.UI
                 if (currentlySelectedListItem == button)
                 {
                     currentlySelectedListItem = null;
-                    selectButton.interactable = false;
+                    deleteButton.interactable = false;
                     return;
                 }
             }
 
             button.GetComponent<Animator>().SetTrigger("GreenOn");
             currentlySelectedListItem = button;
-            selectButton.interactable = true;
+            deleteButton.interactable = true;
         }
 
-        public void SelectBtn()
+        public void GoBackBtn()
         {
-            PlayerPrefs.SetString("username", currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
-            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+            FindObjectOfType<SceneLoader>().LoadScene("StartScene");
+        }
+
+        public void DeleteBtn()
+        {
+
         }
     }
 }
-
