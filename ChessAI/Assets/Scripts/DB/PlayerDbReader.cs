@@ -22,7 +22,7 @@ namespace Chess.DB
             }
 
             // Create a command to check if the record exists in the data base
-            dbcmd.CommandText = $"SELECT Player_ID, Username, DefaultDifficulty FROM Players WHERE Username='{name}' LIMIT 1;";
+            dbcmd.CommandText = $"SELECT * FROM Players WHERE Username='{name}' LIMIT 1;";
             // Executes teh command
             IDataReader reader = dbcmd.ExecuteReader();
 
@@ -48,6 +48,35 @@ namespace Chess.DB
 
             // Returns the record
             return new PlayerRecord(Player_ID, Username, DefaultDifficulty, true);
+        }
+        
+        // Returns all player records
+        public PlayerRecord[] ReadAllPlayers()
+        {
+            // Throws an exception if the data base has not been opend
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectivly.");
+            }
+
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT * FROM Players;";
+            // Executes teh command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            // Reads all player records
+            List<PlayerRecord> playerRecords = new List<PlayerRecord>();
+            while (reader.Read())
+            {
+                playerRecords.Add(new PlayerRecord(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), true));
+            }
+
+            // Disposes of the reader
+            reader.Close();
+            reader.Dispose();
+
+            // Returns the player records
+            return playerRecords.ToArray();
         }
 
         #endregion

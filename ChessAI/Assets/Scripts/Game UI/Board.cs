@@ -51,14 +51,8 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            /// Debugz
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-
+            /// Debug
             OpeningBook.LoadBookFromCSV(false);
-
-            Debug.Log($"Time: {stopwatch.ElapsedMilliseconds / 1000f } secounds");
-            stopwatch.Stop();
             ///
 
             // Disables/hides the board preview area
