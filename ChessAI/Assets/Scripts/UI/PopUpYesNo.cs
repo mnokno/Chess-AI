@@ -12,11 +12,6 @@ namespace Chess.UI
         public TMPro.TextMeshProUGUI messageText;
         private Action<Anwser> action;
 
-
-        private void Start()
-        {
-            Show();
-        }
         // Called when the background button is pressed
         public void BackGroundBtn()
         {
@@ -53,6 +48,12 @@ namespace Chess.UI
         public void SetAction(Action<Anwser> action)
         {
             this.action = action;
+        }
+
+        // Sets message in the massage box
+        public void SetMessage(string message)
+        {
+            messageText.text = message;
         }
 
         // Enums
