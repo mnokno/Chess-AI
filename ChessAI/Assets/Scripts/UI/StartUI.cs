@@ -8,7 +8,7 @@ namespace Chess.UI
     {
         public void SelectProfileBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectionScene");
         }
 
         public void CreateProfileBtn()
