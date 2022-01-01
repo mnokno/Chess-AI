@@ -58,6 +58,7 @@ namespace Chess.UI
                 {
                     currentlySelectedListItem = null;
                     inputFieldOldUsername.text = "";
+                    inputFieldNewUsername.text = "";
                     dropdown.SetValueWithoutNotify(0);
                     deleteButton.interactable = false;
                     updatePanel.interactable = false;
@@ -72,6 +73,7 @@ namespace Chess.UI
             PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
             reader.CloseDB();
             inputFieldOldUsername.text = playerRecord.username;
+            inputFieldNewUsername.text = "";
             dropdown.SetValueWithoutNotify(int.Parse(playerRecord.defaultDifficulty));
             updatePanel.interactable = true;
             deleteButton.interactable = true;
