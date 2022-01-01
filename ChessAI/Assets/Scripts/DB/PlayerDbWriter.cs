@@ -35,7 +35,7 @@ namespace Chess.DB
             }
 
             // Delets a player with the given username
-            dbcmd.CommandText = $"DELETE FROM OpeningBook WHERE Username='{username}';";
+            dbcmd.CommandText = $"DELETE FROM Players WHERE Username='{username}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }

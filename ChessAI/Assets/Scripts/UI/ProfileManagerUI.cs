@@ -66,7 +66,7 @@ namespace Chess.UI
             // Delets the profile
             PlayerDbWriter writer = new PlayerDbWriter();
             writer.OpenDB();
-            writer.DeleteFromPlayers(currentlySelectedListItem.GetComponent<TMPro.TextMeshProUGUI>().text);
+            writer.DeleteFromPlayers(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
             writer.CloseDB();
 
             // Delets the list item corresponding to the deleted profile
