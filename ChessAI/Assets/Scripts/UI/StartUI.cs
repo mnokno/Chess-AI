@@ -16,9 +16,9 @@ namespace Chess.UI
             FindObjectOfType<SceneLoader>().LoadScene("ProfileCreationScene");
         }
 
-        public void DeleteProfileBtn()
+        public void ProfileManagerBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("ProfileDeleteScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileManagerScene");
         }
 
         public void QuitBtn()

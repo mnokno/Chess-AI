@@ -417,7 +417,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Delete Profile
+  m_text: Profile Manager
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1701,7 +1701,7 @@ GameObject:
   - component: {fileID: 1809042615}
   - component: {fileID: 1809042614}
   m_Layer: 5
-  m_Name: Button (Delete profile)
+  m_Name: Button (Profile Manager)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1774,7 +1774,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979648}
         m_TargetAssemblyTypeName: Chess.UI.StartUI, Assembly-CSharp
-        m_MethodName: DeleteProfileBtn
+        m_MethodName: ProfileManagerBtn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
