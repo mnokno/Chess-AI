@@ -6,11 +6,6 @@ namespace Chess.UI
 {
     public class HomeUI : MonoBehaviour
     {
-        private void Start()
-        {
-            Debug.Log(PlayerPrefs.GetString("username"));
-        }
-
         public void StartNewGameBtn()
         {
             FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");

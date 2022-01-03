@@ -79,6 +79,43 @@ namespace Chess.DB
             return playerRecords.ToArray();
         }
 
+        // Returns true if a given name is taken fro a given user
+        public bool IsGameNameTaken(string gameName, int userID)
+        {
+            // Throws an exception if the data base has not been opend
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectivly.");
+            }
+
+            bool IsGameNameTaken(string tableName)
+            {
+                // Create a command to check if the record exists in the data base
+                dbcmd.CommandText = $"SELECT Game_ID FROM {tableName} WHERE Player_ID='{userID}' AND GameTitle='{gameName}' LIMIT 1;";
+                // Executes teh command
+                IDataReader reader = dbcmd.ExecuteReader();
+
+                if (reader.IsDBNull(0))
+                {
+                    // Disposes of the reader
+                    reader.Close();
+                    reader.Dispose();
+                    // The game name is not taken
+                    return false;
+                }
+                else
+                {
+                    // Disposes of the reader
+                    reader.Close();
+                    reader.Dispose();
+                    // The game name is not taken
+                    return true;
+                }
+            }
+
+            return IsGameNameTaken("SavedGames") || IsGameNameTaken("GameRecords");
+        }
+
         #endregion
     }
 }

@@ -113,7 +113,10 @@ namespace Chess.DB
 	     *   "TimeLeft"	REAL NOT NULL,
 	     *   "StartDate"	TEXT NOT NULL,
 	     *   "GameTitle"	TEXT NOT NULL,
+	     *   "UnmakesLimit"	INTEGER NOT NULL,
+	     *   "UnmakesMade"	INTEGER NOT NULL,
 	     *   FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
+	     *   "TimeControll"	TEXT NOT NULL,
 	     *   PRIMARY KEY("Game_ID" AUTOINCREMENT)
          *);
          */
@@ -128,9 +131,12 @@ namespace Chess.DB
             public string timeLeft;
             public string startDate;
             public string gameTitle;
+            public int unmakesLimit;
+            public int unmakesMade;
+            public string timeControll;
             public bool isValid;
 
-            public SavedGameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string timeLeft, string startDate, string gameTitle, bool isValid)
+            public SavedGameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string timeLeft, string startDate, string gameTitle, int unmakesLimit, int unmakesMade, string timeControll, bool isValid)
             {
                 this.gameID = gameID;
                 this.playerID = playerID;
@@ -141,6 +147,9 @@ namespace Chess.DB
                 this.timeLeft = timeLeft;
                 this.startDate = startDate;
                 this.gameTitle = gameTitle;
+                this.unmakesLimit = unmakesLimit;
+                this.unmakesMade = unmakesMade;
+                this.timeControll = timeControll;
                 this.isValid = isValid;
             }
         }
@@ -157,6 +166,8 @@ namespace Chess.DB
          *    "StartDate"	TEXT NOT NULL,
          *    "EndDate"	TEXT NOT NULL,
          *    "GameTitle"	TEXT NOT NULL,
+         *    "WhereUnmakesEnabled"	BLOB NOT NULL,
+         *    "TimeControll"	TEXT NOT NULL,
          *    FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
          *    PRIMARY KEY("Game_ID" AUTOINCREMENT)
          *);
@@ -173,9 +184,11 @@ namespace Chess.DB
             public string startDate;
             public string endDate;
             public string gameTitle;
+            public bool whereUnmakesEnabled;
+            public string timeControll;
             public bool isValid;
 
-            public GameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string gameResult, string startDate, string endDate, string gameTitle, bool isValid)
+            public GameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string gameResult, string startDate, string endDate, string gameTitle, bool whereUnmakesEnabled,string timeControll, bool isValid)
             {
                 this.gameID = gameID;
                 this.playerID = playerID;
@@ -187,6 +200,8 @@ namespace Chess.DB
                 this.startDate = startDate;
                 this.endDate = endDate;
                 this.gameTitle = gameTitle;
+                this.whereUnmakesEnabled = whereUnmakesEnabled;
+                this.timeControll = timeControll;
                 this.isValid = isValid;
             }
         }
