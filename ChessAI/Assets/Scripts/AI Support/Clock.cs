@@ -11,10 +11,13 @@ namespace Chess.EngineUtility
 
         private int initialTime;
         private int timeIncrement;
-        private float reamainignTimeWhite;
-        private float reamainignTimeBlack;
+        public float reamainignTimeWhite { get; private set; }
+        public float reamainignTimeBlack { get; private set; }
 
+
+        private float currentTimeTotal = 0;
         private bool whitesTurn;
+        public Stopwatch stopwatch { get; private set; }
 
         #endregion
 
@@ -43,12 +46,38 @@ namespace Chess.EngineUtility
 
         public void StartClock()
         {
-
+            stopwatch.Start();
         }
 
         public void NextPlayersTurn()
         {
+            stopwatch.Stop();
+            if (whitesTurn)
+            {
+                reamainignTimeWhite -= currentTimeTotal - stopwatch.ElapsedMilliseconds; // Time taken to make a move
+                reamainignTimeWhite += timeIncrement; // Adds time increment
+            }
+            else
+            {
+                reamainignTimeBlack -= currentTimeTotal - stopwatch.ElapsedMilliseconds; // Time taken to make a move
+                reamainignTimeBlack += timeIncrement; // Adds time increment
+            }
+            currentTimeTotal = 0;
+            whitesTurn = !whitesTurn;
+            stopwatch.Reset();
+            stopwatch.Start();
+        }
 
+        public void Resume()
+        {
+            stopwatch.Start();
+        }
+
+        public void Pause()
+        {
+            stopwatch.Stop();
+            currentTimeTotal += stopwatch.ElapsedMilliseconds;
+            stopwatch.Reset();
         }
 
         #endregion
