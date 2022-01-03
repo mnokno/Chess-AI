@@ -13,7 +13,7 @@ namespace Chess.EngineUtility
         private int timeIncrement;
         public float reamainignTimeWhite { get; private set; }
         public float reamainignTimeBlack { get; private set; }
-
+        private Position position;
 
         private float currentTimeTotal = 0;
         private bool whitesTurn;
@@ -23,21 +23,23 @@ namespace Chess.EngineUtility
 
         #region Class constructor
 
-        public Clock(int initialTime, int timeIncrement)
+        public Clock(int initialTime, int timeIncrement, Position position)
         {
             this.initialTime = initialTime;
             this.timeIncrement = timeIncrement;
             reamainignTimeWhite = initialTime;
             reamainignTimeBlack = initialTime;
+            this.position = position;
         }
 
-        public Clock(int initialTime, int timeIncrement, float reamainignTimeWhite, float reamainignTimeBlack, bool whitesTurn)
+        public Clock(int initialTime, int timeIncrement, float reamainignTimeWhite, float reamainignTimeBlack, bool whitesTurn, Position position)
         {
             this.initialTime = initialTime;
             this.timeIncrement = timeIncrement;
             this.reamainignTimeWhite = reamainignTimeWhite;
             this.reamainignTimeBlack = reamainignTimeBlack;
             this.whitesTurn = whitesTurn;
+            this.position = position;
         }
 
         #endregion
@@ -52,14 +54,16 @@ namespace Chess.EngineUtility
         public void NextPlayersTurn()
         {
             stopwatch.Stop();
+            float timeTaken = currentTimeTotal + stopwatch.ElapsedMilliseconds; // Time taken to make a move
+            position.timeTakenPerMove.Add(timeTaken); // Logs the time taken to make this move
             if (whitesTurn)
             {
-                reamainignTimeWhite -= currentTimeTotal - stopwatch.ElapsedMilliseconds; // Time taken to make a move
+                reamainignTimeWhite -= timeTaken; // Updates remaining time
                 reamainignTimeWhite += timeIncrement; // Adds time increment
             }
             else
             {
-                reamainignTimeBlack -= currentTimeTotal - stopwatch.ElapsedMilliseconds; // Time taken to make a move
+                reamainignTimeBlack -= timeTaken; // Updates remaining time
                 reamainignTimeBlack += timeIncrement; // Adds time increment
             }
             currentTimeTotal = 0;

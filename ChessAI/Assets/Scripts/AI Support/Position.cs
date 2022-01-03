@@ -27,6 +27,8 @@ namespace Chess.EngineUtility
         private string initialFEN; // The FEN string loaded to this position
         private string initialPNG; // The PNG string loaded to this position
 
+        public List<float> timeTakenPerMove = new List<float>(); // Used to store how much time each player took for every move they played
+
         #endregion
 
         // Responsible for square initialization
