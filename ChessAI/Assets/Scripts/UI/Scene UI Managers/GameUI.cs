@@ -14,6 +14,8 @@ namespace Chess.UI
         public Color deselected;
         public CanvasGroup gameDisplayCG;
         public CanvasGroup engineDetailsDisplayCG;
+        public GameObject content;
+        public GameObject contentItemPrefab;
 
         private bool gameDisplayActive;
 
