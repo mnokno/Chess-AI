@@ -47,11 +47,6 @@ namespace Chess.Engine
         {
             // Create a new chess engine
             chessEngine = new ChessEngine();
-            // Loads the opening book if enabled
-            if (usedOpeningBook)
-            {
-                OpeningBook.LoadBookFromCSV(false);
-            }
         }
 
         // Start is called before the first frame update
