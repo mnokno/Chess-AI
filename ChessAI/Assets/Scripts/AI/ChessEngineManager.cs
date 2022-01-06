@@ -45,7 +45,13 @@ namespace Chess.Engine
         // Awake is called before Start
         void Awake()
         {
+            // Create a new chess engine
             chessEngine = new ChessEngine();
+            // Loads the opening book if enabled
+            if (usedOpeningBook)
+            {
+                OpeningBook.LoadBookFromCSV(false);
+            }
         }
 
         // Start is called before the first frame update
@@ -121,8 +127,8 @@ namespace Chess.Engine
         // Plays an AI generated move
         public void MakeAIMove()
         {
-            // Easy 14, Medium 26, Hard 40
-            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(14, 3, true));
+            // Easy 10, Medium 20, Hard 30
+            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, 3, true));
         }
 
         // Plays an AI generated move

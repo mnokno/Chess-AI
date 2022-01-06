@@ -13,7 +13,7 @@ namespace Chess.EngineUtility
         private static string openingBookDirectory = Application.streamingAssetsPath + "/Opening/OpeningBook.csv";
         // Opening book as dictionary
         private static Dictionary<ulong, List<Entry>> book = new Dictionary<ulong, List<Entry>>();
-        // Flag to show wheter or not the book has loaded
+        // Flag to show whether or not the book has loaded
         public static bool hasLoaded { get; private set; }
 
         #endregion
@@ -22,7 +22,7 @@ namespace Chess.EngineUtility
 
         static OpeningBook()
         {
-            hasLoaded = true;
+            hasLoaded = false;
         }
 
         #endregion
@@ -162,17 +162,38 @@ namespace Chess.EngineUtility
             Debug.Log("The opening book has loaded");
         }
 
-        // Resturs a random move from the opening book, and 0 if no move was found
+        // Returns a random move from the opening book, and 0 if no move was found
         public static ushort GetMove(Position position)
         {
-            // Chesk if the opening book has been loaded
+            // Checks if the opening book has been loaded
             if (hasLoaded)
             {
                 book.TryGetValue(position.zobristKey, out List<Entry> entries);
                 if (entries != null)
                 {
-                    // Gets a move form the opening data base
-                    ushort move = entries[Random.Range(0, entries.Count - 1)].move;
+                    // Gets a move form the opening data base use weighted probabilities
+                    int totalWeight = 5; // There is a weight of 5 for not using the opening book
+                    foreach (Entry entry in entries)
+                    {
+                        totalWeight += entry.count;
+                    }
+                    int rngVal = Random.Range(0, totalWeight);
+                    int rollingTotal = 0;
+                    ushort move = 0;
+                    foreach (Entry entry in entries)
+                    {
+                        rollingTotal += entry.count;
+                        if (rollingTotal > rngVal)
+                        {
+                            move = entry.move;
+                            break;
+                        }
+                    }
+                    // It was chosen to abandon the opening book for this line
+                    if (move == 0)
+                    {
+                        return move;
+                    }
 
                     // Check if the move if valid
                     MoveGenerator moveGenerator = new MoveGenerator();

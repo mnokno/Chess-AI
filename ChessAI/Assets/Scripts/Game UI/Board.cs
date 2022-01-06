@@ -61,10 +61,6 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            /// Debug/TMP
-            OpeningBook.LoadBookFromCSV(false);
-            ///
-
             // Disables/hides the board preview area
             GetComponentInParent<SpriteRenderer>().enabled = false;
             // Generates the chess board

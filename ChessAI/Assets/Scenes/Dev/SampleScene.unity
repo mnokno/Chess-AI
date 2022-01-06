@@ -2065,6 +2065,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1054683471}
     - target: {fileID: 1199519224726600508, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
+      propertyPath: usedOpeningBook
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1199519224726600508, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
       propertyPath: zobristHashText
       value: 
       objectReference: {fileID: 1573572647}
