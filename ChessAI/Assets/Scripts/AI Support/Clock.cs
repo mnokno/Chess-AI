@@ -80,7 +80,6 @@ namespace Chess.EngineUtility
             whitesTurn = !whitesTurn;
             stopwatch.Reset();
             stopwatch.Start();
-            UnityEngine.Debug.Log($"White: {reamainignTimeWhite / 1000f} Black: {reamainignTimeBlack / 1000f}");
         }
 
         public void Resume()

@@ -61,8 +61,8 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            /// Debug
-            OpeningBook.LoadBookFromCSV(true);
+            /// Debug/TMP
+            OpeningBook.LoadBookFromCSV(false);
             ///
 
             // Disables/hides the board preview area

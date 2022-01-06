@@ -121,7 +121,8 @@ namespace Chess.Engine
         // Plays an AI generated move
         public void MakeAIMove()
         {
-            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(30, 3, true));
+            // Easy 14, Medium 26, Hard 40
+            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(14, 3, true));
         }
 
         // Plays an AI generated move
@@ -177,15 +178,7 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove(MoveGenerationProfile moveGenerationProfile)
         {
             // Calculates AI move
-            if (moveGenerationProfile.autoCalculate)
-            {
-                throw new System.NotImplementedException();
-                moveToPlay = chessEngine.CalculateBestMove(TimeManagement.GetRecomendedTime(0, 0, 0, 0)); // TMP
-            }
-            else
-            {
-                moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
-            }
+            moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
             // Sets a flag
             calculated = true;
         }
