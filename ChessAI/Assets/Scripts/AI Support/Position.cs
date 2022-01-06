@@ -550,6 +550,38 @@ namespace Chess.EngineUtility
                 }
             }
         }
+
+        // Returns true if a given side has sufficient material to deliver a check mate
+        public bool IsMaterialSufficient(bool whiteSide)
+        {
+            if (whiteSide)
+            {
+                if (bitboard.pieces[0] == 0) // if there are no pawns
+                {
+                    if ((bitboard.pieces[3] | bitboard.pieces[4]) == 0) // if there are rooks or queens
+                    {
+                        if (BitOps.PopulationCount(bitboard.pieces[1] | bitboard.pieces[2]) < 2) // If there is less then two knight and bishops
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (bitboard.pieces[7] == 0) // if there are no pawns
+                {
+                    if ((bitboard.pieces[10] | bitboard.pieces[11]) == 0) // if there are rooks or queens
+                    {
+                        if (BitOps.PopulationCount(bitboard.pieces[8] | bitboard.pieces[9]) < 2) // If there is less then two knight and bishops
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
         
         // Returns piece type to Promote to specified by the flag, returns 10 if its not a proration move
         public static byte GetPromoteTo(ushort flag)

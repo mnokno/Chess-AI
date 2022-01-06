@@ -183,8 +183,17 @@ namespace Chess.Engine
                 Vector2 times = chessEngine.centralPosition.clock.GetCurrentTimes();
                 if (times.x <= 0)
                 {
-                    // Updates and shows the display
-                    FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Black Won", true);
+                    // Checks if the material is sufficient
+                    if (chessEngine.centralPosition.IsMaterialSufficient(false))
+                    {
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Black Won", true);
+                    }
+                    else
+                    {
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Draw", true);
+                    }
                     // Updates game state
                     chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
                     // Stops the clocks
@@ -195,8 +204,17 @@ namespace Chess.Engine
                 }
                 else if (times.y <= 0)
                 {
-                    // Updates and shows the display
-                    FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "White Won", true);
+                    // Checks if the material is sufficient
+                    if (chessEngine.centralPosition.IsMaterialSufficient(true))
+                    {
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "White Won", true);
+                    }
+                    else
+                    {
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Draw", true);
+                    }
                     // Updates game state
                     chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
                     // Stops the clocks
