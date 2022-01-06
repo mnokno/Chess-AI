@@ -14,10 +14,11 @@ namespace Chess.UI
         public Color deselected;
         public CanvasGroup gameDisplayCG;
         public CanvasGroup engineDetailsDisplayCG;
-        public GameObject content;
+        public Transform content;
         public GameObject contentItemPrefab;
 
         private bool gameDisplayActive;
+        private GameObject currentItem;
 
         // Class functions
 
@@ -57,6 +58,27 @@ namespace Chess.UI
                 gameButtonImage.color = deselected;
                 engineDetailsButtonImage.color = selected;
                 gameDisplayActive = false;
+            }
+        }
+
+        public void LogMove(int turnNumber, string move, float time)
+        {
+            if (currentItem == null)
+            {
+                currentItem = Instantiate(contentItemPrefab, content);
+                TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
+                Debug.Log("HERE");
+                turnReportDisplay.SetTrunNumber(turnNumber);
+                turnReportDisplay.SetMove(true, move);
+                turnReportDisplay.SetTime(true, time);
+            }
+            else
+            {
+                TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
+                turnReportDisplay.SetTrunNumber(turnNumber);
+                turnReportDisplay.SetMove(false, move);
+                turnReportDisplay.SetTime(false, time);
+                currentItem = null;
             }
         }
     }

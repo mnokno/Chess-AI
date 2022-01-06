@@ -25,6 +25,8 @@ namespace Chess.UI
 
         public Position localPosition; // Stores position represented by this board
         public MoveGenerator moveGenerator; // Used to show and validates moves
+        public bool logMoveToDisplay = false; // Used to log move data to a game display
+        public GameUI gameUI; // Used to log move data
 
         #endregion
 
@@ -46,6 +48,10 @@ namespace Chess.UI
             selectedPiece = null;
             localPosition = new Position();
             moveGenerator = new MoveGenerator();
+            if (logMoveToDisplay)
+            {
+                gameUI = FindObjectOfType<GameUI>();
+            }
         }
 
         #endregion
@@ -300,12 +306,16 @@ namespace Chess.UI
         // Makes the move and assumes the central position has already been updated
         public void MakeAIMove(int from, int to, bool animate = true)
         {
+            // Converts the move to a ushort move
+            ushort move = ConvertToMove(from, to);
+            // Converts the move to pgn
+            string movePGN = Move.ConvertUshortToPNG(move, localPosition);
             // Updates local position
-            localPosition.MakeMove(ConvertToMove(from, to));
+            localPosition.MakeMove(move);
             // Plays the move sound
-            PlayMoveSound(ConvertToMove(from, to));
+            PlayMoveSound(move);
             // Makes the move on the visual chess board
-            parrentBoard.MakeMove(ConvertToMove(from, to), animate:animate);
+            parrentBoard.MakeMove(move, animate:animate);
             // Deselects the piece
             if (selectedPiece != null)
             {
@@ -332,6 +342,12 @@ namespace Chess.UI
             if (parrentBoard.engineManager.chessEngine.centralPosition.useClock)
             {
                 parrentBoard.engineManager.chessEngine.centralPosition.clock.NextPlayersTurn();
+            }
+            // Updates move display
+            if (logMoveToDisplay)
+            {
+                int turnNumer = (int)Math.Ceiling(parrentBoard.engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
+                gameUI.LogMove(turnNumer, movePGN, parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove[parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove.Count - 1]);
             }
         }
 

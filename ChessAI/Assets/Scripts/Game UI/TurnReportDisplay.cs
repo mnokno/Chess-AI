@@ -14,19 +14,43 @@ namespace Chess.UI
         public TMPro.TextMeshProUGUI timeBlackText;
         public RectTransform whiteTimeImageRectTransform;
         public RectTransform blackTimeImageRectTransform;
+        public UnityEngine.UI.Image imageBackground;
 
-        public Color light;
-        public Color dark;
+        public Color lightColor;
+        public Color darkColor;
 
-        private const int MaxImageSize = 195;
+        private const float MaxImageSize = 182f;
         private float totalTime;
+        private static bool wasPrevLight = true;
 
         // Class functions
 
+        private void Awake()
+        {
+            turnNumberText.text = "";
+            moveWhiteText.text = "";
+            moveBalckText.text = "";
+            timeWhiteText.text = "";
+            timeBlackText.text = "";
+            whiteTimeImageRectTransform.sizeDelta = new Vector2(0, whiteTimeImageRectTransform.sizeDelta.y);
+            blackTimeImageRectTransform.sizeDelta = new Vector2(0, blackTimeImageRectTransform.sizeDelta.y);
+            if (wasPrevLight)
+            {
+                imageBackground.color = darkColor;
+                wasPrevLight = false;
+            }
+            else
+            {
+                imageBackground.color = lightColor;
+                wasPrevLight = true;
+            }
+            totalTime = FindObjectOfType<Common.ChessGameDataManager>().chessGameData.initialTime;
+            Debug.Log("EJRE");
+        }
+
         public void SetTrunNumber(int turnNumber)
         {
-            turnNumberText.text = turnNumber.ToString();
-            totalTime = FindObjectOfType<Common.ChessGameDataManager>().chessGameData.initialTime;
+            turnNumberText.text = turnNumber.ToString() + '.';
         }
 
         public void SetMove(bool white, string move)
@@ -46,7 +70,7 @@ namespace Chess.UI
             if (white)
             {
                 timeWhiteText.text = FormatTime(time);
-                float imageSize = MaxImageSize * (totalTime / time) * 3;
+                float imageSize = MaxImageSize * ((time / 1000f) / totalTime) * 4;
                 if (imageSize > MaxImageSize)
                 {
                     imageSize = MaxImageSize;
@@ -56,7 +80,7 @@ namespace Chess.UI
             else
             {
                 timeBlackText.text = FormatTime(time);
-                float imageSize = MaxImageSize * (totalTime / time) * 3;
+                float imageSize = MaxImageSize * ((time / 1000f) / totalTime) * 4;
                 if (imageSize > MaxImageSize)
                 {
                     imageSize = MaxImageSize;
