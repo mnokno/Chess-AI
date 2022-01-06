@@ -62,6 +62,11 @@ namespace Chess.Engine
                 FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
             }
 
+            // Start coroutine for detecting timeout
+            if (GetComponent<Board>().useClock)
+            {
+                StartCoroutine(nameof(CheckForTimeOuts));
+            }
             // Ensures that the opening book has loaded
             while (!OpeningBook.hasLoaded && usedOpeningBook)
             {
@@ -133,9 +138,9 @@ namespace Chess.Engine
                     }
                     else
                     {
-                        // Fetches a move from teh opening books
+                        // Fetches a move from the opening books
                         moveToPlay = OpeningBook.GetMove(chessEngine.centralPosition);
-                        // Cheks if teh move is valid
+                        // Checks if the move is valid
                         if (moveToPlay == 0)
                         {
                             // Calculates the best moves, since the move was not valid
@@ -169,6 +174,39 @@ namespace Chess.Engine
             moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
             // Sets a flag
             calculated = true;
+        }
+
+        private IEnumerator CheckForTimeOuts()
+        {
+            while (true)
+            {
+                Vector2 times = chessEngine.centralPosition.clock.GetCurrentTimes();
+                if (times.x <= 0)
+                {
+                    // Updates and shows the display
+                    FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Black Won", true);
+                    // Updates game state
+                    chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
+                    // Stops the clocks
+                    chessEngine.centralPosition.clock.StopClock();
+                    // Cancels search
+                    chessEngine.CancelSearch();
+                    break;
+                }
+                else if (times.y <= 0)
+                {
+                    // Updates and shows the display
+                    FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "White Won", true);
+                    // Updates game state
+                    chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
+                    // Stops the clocks
+                    chessEngine.centralPosition.clock.StopClock();
+                    // Cancels search
+                    chessEngine.CancelSearch();
+                    break;
+                }
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
         }
 
         #endregion

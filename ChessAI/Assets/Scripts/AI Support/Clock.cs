@@ -28,7 +28,7 @@ namespace Chess.EngineUtility
         {
             whitesTurn = true;
             this.initialTime = initialTime * 60000;
-            this.timeIncrement = timeIncrement;
+            this.timeIncrement = timeIncrement * 1000;
             reamainignTimeWhite = initialTime * 60000f;
             reamainignTimeBlack = initialTime * 60000f;
             this.position = position;
@@ -39,7 +39,7 @@ namespace Chess.EngineUtility
         public Clock(int initialTime, int timeIncrement, float reamainignTimeWhite, float reamainignTimeBlack, bool whitesTurn, Position position)
         {
             this.initialTime = initialTime * 60000;
-            this.timeIncrement = timeIncrement;
+            this.timeIncrement = timeIncrement * 1000;
             this.reamainignTimeWhite = reamainignTimeWhite;
             this.reamainignTimeBlack = reamainignTimeBlack;
             this.whitesTurn = whitesTurn;
@@ -54,6 +54,11 @@ namespace Chess.EngineUtility
         public void StartClock()
         {
             stopwatch.Start();
+        }
+
+        public void StopClock()
+        {
+            stopwatch.Stop();
         }
 
         public void NextPlayersTurn()

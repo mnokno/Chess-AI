@@ -54,7 +54,7 @@ namespace Chess.UI
             // Updates clock settings
             if (useClock)
             {
-                engineManager.chessEngine.centralPosition.InitClock(3, 0);
+                engineManager.chessEngine.centralPosition.InitClock(1, 3);
             }
         }
 

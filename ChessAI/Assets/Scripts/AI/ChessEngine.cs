@@ -104,6 +104,13 @@ namespace Chess.Engine
             return bestMove;
         }
 
+        // Stops the search imminently
+        public void CancelSearch()
+        {
+            dynamicEvolution.CancelSearch();
+            cancelSearch = true;
+        }
+
         // Stops the search
         public async void CancelSearch(float delay)
         {
