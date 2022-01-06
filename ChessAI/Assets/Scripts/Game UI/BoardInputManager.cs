@@ -328,9 +328,11 @@ namespace Chess.UI
             lastMoveSquares[0].Highlighted(true);
             lastMoveSquares[1].Highlighted(true);
 
-            // TESTING 
-            // ShowQuiescenceMoves();
-            // END TESTING
+            // Updates clock
+            if (parrentBoard.engineManager.chessEngine.centralPosition.useClock)
+            {
+                parrentBoard.engineManager.chessEngine.centralPosition.clock.NextPlayersTurn();
+            }
         }
 
         // Plays a sound for the made move, call after the local position has been updated

@@ -29,6 +29,9 @@ namespace Chess.EngineUtility
 
         public List<float> timeTakenPerMove = new List<float>(); // Used to store how much time each player took for every move they played
 
+        public Clock clock; // Clock for timing moves
+        public bool useClock = false; // Option to turn off clock
+
         #endregion
 
         // Responsible for square initialization
@@ -54,6 +57,13 @@ namespace Chess.EngineUtility
 
         // General use functions
         #region General
+
+        public void InitClock(int initTime, int timeIncrement)
+        {
+            useClock = true;
+            clock = new Clock(initTime, timeIncrement, this);
+            clock.StartClock();
+        }
 
         // Loads a fen
         public void LoadFEN(FEN fen)

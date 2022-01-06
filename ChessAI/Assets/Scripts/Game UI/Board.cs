@@ -20,6 +20,7 @@ namespace Chess.UI
         public bool whiteBottom; // Used to decide where to generate white pieces and how to annotate the board
         public bool hvh; // Human versus human
         public bool whiteHumman; // True if human play white
+        public bool useClock; // Used to deiced whether or not this board will use clock to time move (introduces loses by time)
         [HideInInspector]
         public bool whiteToMove; // True if white is to move
 
@@ -47,6 +48,15 @@ namespace Chess.UI
 
         // Responsible for board initialization
         #region Initialization
+
+        void Awake()
+        {
+            // Updates clock settings
+            if (useClock)
+            {
+                engineManager.chessEngine.centralPosition.InitClock(3, 0);
+            }
+        }
 
         // Start is called before the first frame update
         void Start()

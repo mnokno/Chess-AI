@@ -9,7 +9,7 @@ namespace Chess.EngineUtility
     {
         #region Class variables
 
-        private int initialTime;
+        public int initialTime { get; private set; }
         private int timeIncrement;
         public float reamainignTimeWhite { get; private set; }
         public float reamainignTimeBlack { get; private set; }
@@ -23,28 +23,33 @@ namespace Chess.EngineUtility
 
         #region Class constructor
 
+        // For staring new game
         public Clock(int initialTime, int timeIncrement, Position position)
         {
-            this.initialTime = initialTime;
+            whitesTurn = true;
+            this.initialTime = initialTime * 60000;
             this.timeIncrement = timeIncrement;
-            reamainignTimeWhite = initialTime;
-            reamainignTimeBlack = initialTime;
+            reamainignTimeWhite = initialTime * 60000f;
+            reamainignTimeBlack = initialTime * 60000f;
             this.position = position;
+            stopwatch = new Stopwatch();
         }
 
+        // For loading game
         public Clock(int initialTime, int timeIncrement, float reamainignTimeWhite, float reamainignTimeBlack, bool whitesTurn, Position position)
         {
-            this.initialTime = initialTime;
+            this.initialTime = initialTime * 60000;
             this.timeIncrement = timeIncrement;
             this.reamainignTimeWhite = reamainignTimeWhite;
             this.reamainignTimeBlack = reamainignTimeBlack;
             this.whitesTurn = whitesTurn;
             this.position = position;
+            stopwatch = new Stopwatch();
         }
 
         #endregion
 
-        #region Class utilites
+        #region Class utilities
 
         public void StartClock()
         {
@@ -70,6 +75,7 @@ namespace Chess.EngineUtility
             whitesTurn = !whitesTurn;
             stopwatch.Reset();
             stopwatch.Start();
+            UnityEngine.Debug.Log($"White: {reamainignTimeWhite / 1000f} Black: {reamainignTimeBlack / 1000f}");
         }
 
         public void Resume()
@@ -84,6 +90,21 @@ namespace Chess.EngineUtility
             stopwatch.Reset();
         }
 
+        /// <summary>
+        /// Return both time in a single vector, x = whites time, y = blacks time
+        /// </summary>
+        /// <returns></returns>
+        public Vector2 GetCurrentTimes()
+        {
+            if (whitesTurn)
+            {
+                return new Vector2(reamainignTimeWhite - stopwatch.ElapsedMilliseconds, reamainignTimeBlack);
+            }
+            else
+            {
+                return new Vector2(reamainignTimeWhite, reamainignTimeBlack - stopwatch.ElapsedMilliseconds);
+            }
+        }
         #endregion
     }
 }
