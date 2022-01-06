@@ -49,7 +49,7 @@ namespace Chess.UI
                 lowerTimeDisplay.color = blackTimeDisplayFontColor;
             }
 
-            if (board.whiteHumman)
+            if (board.whiteHumman == board.whiteBottom)
             {
                 upperUsername.text = aiName;
                 lowerUsername.text = username;

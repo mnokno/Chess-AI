@@ -31,6 +31,8 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI FENText;
         public TMPro.TextMeshProUGUI PGNText;
 
+        // Game setting
+        Common.ChessGameDataManager chessGameDataManager;
         // Used to play an AI move once its calculated
         public bool calculated = false;
         public ushort moveToPlay = 0;
@@ -52,26 +54,23 @@ namespace Chess.Engine
         // Start is called before the first frame update
         void Start()
         {
+            StartCoroutine("CheckForAIMove");
             if (updateLables)
             {
                 // Starts coroutines
                 StartCoroutine("UpdateInfo");
-                StartCoroutine("CheckForAIMove");
                 // Updates display info
                 zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
                 // Updates FEN info
                 FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
             }
 
+            // Finds data manager
+            chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
             // Start coroutine for detecting timeout
             if (GetComponent<Board>().useClock)
             {
                 StartCoroutine(nameof(CheckForTimeOuts));
-            }
-            // Ensures that the opening book has loaded
-            while (!OpeningBook.hasLoaded && usedOpeningBook)
-            {
-                System.Threading.Thread.Sleep(100);
             }
         }
 
@@ -122,8 +121,23 @@ namespace Chess.Engine
         // Plays an AI generated move
         public void MakeAIMove()
         {
+            // Gets recommended time
+            float currentTime = chessEngine.centralPosition.sideToMove ? chessEngine.centralPosition.clock.GetCurrentTimes().x : chessEngine.centralPosition.clock.GetCurrentTimes().y;
+            int moveNumber = chessEngine.centralPosition.historicMoveData.Count / 2;
+            float time = TimeManagement.GetRecomendedTime(currentTime / 1000f, chessGameDataManager.chessGameData.timeIncrement, chessGameDataManager.chessGameData.initialTime, moveNumber);
             // Easy 10, Medium 20, Hard 30
-            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, 3, true));
+            if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy
+            {
+                MakeAIMove(new ChessEngineManager.MoveGenerationProfile(10, time, true));
+            }
+            else if (chessGameDataManager.chessGameData.AiStrength == "2") // Medium
+            {
+                MakeAIMove(new ChessEngineManager.MoveGenerationProfile(20, time, true));
+            }
+            else // Hard
+            {
+                MakeAIMove(new ChessEngineManager.MoveGenerationProfile(30, time, true));
+            }
         }
 
         // Plays an AI generated move

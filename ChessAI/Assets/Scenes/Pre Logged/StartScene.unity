@@ -1634,7 +1634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1199519224726600483, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
       propertyPath: useClock
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1199519224726600483, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
       propertyPath: fenString

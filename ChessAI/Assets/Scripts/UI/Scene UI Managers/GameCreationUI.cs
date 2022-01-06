@@ -32,7 +32,7 @@ namespace Chess.UI
             PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(PlayerPrefs.GetString("username"));
             reader.CloseDB();
 
-            // Sets the game difficuly to their defult AI diffuculty
+            // Sets the game difficulty to their default AI difficulty
             gameDifficultyDropdown.SetValueWithoutNotify(int.Parse(playerRecord.defaultDifficulty));
             // Saves players record for later usage
             currentPlayerRecord = playerRecord;
@@ -46,13 +46,13 @@ namespace Chess.UI
             {
                 invalidDifficulty.Show();
             }
-            else if (initialTimeInputField.text == "") // Invalid time controll
+            else if (initialTimeInputField.text == "") // Invalid time control
             {
                 initialTimeIsRequired.Show();
             }
             else if (IsGameNameTaken(gameName)) // Invalid game name
             {
-                invalidGameName.SetMessage($"Game name '{gameName}' is already taken, please chouse a different game name.");
+                invalidGameName.SetMessage($"Game name '{gameName}' is already taken, please chose a different game name.");
                 invalidGameName.Show();
             }
             else
@@ -93,8 +93,8 @@ namespace Chess.UI
                     isHumanWhite = isHumanWhite
                 };
 
-                // Loads the game
-                FindObjectOfType<SceneLoader>().LoadScene("GameScene");
+                // Loads next scene after the opening book has loaded
+                StartCoroutine(nameof(WaitForDB));
             }
         }
 
@@ -131,6 +131,17 @@ namespace Chess.UI
         public void GoBackBtn()
         {
             FindObjectOfType<SceneLoader>().LoadScene("StartScene");
+        }
+
+        public IEnumerator WaitForDB()
+        {
+            while (!EngineUtility.OpeningBook.hasLoaded)
+            {
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+
+            // Loads the game
+            FindObjectOfType<SceneLoader>().LoadScene("GameScene");
         }
     }
 }

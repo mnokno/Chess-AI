@@ -51,10 +51,39 @@ namespace Chess.UI
 
         void Awake()
         {
+            Common.ChessGameDataManager chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
             // Updates clock settings
             if (useClock)
             {
-                engineManager.chessEngine.centralPosition.InitClock(1, 3);
+                if (chessGameDataManager != null)
+                {
+                    if (chessGameDataManager.chessGameData.newGame)
+                    {
+                        engineManager.chessEngine.centralPosition.InitClock(chessGameDataManager.chessGameData.initialTime, chessGameDataManager.chessGameData.timeIncrement);
+                    }
+                    else
+                    {
+                        throw new System.NotImplementedException();
+                    }
+                }
+                else
+                {
+                    engineManager.chessEngine.centralPosition.InitClock(1, 180);
+                }
+            }
+            // Updates board setting
+            if (chessGameDataManager != null)
+            {
+                if (chessGameDataManager.chessGameData.isHumanWhite)
+                {
+                    whiteBottom = true;
+                    whiteHumman = true;
+                }
+                else
+                {
+                    whiteBottom = false;
+                    whiteHumman = false;
+                }
             }
         }
 
