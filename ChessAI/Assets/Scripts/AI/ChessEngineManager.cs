@@ -171,7 +171,14 @@ namespace Chess.Engine
         private void MakeCalculatedAIMove(MoveGenerationProfile moveGenerationProfile)
         {
             // Calculates AI move
-            moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
+            if (moveGenerationProfile.autoCalculate)
+            {
+                moveToPlay = chessEngine.CalculateBestMove(TimeManagement.GetRecomendedTime(0, 0, 0, 0)); // TMP
+            }
+            else
+            {
+                moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
+            }
             // Sets a flag
             calculated = true;
         }
@@ -314,11 +321,13 @@ namespace Chess.Engine
         {
             public byte bookLimit;
             public float timeLimit;
+            public bool autoCalculate;
 
-            public MoveGenerationProfile(byte bookLimit, float timeLimit)
+            public MoveGenerationProfile(byte bookLimit, float timeLimit, bool autoCalculate)
             {
                 this.bookLimit = bookLimit;
                 this.timeLimit = timeLimit;
+                this.autoCalculate = autoCalculate;
             }
         }
 
