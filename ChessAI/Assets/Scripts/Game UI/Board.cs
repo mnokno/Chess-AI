@@ -62,7 +62,7 @@ namespace Chess.UI
         void Start()
         {
             /// Debug
-            OpeningBook.LoadBookFromCSV(false);
+            OpeningBook.LoadBookFromCSV(true);
             ///
 
             // Disables/hides the board preview area
@@ -84,7 +84,7 @@ namespace Chess.UI
             if (!hvh && whiteHumman != whiteToMove)
             {
                 // If so an AI move is played
-                engineManager.MakeAIMove(new ChessEngineManager.MoveGenerationProfile(0, 5));
+                engineManager.MakeAIMove();
             }
         }
 

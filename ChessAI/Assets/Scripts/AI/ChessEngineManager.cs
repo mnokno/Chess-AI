@@ -118,7 +118,13 @@ namespace Chess.Engine
             }
         }
 
-        // Makes an AI generated move
+        // Plays an AI generated move
+        public void MakeAIMove()
+        {
+            MakeAIMove(new ChessEngineManager.MoveGenerationProfile(30, 3, true));
+        }
+
+        // Plays an AI generated move
         public void MakeAIMove(MoveGenerationProfile moveGenerationProfile, bool random = false)
         {
             if (chessEngine.centralPosition.gameState == Position.GameState.OnGoing)
@@ -173,6 +179,7 @@ namespace Chess.Engine
             // Calculates AI move
             if (moveGenerationProfile.autoCalculate)
             {
+                throw new System.NotImplementedException();
                 moveToPlay = chessEngine.CalculateBestMove(TimeManagement.GetRecomendedTime(0, 0, 0, 0)); // TMP
             }
             else
