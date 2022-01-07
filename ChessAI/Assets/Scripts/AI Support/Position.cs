@@ -628,7 +628,8 @@ namespace Chess.EngineUtility
             FiftyMoveRule = 3,
             Stalemate = 4,
             InsufficientMaterial = 5,
-            OutOfTime = 6
+            OutOfTime = 6,
+            Surrender = 7
         }
 
         #endregion

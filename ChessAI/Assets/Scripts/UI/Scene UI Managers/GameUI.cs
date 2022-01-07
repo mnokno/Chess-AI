@@ -16,6 +16,7 @@ namespace Chess.UI
         public CanvasGroup engineDetailsDisplayCG;
         public Transform content;
         public GameObject contentItemPrefab;
+        public ScrollRect scrollRect;
 
         private bool gameDisplayActive;
         private GameObject currentItem;
@@ -63,6 +64,7 @@ namespace Chess.UI
 
         public void LogMove(int turnNumber, string move, float time)
         {
+            // Logs the move
             if (currentItem == null)
             {
                 currentItem = Instantiate(contentItemPrefab, content);
@@ -79,6 +81,9 @@ namespace Chess.UI
                 turnReportDisplay.SetTime(false, time);
                 currentItem = null;
             }
+            // Scrolls to the bottom of the scroll rec
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 0;
         }
     }
 }

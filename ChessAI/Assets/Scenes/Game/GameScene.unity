@@ -3851,6 +3851,7 @@ MonoBehaviour:
   engineDetailsDisplayCG: {fileID: 1768618455}
   content: {fileID: 530987925}
   contentItemPrefab: {fileID: 3941484542217750510, guid: 81653d4c34a560d4d88d01cd8649d49e, type: 3}
+  scrollRect: {fileID: 1354187268}
 --- !u!1 &1604587413
 GameObject:
   m_ObjectHideFlags: 0

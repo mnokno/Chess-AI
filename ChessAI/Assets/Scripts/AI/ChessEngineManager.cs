@@ -211,7 +211,7 @@ namespace Chess.Engine
                     depthChange--;
                 }
             }
-            if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- Max - 3
+            if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- Max - 4
             {
                 moveToPlay = GetLowerDepth(4);
             }
