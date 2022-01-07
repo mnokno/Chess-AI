@@ -497,7 +497,7 @@ namespace Chess.EngineUtility
                     gameState = GameState.ThreefoldRepetition;
                 }
             }
-
+            
             boardStateHistory.Push(zobristKey); // boardStateHistory
             sideToMove = !sideToMove; // Updates side to move
         }

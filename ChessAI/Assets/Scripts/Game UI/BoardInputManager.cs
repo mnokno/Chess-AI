@@ -349,6 +349,11 @@ namespace Chess.UI
                 int turnNumer = (int)Math.Ceiling(parrentBoard.engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
                 gameUI.LogMove(turnNumer, movePGN, parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove[parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove.Count - 1]);
             }
+            // Checks if the game is still onGoing
+            if (parrentBoard.engineManager.chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
+            {
+                parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+            }
         }
 
         // Plays a sound for the made move, call after the local position has been updated

@@ -46,7 +46,7 @@ namespace Chess.UI
             {
                 invalidDifficulty.Show();
             }
-            else if (initialTimeInputField.text == "") // Invalid time control
+            else if (initialTimeInputField.text.Replace("-", "") == "") // Invalid time control
             {
                 initialTimeIsRequired.Show();
             }
@@ -63,10 +63,10 @@ namespace Chess.UI
                 string AiStrength = gameDifficultyDropdown.value.ToString();
                 string moves = "";
                 string timeUsage = "";
-                int timeLeft = int.Parse(initialTimeInputField.text) * 60;
-                int initialTime = int.Parse(initialTimeInputField.text) * 60;
-                int timeIncrement = timeIncrementInputField.text == "" ? 0 : int.Parse(timeIncrementInputField.text);
-                int unmakesLimit = moveUnamkeLimitInputField.text == "" ? 0 : int.Parse(moveUnamkeLimitInputField.text);
+                int timeLeft = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
+                int initialTime = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
+                int timeIncrement = timeIncrementInputField.text.Replace("-", "") == "" ? 0 : int.Parse(timeIncrementInputField.text);
+                int unmakesLimit = moveUnamkeLimitInputField.text.Replace("-", "") == "" ? 0 : int.Parse(moveUnamkeLimitInputField.text);
                 int unmakesMade = 0;
                 bool whereUnamkesEnabled = unmakesLimit == 0 ? false : true;
                 string startDate = System.DateTime.Today.ToString();
