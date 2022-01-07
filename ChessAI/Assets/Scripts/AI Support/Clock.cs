@@ -10,7 +10,7 @@ namespace Chess.EngineUtility
         #region Class variables
 
         public int initialTime { get; private set; }
-        private int timeIncrement;
+        public int timeIncrement { get; private set; }
         public float reamainignTimeWhite { get; private set; }
         public float reamainignTimeBlack { get; private set; }
         private Position position;
@@ -58,7 +58,12 @@ namespace Chess.EngineUtility
 
         public void StopClock()
         {
-            stopwatch.Stop();
+            stopwatch.Stop(); 
+        }
+
+        public void ResetClock()
+        {
+            stopwatch.Reset();
         }
 
         public void NextPlayersTurn()
@@ -92,6 +97,18 @@ namespace Chess.EngineUtility
             stopwatch.Stop();
             currentTimeTotal += stopwatch.ElapsedMilliseconds;
             stopwatch.Reset();
+        }
+
+        public void AddTime(bool white, float time)
+        {
+            if (white)
+            {
+                reamainignTimeWhite += time;
+            }
+            else
+            {
+                reamainignTimeBlack += time;
+            }
         }
 
         /// <summary>

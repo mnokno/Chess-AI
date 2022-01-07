@@ -58,6 +58,36 @@ namespace Chess.EngineUtility
         // General use functions
         #region General
 
+        // Takes back two move (one turn)
+        public void TakeBack()
+        {
+            // Stops clock
+            clock.StopClock();
+            clock.ResetClock();
+
+            // Re-founds time to both players
+            if (sideToMove)
+            {
+                clock.AddTime(false, timeTakenPerMove[timeTakenPerMove.Count - 1] - clock.timeIncrement);
+                clock.AddTime(true, timeTakenPerMove[timeTakenPerMove.Count - 2] - clock.timeIncrement);
+            }
+            else
+            {
+                clock.AddTime(true, timeTakenPerMove[timeTakenPerMove.Count - 1] - clock.timeIncrement);
+                clock.AddTime(false, timeTakenPerMove[timeTakenPerMove.Count - 2] - clock.timeIncrement);
+            }
+            timeTakenPerMove.RemoveAt(timeTakenPerMove.Count - 1);
+            timeTakenPerMove.RemoveAt(timeTakenPerMove.Count - 1);
+
+            // Unmakes the moves
+            UnmakeMove(moves.Peek());
+            UnmakeMove(moves.Peek());
+
+            // Starts the clock
+            clock.StartClock();
+        }
+
+        // Initiates the clock
         public void InitClock(int initTime, int timeIncrement)
         {
             useClock = true;

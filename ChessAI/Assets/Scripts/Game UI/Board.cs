@@ -256,6 +256,15 @@ namespace Chess.UI
             whiteToMove = !whiteToMove;
         }
 
+        // Takes back two move (one turn)
+        public void TakeBack()
+        {
+            engineManager.chessEngine.centralPosition.TakeBack();
+            string FEN = engineManager.chessEngine.centralPosition.GetFEN();
+            LoadFEN((new FEN(FEN)).GetPiecePlacment());
+            inputManager.LoadFEN(new FEN(FEN));
+        }
+
         #endregion
 
         // Support functions for piece and square class

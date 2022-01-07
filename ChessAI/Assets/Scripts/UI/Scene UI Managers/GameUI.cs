@@ -28,6 +28,7 @@ namespace Chess.UI
 
         private bool gameDisplayActive;
         private GameObject currentItem;
+        private Stack<GameObject> items = new Stack<GameObject>();
         private Common.ChessGameDataManager chessGameDataManager;
         private Board board;
 
@@ -93,7 +94,28 @@ namespace Chess.UI
                 turnReportDisplay.SetTrunNumber(turnNumber);
                 turnReportDisplay.SetMove(false, move);
                 turnReportDisplay.SetTime(false, time);
+                items.Push(currentItem);
                 currentItem = null;
+            }
+            // Scrolls to the bottom of the scroll rec
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 0;
+        }
+
+        public void UnLogTurn()
+        {
+            // Unlogs the move
+            if (currentItem != null)
+            {
+                DestroyImmediate(currentItem);
+                currentItem = items.Pop();
+                TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
+                turnReportDisplay.SetMove(false, "");
+                turnReportDisplay.SetTime(false, 0);
+            }
+            else 
+            {
+                DestroyImmediate(items.Pop());
             }
             // Scrolls to the bottom of the scroll rec
             Canvas.ForceUpdateCanvases();
@@ -104,8 +126,13 @@ namespace Chess.UI
         {
             if (board.whiteHumman == board.whiteToMove)
             {
-                chessGameDataManager.chessGameData.unmakesMade++;
-                UpdateTaleBacksSubText();
+                if (board.engineManager.chessEngine.centralPosition.moves.Count >= 2)
+                {
+                    chessGameDataManager.chessGameData.unmakesMade++;
+                    UpdateTaleBacksSubText();
+                    board.TakeBack();
+                    UnLogTurn();
+                }
             }
             else
             {
