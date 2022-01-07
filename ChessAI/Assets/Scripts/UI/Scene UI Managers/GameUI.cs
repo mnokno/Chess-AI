@@ -149,6 +149,7 @@ namespace Chess.UI
 
         public void SurrenderBtn()
         {
+            board.inputManager.takeHumanInpuit = false;
             surrender.SetAction(Surrender);
             surrender.Show();
         }
@@ -158,6 +159,10 @@ namespace Chess.UI
             if (anwser == PopUpYesNo.Anwser.Yes)
             {
                 FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+            }
+            else
+            {
+                board.inputManager.takeHumanInpuit = true;
             }
         }
 
