@@ -33,7 +33,7 @@ namespace Chess.UI
             }
             else if (IsUsernameTaken(inputField.text)) // Invalid username
             {
-                invalidUserName.SetMessage($"Username '{inputField.text}' is already taken, please chouse a different username.");
+                invalidUserName.SetMessage($"Username '{inputField.text}' is already taken, please chose a different username.");
                 invalidUserName.Show();
             }
             else // Creates user

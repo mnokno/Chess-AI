@@ -70,7 +70,7 @@ namespace Chess.Engine
             // Start coroutine for detecting timeout
             if (GetComponent<Board>().useClock)
             {
-                StartCoroutine(nameof(CheckForTimeOuts));
+                StartCoroutine(nameof(CheckGameState));
             }
         }
 
@@ -223,57 +223,117 @@ namespace Chess.Engine
             calculated = true;
         }
 
-        private IEnumerator CheckForTimeOuts()
+        private IEnumerator CheckGameState()
         {
+            void EndGame()
+            {
+                // Stops the clocks
+                chessEngine.centralPosition.clock.StopClock();
+                // Cancels search
+                chessEngine.CancelSearch();
+                // Disables the chess board
+                inputManager.EndGame();
+            }
+
             while (true)
             {
+                // Checks for surrender
+                if (chessEngine.centralPosition.gameState == Position.GameState.Surrender)
+                {
+                    chessGameDataManager.chessGameData.gameResultCode = Position.GameState.Surrender.ToString();
+                    if (inputManager.parrentBoard.whiteHumman)
+                    {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "0-1";
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("Surrender", "Black Won", true);
+                    }
+                    else
+                    {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "1-0";
+                        // Updates and shows the display
+                        FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("Surrender", "White Won", true);
+                    }
+                    // Ends the game
+                    EndGame();
+                    break;
+                }
+                // Checks for timeouts
                 Vector2 times = chessEngine.centralPosition.clock.GetCurrentTimes();
                 if (times.x <= 0)
                 {
+                    chessGameDataManager.chessGameData.gameResultCode = Position.GameState.OutOfTime.ToString();
                     // Checks if the material is sufficient
                     if (chessEngine.centralPosition.IsMaterialSufficient(false))
                     {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "0-1";
                         // Updates and shows the display
                         FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Black Won", true);
                     }
                     else
                     {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "1/2-1/2";
                         // Updates and shows the display
                         FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Draw", true);
                     }
+                    // Ends the game
+                    EndGame();
                     // Updates game state
                     chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
-                    // Stops the clocks
-                    chessEngine.centralPosition.clock.StopClock();
-                    // Cancels search
-                    chessEngine.CancelSearch();
                     break;
                 }
                 else if (times.y <= 0)
                 {
+                    chessGameDataManager.chessGameData.gameResultCode = Position.GameState.OutOfTime.ToString();
                     // Checks if the material is sufficient
                     if (chessEngine.centralPosition.IsMaterialSufficient(true))
                     {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "1-0";
                         // Updates and shows the display
                         FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "White Won", true);
                     }
                     else
                     {
+                        // Updates game result
+                        chessGameDataManager.chessGameData.gameResult = "1/2-1/2";
                         // Updates and shows the display
                         FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("On Time", "Draw", true);
                     }
+                    // Ends the game
+                    EndGame();
                     // Updates game state
                     chessEngine.centralPosition.gameState = Position.GameState.OutOfTime;
-                    // Stops the clocks
-                    chessEngine.centralPosition.clock.StopClock();
-                    // Cancels search
-                    chessEngine.CancelSearch();
                     break;
                 }
                 yield return new WaitForSecondsRealtime(0.1f);
             }
         }
 
+        public void SurrenderHuman()
+        {
+            if (inputManager.parrentBoard.whiteHumman)
+            {
+                // Updates and shows the display
+                FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("Surrender", "Black Won", true);
+            }
+            else
+            {
+                // Updates and shows the display
+                FindObjectOfType<GameResultInfoDisplayManager>().UpdateDisplay("Surrender", "White Won", true);
+            }
+            // Stops the clocks
+            chessEngine.centralPosition.clock.StopClock();
+            // Cancels search
+            chessEngine.CancelSearch();
+            // Disables the chess board
+            inputManager.EndGame();
+            // Updates game state
+            chessEngine.centralPosition.gameState = Position.GameState.Surrender;
+        }
         #endregion
 
         // Updates search info

@@ -17,9 +17,14 @@ namespace Chess.UI
         public Transform content;
         public GameObject contentItemPrefab;
         public ScrollRect scrollRect;
+        public Button takeBackButton;
+        public Button reviewButton;
+        public Button surrenerButton;
+        public TMPro.TextMeshProUGUI takeBackText;
 
         private bool gameDisplayActive;
         private GameObject currentItem;
+        private Common.ChessGameDataManager chessGameDataManager;
 
         // Class functions
 
@@ -32,6 +37,9 @@ namespace Chess.UI
             gameButtonImage.color = selected;
             engineDetailsButtonImage.color = deselected;
             gameDisplayActive = true;
+            chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
+            StartCoroutine(nameof(CheckGameState));
+            UpdateTaleBacksSubText();
         }
 
         public void GameBtn()
@@ -88,7 +96,8 @@ namespace Chess.UI
 
         public void TabkeBackBtn()
         {
-
+            chessGameDataManager.chessGameData.unmakesMade++;
+            UpdateTaleBacksSubText();
         }
 
         public void ReviewGameBtn()
@@ -98,7 +107,47 @@ namespace Chess.UI
 
         public void SurrenderBtn()
         {
+            Surrender();
+        }
 
+        public void Surrender()
+        {
+            FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+        }
+
+        public IEnumerator CheckGameState()
+        {
+            while (true)
+            {
+                if (chessGameDataManager.chessGameData.gameResultCode != null)
+                {
+                    takeBackButton.interactable = false;
+                    reviewButton.interactable = true;
+                    surrenerButton.interactable = false;
+                    break;
+                }
+                else
+                {
+                    yield return new WaitForSecondsRealtime(0.1f);
+                }
+            }
+        }
+
+        public void UpdateTaleBacksSubText()
+        {
+            if (chessGameDataManager.chessGameData.unmakesLimit - chessGameDataManager.chessGameData.unmakesMade <= 0)
+            {
+                takeBackButton.interactable = false;
+                takeBackText.text = $"You have {0} takebacks";
+            }
+            else if (chessGameDataManager.chessGameData.unmakesLimit - chessGameDataManager.chessGameData.unmakesMade == 1)
+            {
+                takeBackText.text = $"You have {1} takeback";
+            }
+            else
+            {
+                takeBackText.text = $"You have {chessGameDataManager.chessGameData.unmakesLimit - chessGameDataManager.chessGameData.unmakesMade} takebacks";
+            }
         }
     }
 }

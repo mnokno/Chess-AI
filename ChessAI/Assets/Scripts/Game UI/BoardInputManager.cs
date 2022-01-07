@@ -361,8 +361,19 @@ namespace Chess.UI
                 // Checks if the game is still onGoing
                 if (parrentBoard.engineManager.chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
                 {
-                    parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+                    EndGame();
                 }
+            }
+        }
+
+        // Called when the game comes to en end
+        public void EndGame()
+        {
+            parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+            interactable = false;
+            if (selectedPiece != null)
+            {
+                Deselect();
             }
         }
 

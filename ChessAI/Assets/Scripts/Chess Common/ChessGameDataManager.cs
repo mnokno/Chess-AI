@@ -23,11 +23,15 @@ namespace Chess.Common
             }
         }
 
+        [System.Serializable]
         public struct ChessGameData
         {
+            // To tell other classes what should be done whit the chess data
             public bool loadGame;
             public bool newGame;
+            // Reference to the game DI (only when the game is read from database)
             public int gameID;
+            // Data for loading game
             public string AiStrength;
             public string moves;
             public bool isHumanWhite;
@@ -37,10 +41,13 @@ namespace Chess.Common
             public int timeIncrement;
             public int unmakesLimit;
             public int unmakesMade;
-            public bool whereUnamkesEnabled;
+            // For game review
             public string startDate;
             public string endDate;
             public string gameTitle;
+            public string gameResult;
+            public string gameResultCode;
+            public bool whereUnamkesEnabled;
         }
     }
 }

@@ -61,8 +61,6 @@ namespace Chess.UI
                 bool loadGame = true;
                 bool newGame = true;
                 string AiStrength = gameDifficultyDropdown.value.ToString();
-                string moves = "";
-                string timeUsage = "";
                 int timeLeft = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
                 int initialTime = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
                 int timeIncrement = timeIncrementInputField.text.Replace("-", "") == "" ? 0 : int.Parse(timeIncrementInputField.text);
@@ -80,8 +78,6 @@ namespace Chess.UI
                     loadGame = loadGame,
                     newGame = newGame,
                     AiStrength = AiStrength,
-                    moves = moves,
-                    timeUsage = timeUsage,
                     timeLeft = timeLeft,
                     initialTime = initialTime,
                     timeIncrement = timeIncrement,
@@ -116,7 +112,14 @@ namespace Chess.UI
 
         public string AutoGenerateGameName()
         {
-            return "new game";
+            int nameIteration = 1;
+            string name = currentPlayerRecord.username + "-" + nameIteration;
+            while (IsGameNameTaken(name))
+            {
+                nameIteration++;
+                name = currentPlayerRecord.username + "-" + nameIteration;
+            }
+            return name;
         }
 
         public bool IsGameNameTaken(string gameName)

@@ -74,6 +74,8 @@ namespace Chess.UI
         // Updates the display base state of the given position
         public void UpdateDisplay(EngineUtility.Position position, bool showDisplay)
         {
+            // Finds chess game data manager
+            Common.ChessGameDataManager chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
             // Creates string used to store display info
             string newMainDisplayText;
             string newSubDisplayText;
@@ -81,6 +83,8 @@ namespace Chess.UI
             // Decides on the content of the display info
             if (position.gameState == EngineUtility.Position.GameState.Checkmate)
             {
+                chessGameDataManager.chessGameData.gameResult = position.sideToMove ? "0-1" : "1-0";
+                chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Checkmate.ToString();
                 newMainDisplayText = position.sideToMove ? "Black Won" : "White Won";
                 newSubDisplayText = "Checkmate";
             }
@@ -92,18 +96,23 @@ namespace Chess.UI
             else
             {
                 newMainDisplayText = "Draw";
+                chessGameDataManager.chessGameData.gameResult = "1/2-1/2";
                 switch (position.gameState)
                 {
                     case EngineUtility.Position.GameState.InsufficientMaterial:
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.InsufficientMaterial.ToString();
                         newSubDisplayText = "Insufficient Material";
                         break;
                     case EngineUtility.Position.GameState.Stalemate:
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Stalemate.ToString();
                         newSubDisplayText = "Stalemate";
                         break;
                     case EngineUtility.Position.GameState.ThreefoldRepetition:
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.ThreefoldRepetition.ToString();
                         newSubDisplayText = "Repetition";
                         break;
                     default: // EngineUtility.Position.GameState.FiftyMoveRule
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.FiftyMoveRule.ToString();
                         newSubDisplayText = "Fifty Move Rule";
                         break;
                 }
