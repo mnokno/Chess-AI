@@ -13,6 +13,7 @@ namespace Chess.UI
         #region Class variables
 
         public bool interactable; // Decides whether or not this board input manager will interact
+        public bool takeHumanInpuit; // Decides whether or not human can interact with this board
         public Board parrentBoard; // Reference to parent chess board
 
         private float globalSquareLength; // Length of a sing square in the global scale 
@@ -63,7 +64,7 @@ namespace Chess.UI
         // Update is called once per frame
         void Update()
         {
-            if (interactable)
+            if (interactable && takeHumanInpuit)
             {
                 // Exits full screen move
                 if (Input.GetKeyDown(KeyCode.F))
@@ -363,6 +364,8 @@ namespace Chess.UI
                 {
                     EndGame();
                 }
+                // Sets game saved flag to false
+                parrentBoard.engineManager.chessGameDataManager.chessGameData.saved = false;
             }
         }
 

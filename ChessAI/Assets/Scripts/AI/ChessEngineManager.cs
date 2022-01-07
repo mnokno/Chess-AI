@@ -32,7 +32,7 @@ namespace Chess.Engine
         public TMPro.TextMeshProUGUI PGNText;
 
         // Game setting
-        Common.ChessGameDataManager chessGameDataManager;
+        public Common.ChessGameDataManager chessGameDataManager;
         // Used to play an AI move once its calculated
         public bool calculated = false;
         public ushort moveToPlay = 0;

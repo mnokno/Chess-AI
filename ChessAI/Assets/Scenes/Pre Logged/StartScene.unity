@@ -1648,6 +1648,10 @@ PrefabInstance:
       propertyPath: interactable
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1199519224726600510, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
+      propertyPath: takeHumanInpuit
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1199519225866134323, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
       propertyPath: m_LocalScale.x
       value: 1

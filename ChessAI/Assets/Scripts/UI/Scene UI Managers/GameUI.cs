@@ -22,9 +22,14 @@ namespace Chess.UI
         public Button surrenerButton;
         public TMPro.TextMeshProUGUI takeBackText;
 
+        public PopUpMessage invalidTakeback;
+        public PopUpYesNo surrender;
+        public PopUpYesNo gameNotSaved;
+
         private bool gameDisplayActive;
         private GameObject currentItem;
         private Common.ChessGameDataManager chessGameDataManager;
+        private Board board;
 
         // Class functions
 
@@ -38,6 +43,7 @@ namespace Chess.UI
             engineDetailsButtonImage.color = deselected;
             gameDisplayActive = true;
             chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
+            board = FindObjectOfType<Board>();
             StartCoroutine(nameof(CheckGameState));
             UpdateTaleBacksSubText();
         }
@@ -96,23 +102,36 @@ namespace Chess.UI
 
         public void TabkeBackBtn()
         {
-            chessGameDataManager.chessGameData.unmakesMade++;
-            UpdateTaleBacksSubText();
+            if (board.whiteHumman == board.whiteToMove)
+            {
+                chessGameDataManager.chessGameData.unmakesMade++;
+                UpdateTaleBacksSubText();
+            }
+            else
+            {
+                board.inputManager.takeHumanInpuit = false;
+                invalidTakeback.SetAction(() => board.inputManager.takeHumanInpuit = true);
+                invalidTakeback.Show();
+            }
         }
 
         public void ReviewGameBtn()
         {
-
+            
         }
 
         public void SurrenderBtn()
         {
-            Surrender();
+            surrender.SetAction(Surrender);
+            surrender.Show();
         }
 
-        public void Surrender()
+        public void Surrender(PopUpYesNo.Anwser anwser)
         {
-            FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+            if (anwser == PopUpYesNo.Anwser.Yes)
+            {
+                FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+            }
         }
 
         public IEnumerator CheckGameState()

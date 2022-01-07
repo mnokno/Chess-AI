@@ -29,6 +29,7 @@ namespace Chess.Common
             // To tell other classes what should be done whit the chess data
             public bool loadGame;
             public bool newGame;
+            public bool saved;
             // Reference to the game DI (only when the game is read from database)
             public int gameID;
             // Data for loading game

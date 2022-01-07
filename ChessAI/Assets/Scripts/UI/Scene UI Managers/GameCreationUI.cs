@@ -60,6 +60,7 @@ namespace Chess.UI
                 // Gets game data
                 bool loadGame = true;
                 bool newGame = true;
+                bool saved = false;
                 string AiStrength = gameDifficultyDropdown.value.ToString();
                 int timeLeft = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
                 int initialTime = Mathf.Abs(int.Parse(initialTimeInputField.text)) * 60;
@@ -77,6 +78,7 @@ namespace Chess.UI
                 {
                     loadGame = loadGame,
                     newGame = newGame,
+                    saved = saved,
                     AiStrength = AiStrength,
                     timeLeft = timeLeft,
                     initialTime = initialTime,
