@@ -67,7 +67,6 @@ namespace Chess.UI
             {
                 currentItem = Instantiate(contentItemPrefab, content);
                 TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
-                Debug.Log("HERE");
                 turnReportDisplay.SetTrunNumber(turnNumber);
                 turnReportDisplay.SetMove(true, move);
                 turnReportDisplay.SetTime(true, time);

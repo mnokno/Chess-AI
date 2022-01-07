@@ -45,7 +45,6 @@ namespace Chess.UI
                 wasPrevLight = true;
             }
             totalTime = FindObjectOfType<Common.ChessGameDataManager>().chessGameData.initialTime;
-            Debug.Log("EJRE");
         }
 
         public void SetTrunNumber(int turnNumber)

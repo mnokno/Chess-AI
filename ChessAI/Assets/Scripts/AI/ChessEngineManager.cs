@@ -194,6 +194,31 @@ namespace Chess.Engine
         {
             // Calculates AI move
             moveToPlay = chessEngine.CalculateBestMove(moveGenerationProfile.timeLimit);
+            // Returns a move at a lower depth
+            ushort GetLowerDepth(int lowerBy)
+            {
+                if (chessEngine.generatedMoves.Count == 0)
+                {
+                    return 0;
+                }
+                int depthChange = lowerBy;
+                while (true)
+                {
+                    if (chessEngine.generatedMoves.Count >= depthChange + 1)
+                    {
+                        return chessEngine.generatedMoves[chessEngine.generatedMoves.Count - depthChange - 1];
+                    }
+                    depthChange--;
+                }
+            }
+            if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- Max - 3
+            {
+                moveToPlay = GetLowerDepth(4);
+            }
+            else if (chessGameDataManager.chessGameData.AiStrength == "2") // Medium --- Max - 2
+            {
+                moveToPlay = GetLowerDepth(2);
+            }
             // Sets a flag
             calculated = true;
         }

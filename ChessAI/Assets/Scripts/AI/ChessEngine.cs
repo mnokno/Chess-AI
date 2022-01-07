@@ -33,6 +33,7 @@ namespace Chess.Engine
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
         // Used for progressive depth search
+        public List<ushort> generatedMoves = new List<ushort>(); // Used to store generated move, different AI difficulties will chose a move from different depths
         public ushort bestMove = ushort.MaxValue; // Set initially to an invalid move
         public ushort previousBestMove = ushort.MaxValue; // Set initially to an invalid move
         public byte currentBaseDepht = 0;
@@ -70,6 +71,8 @@ namespace Chess.Engine
         // Calculate best move in the given time limit 
         public ushort CalculateBestMove(float timeLimit)
         {
+            // Clears the moves list
+            generatedMoves.Clear();
             // Resets flag, and parameters
             cancelSearch = false;
             currentBaseDepht = 1;
@@ -93,6 +96,8 @@ namespace Chess.Engine
                     // Saves the search results
                     previousBestMove = bestMove;
                     bestMove = move;
+                    // Adds the move to generated moves list
+                    generatedMoves.Add(move);
                     // Updates Depth
                     currentBaseDepht++;
                 }
