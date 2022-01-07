@@ -85,5 +85,20 @@ namespace Chess.UI
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 0;
         }
+
+        public void TabkeBackBtn()
+        {
+
+        }
+
+        public void ReviewGameBtn()
+        {
+
+        }
+
+        public void SurrenderBtn()
+        {
+
+        }
     }
 }

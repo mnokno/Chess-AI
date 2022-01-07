@@ -12,6 +12,7 @@ namespace Chess.UI
         // Class variables
         #region Class variables
 
+        public bool interactable; // Decides whether or not this board input manager will interact
         public Board parrentBoard; // Reference to parent chess board
 
         private float globalSquareLength; // Length of a sing square in the global scale 
@@ -62,51 +63,54 @@ namespace Chess.UI
         // Update is called once per frame
         void Update()
         {
-            // Exits full screen move
-            if (Input.GetKeyDown(KeyCode.F)) 
+            if (interactable)
             {
-                Screen.fullScreen = !Screen.fullScreen;
-            }
-
-            // Snaps the piece to the mouse location if in dragging mode
-            if (movementState == MousePieceMovementState.Dragging)
-            {
-                Drag();
-            }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                
-                if (movementState == MousePieceMovementState.None)
+                // Exits full screen move
+                if (Input.GetKeyDown(KeyCode.F))
                 {
-                    // Clicked the square if no piece is currently selected
-                    Click();
+                    Screen.fullScreen = !Screen.fullScreen;
                 }
-                else if (movementState == MousePieceMovementState.Selected)
-                {              
-                    if (GetIndexUnderMouse() == (selectedPiece.rank * 8 + selectedPiece.file)) // Clicked on the current location
+
+                // Snaps the piece to the mouse location if in dragging mode
+                if (movementState == MousePieceMovementState.Dragging)
+                {
+                    Drag();
+                }
+
+                if (Input.GetMouseButtonDown(0))
+                {
+
+                    if (movementState == MousePieceMovementState.None)
                     {
-                        movementState = MousePieceMovementState.Dragging;
+                        // Clicked the square if no piece is currently selected
+                        Click();
                     }
-                    else if (IsLegal(selectedPiece.rank * 8 + selectedPiece.file, GetIndexUnderMouse()))
+                    else if (movementState == MousePieceMovementState.Selected)
                     {
-                        // Tries to play the move
-                        TryToMakeMove(selectedPiece.rank * 8 + selectedPiece.file, GetIndexUnderMouse());
-                    }
-                    else if (GetIndexUnderMouse() >= 0 && GetIndexUnderMouse() < 64)
-                    {
-                        if (parrentBoard.pieces[GetIndexUnderMouse()] != null)
+                        if (GetIndexUnderMouse() == (selectedPiece.rank * 8 + selectedPiece.file)) // Clicked on the current location
                         {
-                            Deselect();
-                            Click();
+                            movementState = MousePieceMovementState.Dragging;
                         }
+                        else if (IsLegal(selectedPiece.rank * 8 + selectedPiece.file, GetIndexUnderMouse()))
+                        {
+                            // Tries to play the move
+                            TryToMakeMove(selectedPiece.rank * 8 + selectedPiece.file, GetIndexUnderMouse());
+                        }
+                        else if (GetIndexUnderMouse() >= 0 && GetIndexUnderMouse() < 64)
+                        {
+                            if (parrentBoard.pieces[GetIndexUnderMouse()] != null)
+                            {
+                                Deselect();
+                                Click();
+                            }
+                        }
+
                     }
-                 
                 }
-            }
-            else if (movementState == MousePieceMovementState.Dragging && Input.GetMouseButtonUp(0)) // If in dragging move and the mouse button was lifted the piece is dropped
-            {
-                Drop();
+                else if (movementState == MousePieceMovementState.Dragging && Input.GetMouseButtonUp(0)) // If in dragging move and the mouse button was lifted the piece is dropped
+                {
+                    Drop();
+                }
             }
         }
 
@@ -295,64 +299,70 @@ namespace Chess.UI
         // Makes the move and updates central position
         public void MakeHumanMove(int from, int to, bool animate = true)
         {
-            parrentBoard.engineManager.MakeMove(ConvertToMove(from, to));
-            MakeAIMove(from, to, animate:animate);
-            if (!parrentBoard.hvh)
+            if (interactable)
             {
-                parrentBoard.engineManager.MakeAIMove();
+                parrentBoard.engineManager.MakeMove(ConvertToMove(from, to));
+                MakeAIMove(from, to, animate: animate);
+                if (!parrentBoard.hvh)
+                {
+                    parrentBoard.engineManager.MakeAIMove();
+                }
             }
         }
 
         // Makes the move and assumes the central position has already been updated
         public void MakeAIMove(int from, int to, bool animate = true)
         {
-            // Converts the move to a ushort move
-            ushort move = ConvertToMove(from, to);
-            // Converts the move to pgn
-            string movePGN = Move.ConvertUshortToPNG(move, localPosition);
-            // Updates local position
-            localPosition.MakeMove(move);
-            // Plays the move sound
-            PlayMoveSound(move);
-            // Makes the move on the visual chess board
-            parrentBoard.MakeMove(move, animate:animate);
-            // Deselects the piece
-            if (selectedPiece != null)
+            if (interactable)
             {
-                Deselect();
-            }
+                // Converts the move to a ushort move
+                ushort move = ConvertToMove(from, to);
+                // Converts the move to pgn
+                string movePGN = Move.ConvertUshortToPNG(move, localPosition);
+                // Updates local position
+                localPosition.MakeMove(move);
+                // Plays the move sound
+                PlayMoveSound(move);
+                // Makes the move on the visual chess board
+                parrentBoard.MakeMove(move, animate: animate);
+                // Deselects the piece
+                if (selectedPiece != null)
+                {
+                    Deselect();
+                }
 
-            // Deselects last move
-            if (lastMoveSquares[0] != null)
-            {
-                lastMoveSquares[0].Highlighted(false);
-            }
-            if (lastMoveSquares[1] != null)
-            {
-                lastMoveSquares[1].Highlighted(false);
-            }
+                // Deselects last move
+                if (lastMoveSquares[0] != null)
+                {
+                    lastMoveSquares[0].Highlighted(false);
+                }
+                if (lastMoveSquares[1] != null)
+                {
+                    lastMoveSquares[1].Highlighted(false);
+                }
 
-            // Highlights this move
-            lastMoveSquares[0] = parrentBoard.squares[from];
-            lastMoveSquares[1] = parrentBoard.squares[to];
-            lastMoveSquares[0].Highlighted(true);
-            lastMoveSquares[1].Highlighted(true);
+                // Highlights this move
+                lastMoveSquares[0] = parrentBoard.squares[from];
+                lastMoveSquares[1] = parrentBoard.squares[to];
+                lastMoveSquares[0].Highlighted(true);
+                lastMoveSquares[1].Highlighted(true);
 
-            // Updates clock
-            if (parrentBoard.engineManager.chessEngine.centralPosition.useClock)
-            {
-                parrentBoard.engineManager.chessEngine.centralPosition.clock.NextPlayersTurn();
-            }
-            // Updates move display
-            if (logMoveToDisplay)
-            {
-                int turnNumer = (int)Math.Ceiling(parrentBoard.engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
-                gameUI.LogMove(turnNumer, movePGN, parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove[parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove.Count - 1]);
-            }
-            // Checks if the game is still onGoing
-            if (parrentBoard.engineManager.chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
-            {
-                parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+                // Updates clock
+                if (parrentBoard.engineManager.chessEngine.centralPosition.useClock)
+                {
+                    parrentBoard.engineManager.chessEngine.centralPosition.clock.NextPlayersTurn();
+                }
+                // Updates move display
+                if (logMoveToDisplay)
+                {
+                    int turnNumer = (int)Math.Ceiling(parrentBoard.engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
+                    gameUI.LogMove(turnNumer, movePGN, parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove[parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove.Count - 1]);
+                }
+                // Checks if the game is still onGoing
+                if (parrentBoard.engineManager.chessEngine.centralPosition.gameState != Position.GameState.OnGoing)
+                {
+                    parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+                }
             }
         }
 
