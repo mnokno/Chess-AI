@@ -10,14 +10,14 @@ namespace Chess.DB
 {
     public class PlayerDbWriter : PlayerDb
     {
-        #region Players table managment
+        #region Players table management
 
         public void WriteToPlayers(PlayerRecord playerRecord)
         {
-            // Throws an exception if the data base has not been opend
+            // Throws an exception if the data base has not been opened
             if (!this.isOpen)
             {
-                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectivly.");
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
             }
 
             // Create new text command
@@ -30,13 +30,13 @@ namespace Chess.DB
 
         public void DeleteFromPlayers(string username)
         {
-            // Throws an exception if the data base has not been opend
+            // Throws an exception if the data base has not been opened
             if (!this.isOpen)
             {
-                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectivly.");
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
             }
 
-            // Delets a player with the given username
+            // Deletes a player with the given username
             dbcmd.CommandText = $"DELETE FROM Players WHERE Username='{username}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
@@ -44,14 +44,43 @@ namespace Chess.DB
 
         public void UpdatePlayers(string username, string newUsername, string newDifficulty)
         {
-            // Throws an exception if the data base has not been opend
+            // Throws an exception if the data base has not been opened
             if (!this.isOpen)
             {
-                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectivly.");
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
             }
 
-            // Delets a player with the given username
+            // Deletes a player with the given username
             dbcmd.CommandText = $"UPDATE Players SET Username='{newUsername}', DefaultDifficulty='{newDifficulty}' WHERE Username='{username}';";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region Saved game table management
+
+        public void WriteToSavedGame(SavedGameRecord savedGameRecord)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create new text command
+            dbcmd.CommandText = $"INSERT INTO 'SavedGames'" +
+                                    "('Player_ID', 'Moves', 'TimeUsage', 'AIStrength', 'IsHumanWhite', 'StartDate', 'GameTitle', 'UnmakesLimit', 'UnmakesMade', 'TimeControll')" +
+                                    $"VALUES('{savedGameRecord.playerID}', " +
+                                    $"{savedGameRecord.moves}', " +
+                                    $"{savedGameRecord.timeUsage}', " +
+                                    $"{savedGameRecord.AIStrength}', " +
+                                    $"{savedGameRecord.isHumanWhite}', " +
+                                    $"{savedGameRecord.startDate}', " +
+                                    $"{savedGameRecord.gameTitle}', " +
+                                    $"{savedGameRecord.unmakesLimit}', " +
+                                    $"{savedGameRecord.unmakesMade}', " +
+                                    $"'{savedGameRecord.timeControll}');";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }

@@ -9993,7 +9993,7 @@ MonoBehaviour:
   usernameText: {fileID: 7405853827163308578}
   chessGameDataManager: {fileID: 0}
   saveAs: {fileID: 2049294375}
-  gmaeSaveSuccessfully: {fileID: 1867821025}
+  gameSaveSuccessfully: {fileID: 1867821025}
   invalidSaveTime: {fileID: 1949394614}
   gameNotSaved: {fileID: 742029999}
 --- !u!1 &9201655869224139026

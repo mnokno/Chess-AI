@@ -104,20 +104,19 @@ namespace Chess.DB
 
         /*
          *CREATE TABLE "SavedGames" (
-	     *   "Game_ID"	INTEGER NOT NULL UNIQUE,
-	     *   "Player_ID"	INTEGER NOT NULL,
-	     *   "Moves"	TEXT NOT NULL,
-	     *   "TimeUsage"	TEXT NOT NULL,
-	     *   "AIStrength"	TEXT NOT NULL,
-	     *   "IsHumanWhite"	TEXT NOT NULL,
-	     *   "TimeLeft"	REAL NOT NULL,
-	     *   "StartDate"	TEXT NOT NULL,
-	     *   "GameTitle"	TEXT NOT NULL,
-	     *   "UnmakesLimit"	INTEGER NOT NULL,
-	     *   "UnmakesMade"	INTEGER NOT NULL,
-	     *   FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
-	     *   "TimeControll"	TEXT NOT NULL,
-	     *   PRIMARY KEY("Game_ID" AUTOINCREMENT)
+	     *    "Game_ID"	INTEGER NOT NULL UNIQUE,
+	     *    "Player_ID"	INTEGER NOT NULL,
+	     *    "Moves"	TEXT NOT NULL,
+	     *    "TimeUsage"	TEXT NOT NULL,
+	     *    "AIStrength"	TEXT NOT NULL,
+	     *    "IsHumanWhite"	TEXT NOT NULL,
+	     *    "StartDate"	TEXT NOT NULL,
+	     *    "GameTitle"	TEXT NOT NULL,
+	     *    "UnmakesLimit"	INTEGER NOT NULL,
+	     *    "UnmakesMade"	INTEGER NOT NULL,
+	     *    "TimeControll"	TEXT NOT NULL,
+	     *    FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
+	     *    PRIMARY KEY("Game_ID" AUTOINCREMENT)
          *);
          */
         public struct SavedGameRecord
@@ -128,30 +127,12 @@ namespace Chess.DB
             public string timeUsage;
             public string AIStrength;
             public string isHumanWhite;
-            public string timeLeft;
             public string startDate;
             public string gameTitle;
             public int unmakesLimit;
             public int unmakesMade;
             public string timeControll;
             public bool isValid;
-
-            public SavedGameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string timeLeft, string startDate, string gameTitle, int unmakesLimit, int unmakesMade, string timeControll, bool isValid)
-            {
-                this.gameID = gameID;
-                this.playerID = playerID;
-                this.moves = moves;
-                this.timeUsage = timeUsage;
-                this.AIStrength = AIStrength;
-                this.isHumanWhite = isHumanWhite;
-                this.timeLeft = timeLeft;
-                this.startDate = startDate;
-                this.gameTitle = gameTitle;
-                this.unmakesLimit = unmakesLimit;
-                this.unmakesMade = unmakesMade;
-                this.timeControll = timeControll;
-                this.isValid = isValid;
-            }
         }
 
         /*
@@ -187,23 +168,6 @@ namespace Chess.DB
             public bool whereUnmakesEnabled;
             public string timeControll;
             public bool isValid;
-
-            public GameRecord(int gameID, int playerID, string moves, string timeUsage, string AIStrength, string isHumanWhite, string gameResult, string startDate, string endDate, string gameTitle, bool whereUnmakesEnabled,string timeControll, bool isValid)
-            {
-                this.gameID = gameID;
-                this.playerID = playerID;
-                this.moves = moves;
-                this.timeUsage = timeUsage;
-                this.AIStrength = AIStrength;
-                this.gameResult = gameResult;
-                this.isHumanWhite = isHumanWhite;
-                this.startDate = startDate;
-                this.endDate = endDate;
-                this.gameTitle = gameTitle;
-                this.whereUnmakesEnabled = whereUnmakesEnabled;
-                this.timeControll = timeControll;
-                this.isValid = isValid;
-            }
         }
 
         #endregion

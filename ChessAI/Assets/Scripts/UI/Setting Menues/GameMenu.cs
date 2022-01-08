@@ -1,19 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Chess.DB;
 
 namespace Chess.UI 
 {
     public class GameMenu : ExtendedMenu
     {
+        // Class variables
         [HideInInspector]
         public Common.ChessGameDataManager chessGameDataManager;
         private BoardInputManager inputManager;
 
         public SaveAs saveAs;
-        public PopUpMessage gmaeSaveSuccessfully; 
+        public PopUpMessage gameSaveSuccessfully; 
         public PopUpMessage invalidSaveTime;
         public PopUpYesNo gameNotSaved;
+
+        // Class functions
 
         public override void Start()
         {
@@ -63,6 +67,8 @@ namespace Chess.UI
             if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove)
             {
                 Debug.Log("SAVE");
+                SaveGame();
+                gameSaveSuccessfully.Show();
             }
             else
             {
@@ -140,6 +146,16 @@ namespace Chess.UI
                 gameNotSaved.SetAction(Action);
                 gameNotSaved.Show();
             }
+        }
+
+        /// <summary>
+        /// Can only by called in humans turn
+        /// </summary>
+        public void SaveGame()
+        {
+            // Gathers all data that needs to be saved
+            //int playersID = saveAs.
+            PlayerDb.SavedGameRecord savedGameRecord;
         }
     }
 }
