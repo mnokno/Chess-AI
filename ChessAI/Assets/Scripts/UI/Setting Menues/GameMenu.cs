@@ -164,7 +164,14 @@ namespace Chess.UI
                 {
                     moves += move.ToString() + ":";
                 }
-                return moves.Remove(moves.Length - 1);
+                if (moves.Length == 0)
+                {
+                    return moves;
+                }
+                else
+                {
+                    return moves.Remove(moves.Length - 1);
+                }
             }
             string GetTimeUsage()
             {
@@ -173,7 +180,14 @@ namespace Chess.UI
                 {
                     timeUsage += time.ToString() + ":";
                 }
-                return timeUsage.Remove(timeUsage.Length - 1);
+                if (timeUsage.Length == 0)
+                {
+                    return timeUsage;
+                }
+                else
+                {
+                    return timeUsage.Remove(timeUsage.Length - 1);
+                }
             }
 
             // Gathers all data that needs to be saved

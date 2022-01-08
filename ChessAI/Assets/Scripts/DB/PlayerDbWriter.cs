@@ -94,19 +94,18 @@ namespace Chess.DB
             }
 
             // Create new text command
-            dbcmd.CommandText = $"UPDATE SavedGames SET" +
-                                    "('Player_ID', 'Moves', 'TimeUsage', 'AIStrength', 'IsHumanWhite', 'StartDate', 'GameTitle', 'UnmakesLimit', 'UnmakesMade', 'TimeControll')" +
-                                    $"VALUES('{savedGameRecord.playerID}', " +
-                                    $"'{savedGameRecord.moves}', " +
-                                    $"'{savedGameRecord.timeUsage}', " +
-                                    $"'{savedGameRecord.AIStrength}', " +
-                                    $"'{savedGameRecord.isHumanWhite}', " +
-                                    $"'{savedGameRecord.startDate}', " +
-                                    $"'{savedGameRecord.gameTitle}', " +
-                                    $"'{savedGameRecord.unmakesLimit}', " +
-                                    $"'{savedGameRecord.unmakesMade}', " +
-                                    $"'{savedGameRecord.timeControll}')" +
-                                    $"WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
+            dbcmd.CommandText = $"UPDATE SavedGames SET " +
+                                $"Player_ID='{savedGameRecord.playerID}', " +
+                                $"Moves='{savedGameRecord.moves}', " +
+                                $"TimeUsage='{savedGameRecord.timeUsage}', " +
+                                $"AIStrength='{savedGameRecord.AIStrength}', " +
+                                $"IsHumanWhite='{savedGameRecord.isHumanWhite}', " +
+                                $"StartDate='{savedGameRecord.startDate}', " +
+                                $"GameTitle='{savedGameRecord.gameTitle}', " +
+                                $"UnmakesLimit='{savedGameRecord.unmakesLimit}', " +
+                                $"UnmakesMade='{savedGameRecord.unmakesMade}', " +
+                                $"TimeControll='{savedGameRecord.timeControll}' " +
+                                $"WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }
