@@ -18,6 +18,7 @@ namespace Chess.UI
         public GameObject contentItemPrefab;
         public ScrollRect scrollRect;
         public Button takeBackButton;
+        public Button startNewGame;
         public Button reviewButton;
         public Button surrenerButton;
         public TMPro.TextMeshProUGUI takeBackText;
@@ -47,6 +48,7 @@ namespace Chess.UI
             board = FindObjectOfType<Board>();
             StartCoroutine(nameof(CheckGameState));
             UpdateTaleBacksSubText();
+            FindObjectOfType<GameDataDisplay>().SetAiName(chessGameDataManager.chessGameData.AiStrength);
         }
 
         public void GameBtn()
@@ -147,6 +149,11 @@ namespace Chess.UI
             
         }
 
+        public void StartNewGameBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
+        }
+
         public void SurrenderBtn()
         {
             board.inputManager.takeHumanInpuit = false;
@@ -172,7 +179,8 @@ namespace Chess.UI
             {
                 if (chessGameDataManager.chessGameData.gameResultCode != null)
                 {
-                    takeBackButton.interactable = false;
+                    takeBackButton.gameObject.SetActive(false);
+                    startNewGame.gameObject.SetActive(true);
                     reviewButton.interactable = true;
                     surrenerButton.interactable = false;
                     break;

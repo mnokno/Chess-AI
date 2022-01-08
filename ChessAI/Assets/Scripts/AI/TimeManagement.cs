@@ -17,19 +17,19 @@ namespace Chess.Engine
                 float time = currentTime * 0.05f;
                 return time > 0.3f ? time : 0.3f;
             }
-            if (moveNumber <= 25) // Can use up to 62.5% of game time - opening book will save about 25% --- (highest rolling total 62.5%)
+            if (moveNumber < 20) // Can use up to 62.5% of game time - opening book will save about 25% --- (highest rolling total 62.5%)
             {
                 return initialTime * 0.025f + timeIncrement;
             }
-            else if (moveNumber <= 30) // Will use about 10% of total game time --- (highest rolling total 72.5%)
+            else if (moveNumber < 25) // Will use about 10% of total game time --- (highest rolling total 72.5%)
             {
                 return initialTime * 0.02f + timeIncrement;
             }
-            else if (moveNumber <= 35) // Will use about 7.5% of total game time --- (highest rolling total 80%)
+            else if (moveNumber < 30) // Will use about 7.5% of total game time --- (highest rolling total 80%)
             {
                 return initialTime * 0.015f + timeIncrement;
             }
-            else if (moveNumber <= 45) // Will use about 10 % of total game time --- (highest rolling total 80%)
+            else if (moveNumber < 40) // Will use about 10 % of total game time --- (highest rolling total 80%)
             {
                 return initialTime * 0.01f + timeIncrement;
             }

@@ -143,6 +143,22 @@ namespace Chess.Engine
         // Plays an AI generated move
         public void MakeAIMove(MoveGenerationProfile moveGenerationProfile, bool random = false)
         {
+            bool PlayRandom()
+            {
+                if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- 5% for a random move
+                {
+                    return Random.Range(0, 20) == 0;
+                }
+                else if (chessGameDataManager.chessGameData.AiStrength == "2") // Medium --- 2.5% for a random move
+                {
+                    return Random.Range(0, 40) == 0;
+                }
+                else // Hard --- 0% for a random move
+                {
+                    return false;
+                }
+            }
+
             if (chessEngine.centralPosition.gameState == Position.GameState.OnGoing)
             {
                 if (random)
@@ -155,8 +171,19 @@ namespace Chess.Engine
                     // Makes calculated AI move
                     if (chessEngine.centralPosition.historicMoveData.Count >= moveGenerationProfile.bookLimit)
                     {
-                        Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
-                        //MakeCalculatedAIMove(moveGenerationProfile);
+                        if (PlayRandom())
+                        {
+                            // Generates all legal moves
+                            List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
+                            // Choses a random move
+                            moveToPlay = moves[Random.Range(0, moves.Count - 1)];
+                            // Sets a flag
+                            calculated = true;
+                        }
+                        else
+                        {
+                            Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
+                        }
                     }
                     else
                     {
@@ -166,7 +193,19 @@ namespace Chess.Engine
                         if (moveToPlay == 0)
                         {
                             // Calculates the best moves, since the move was not valid
-                            Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
+                            if (PlayRandom())
+                            {
+                                // Generates all legal moves
+                                List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
+                                // Choses a random move
+                                moveToPlay = moves[Random.Range(0, moves.Count - 1)];
+                                // Sets a flag
+                                calculated = true;
+                            }
+                            else
+                            {
+                                Task.Run(() => MakeCalculatedAIMove(moveGenerationProfile));
+                            }
                         }
                         else
                         {

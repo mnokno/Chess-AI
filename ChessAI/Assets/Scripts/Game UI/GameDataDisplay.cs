@@ -32,7 +32,7 @@ namespace Chess.UI
             board = FindObjectOfType<Board>();
             clock = board.engineManager.chessEngine.centralPosition.clock;
             string username = PlayerPrefs.GetString("username");
-            string aiName = "Medium AI";
+            string aiName = "AI";
 
             if (board.whiteBottom)
             {
@@ -84,6 +84,32 @@ namespace Chess.UI
             {
                 upperTimeDisplay.text = FormatTime(whitesTime);
                 lowerTimeDisplay.text = FormatTime(balckTime);
+            }
+        }
+
+        public void SetAiName(string code)
+        {
+            string aiName;
+            if (code == "1")
+            {
+                aiName = "Week AI";
+            }
+            else if (code == "2")
+            {
+                aiName = "Normal AI";
+            }
+            else
+            {
+                aiName = "Strong AI";
+            }
+
+            if (board.whiteHumman == board.whiteBottom)
+            {
+                upperUsername.text = aiName;
+            }
+            else
+            {
+                lowerUsername.text = aiName;
             }
         }
 
