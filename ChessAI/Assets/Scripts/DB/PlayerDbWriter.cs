@@ -60,7 +60,7 @@ namespace Chess.DB
 
         #region Saved game table management
 
-        public void WriteToSavedGame(SavedGameRecord savedGameRecord)
+        public void WriteToSavedGames(SavedGameRecord savedGameRecord)
         {
             // Throws an exception if the data base has not been opened
             if (!this.isOpen)
@@ -81,6 +81,20 @@ namespace Chess.DB
                                     $"{savedGameRecord.unmakesLimit}', " +
                                     $"{savedGameRecord.unmakesMade}', " +
                                     $"'{savedGameRecord.timeControll}');";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        public void DeleteFromSavedGames(int gameID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Deletes a game with the given gameID
+            dbcmd.CommandText = $"DELETE FROM SavedGame WHERE Game_ID='{gameID}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }

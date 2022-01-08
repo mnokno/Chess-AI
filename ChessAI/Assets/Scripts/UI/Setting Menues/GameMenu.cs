@@ -153,9 +153,64 @@ namespace Chess.UI
         /// </summary>
         public void SaveGame()
         {
+            // Gets central position, it contains all information that need to be saved regarding the chess game
+            EngineUtility.Position position = inputManager.parrentBoard.engineManager.chessEngine.centralPosition;
+
+            // Helper functions
+            string GetMoves()
+            {
+                string moves = "";
+                foreach (ushort move in position.moves)
+                {
+                    moves += move.ToString() + ":";
+                }
+                return moves.TrimEnd();
+            }
+            string GetTimeUsage()
+            {
+                string timeUsage = "";
+                foreach (float time in position.timeTakenPerMove)
+                {
+                    timeUsage += time.ToString() + ":";
+                }
+                return timeUsage.TrimEnd();
+            }
+
             // Gathers all data that needs to be saved
-            //int playersID = saveAs.
-            PlayerDb.SavedGameRecord savedGameRecord;
+            int playersID = saveAs.currentPlayerRecord.playerID;
+            string moves = GetMoves();
+            string timeUsage = GetTimeUsage();
+            string aiStrenght = chessGameDataManager.chessGameData.AiStrength;
+            string isHumanWhite = inputManager.parrentBoard.whiteHumman.ToString();
+            string startDate = chessGameDataManager.chessGameData.startDate;
+            string gameTitle = chessGameDataManager.chessGameData.gameTitle;
+            int unmakesLimit = chessGameDataManager.chessGameData.unmakesLimit;
+            int unmakesMade = chessGameDataManager.chessGameData.unmakesMade;
+            string timeControll = chessGameDataManager.chessGameData.initialTime.ToString() + "+" + chessGameDataManager.chessGameData.timeIncrement.ToString();
+
+            PlayerDb.SavedGameRecord savedGameRecord = new PlayerDb.SavedGameRecord()
+            {
+                playerID = playersID,
+                moves = moves,
+                timeUsage = timeUsage,
+                AIStrength = aiStrenght,
+                isHumanWhite = isHumanWhite,
+                startDate = startDate,
+                gameTitle = gameTitle,
+                unmakesLimit = unmakesLimit,
+                unmakesMade = unmakesMade,
+                timeControll = timeControll
+            };
+
+            // Saves the game
+            PlayerDbWriter writer = new PlayerDbWriter();
+            writer.OpenDB();
+            writer.WriteToSavedGames(savedGameRecord);
+            writer.CloseDB();
+
+            // Show a message
+            chessGameDataManager.chessGameData.saved = true;
+            gameSaveSuccessfully.Show();
         }
     }
 }

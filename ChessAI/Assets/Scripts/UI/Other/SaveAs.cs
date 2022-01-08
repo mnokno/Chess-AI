@@ -14,7 +14,8 @@ namespace Chess.UI
         public PopUpMessage invalidGameName;
         public PopUpMessage gameNameIsRequired;
         public CanvasGroup canvasGroup;
-        private PlayerDb.PlayerRecord currentPlayerRecord;
+        [HideInInspector]
+        public PlayerDb.PlayerRecord currentPlayerRecord;
 
         // Class functions
 
