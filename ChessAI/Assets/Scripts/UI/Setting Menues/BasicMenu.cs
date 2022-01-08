@@ -19,12 +19,12 @@ namespace Chess.UI
             fullScreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
         }
 
-        public void QuitBtn()
+        public virtual void QuitBtn()
         {
             Application.Quit();
         }
 
-        public void ReturnBtn()
+        public virtual void ReturnBtn()
         {
             isMenuOn = false;
             animator.SetTrigger("Hide");
@@ -35,7 +35,7 @@ namespace Chess.UI
             ReturnBtn();
         }
 
-        public void SettingsBtn()
+        public virtual void SettingsBtn()
         {
             if (isMenuOn)
             {

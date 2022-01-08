@@ -146,38 +146,68 @@ namespace Chess.UI
 
         public void ReviewGameBtn()
         {
-            
+            if (chessGameDataManager.chessGameData.saved)
+            {
+                FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
+            }
+            else
+            {
+                void Action(PopUpYesNo.Anwser anwser)
+                {
+                    if (anwser == PopUpYesNo.Anwser.Yes)
+                    {
+                        FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
+                    }
+                }
+                gameNotSaved.SetAction(Action);
+                gameNotSaved.Show();
+            }
         }
 
         public void StartNewGameBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
+            if (chessGameDataManager.chessGameData.saved)
+            {
+                FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
+            }
+            else
+            {
+                void Action(PopUpYesNo.Anwser anwser)
+                {
+                    if (anwser == PopUpYesNo.Anwser.Yes)
+                    {
+                        FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
+                    }
+                }
+                gameNotSaved.SetAction(Action);
+                gameNotSaved.Show();
+            } 
         }
 
         public void SurrenderBtn()
         {
-            board.inputManager.takeHumanInpuit = false;
-            surrender.SetAction(Surrender);
-            surrender.Show();
-        }
+            void Action(PopUpYesNo.Anwser anwser)
+            {
+                if (anwser == PopUpYesNo.Anwser.Yes)
+                {
+                    FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+                }
+                else
+                {
+                    board.inputManager.takeHumanInpuit = true;
+                }
+            }
 
-        public void Surrender(PopUpYesNo.Anwser anwser)
-        {
-            if (anwser == PopUpYesNo.Anwser.Yes)
-            {
-                FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
-            }
-            else
-            {
-                board.inputManager.takeHumanInpuit = true;
-            }
+            board.inputManager.takeHumanInpuit = false;
+            surrender.SetAction(Action);
+            surrender.Show();
         }
 
         public IEnumerator CheckGameState()
         {
             while (true)
             {
-                if (chessGameDataManager.chessGameData.gameResultCode != null)
+                if (chessGameDataManager.chessGameData.gameResultCode != null && chessGameDataManager.chessGameData.gameResultCode != "")
                 {
                     takeBackButton.gameObject.SetActive(false);
                     startNewGame.gameObject.SetActive(true);

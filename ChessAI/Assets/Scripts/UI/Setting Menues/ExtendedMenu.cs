@@ -13,13 +13,12 @@ namespace Chess.UI
 
         public override void Start()
         {
-            // Sets correct initial state to the fullscreen toggle
-            fullScreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
+            base.Start();
             // Updates username
             usernameText.text = $"Username: {PlayerPrefs.GetString("username")}";
         }
 
-        public void LogOutBtn()
+        public virtual void LogOutBtn()
         {
             PlayerPrefs.SetString("username", "");
             FindObjectOfType<SceneLoader>().LoadScene("StartScene");
