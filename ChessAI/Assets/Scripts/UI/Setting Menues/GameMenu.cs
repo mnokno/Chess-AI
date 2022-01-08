@@ -164,7 +164,7 @@ namespace Chess.UI
                 {
                     moves += move.ToString() + ":";
                 }
-                return moves.TrimEnd();
+                return moves.Remove(moves.Length - 1);
             }
             string GetTimeUsage()
             {
@@ -173,7 +173,7 @@ namespace Chess.UI
                 {
                     timeUsage += time.ToString() + ":";
                 }
-                return timeUsage.TrimEnd();
+                return timeUsage.Remove(timeUsage.Length - 1);
             }
 
             // Gathers all data that needs to be saved
@@ -203,14 +203,31 @@ namespace Chess.UI
             };
 
             // Saves the game
+            bool isGameNameTaken = IsGameNameTaken(gameTitle);
             PlayerDbWriter writer = new PlayerDbWriter();
             writer.OpenDB();
-            writer.WriteToSavedGames(savedGameRecord);
+            if (isGameNameTaken)
+            {
+                writer.UpdateSavedGames(savedGameRecord, gameTitle, playersID);
+            }
+            else
+            {
+                writer.WriteToSavedGames(savedGameRecord);
+            }
             writer.CloseDB();
 
             // Show a message
             chessGameDataManager.chessGameData.saved = true;
             gameSaveSuccessfully.Show();
+        }
+
+        public bool IsGameNameTaken(string gameName)
+        {
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            bool isTaken = reader.IsGameNameTaken(gameName, saveAs.currentPlayerRecord.playerID);
+            reader.CloseDB();
+            return isTaken;
         }
     }
 }
