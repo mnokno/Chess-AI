@@ -35,7 +35,7 @@ namespace Chess.Engine
             }
             else // End game mode
             {
-                return initialTime * 0.05f + timeIncrement;
+                return currentTime * 0.05f + timeIncrement;
             }
         }
     }

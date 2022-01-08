@@ -67,7 +67,6 @@ namespace Chess.UI
             else
             {
                 gameMenu.chessGameDataManager.chessGameData.gameTitle = gameName;
-                Debug.Log("SAVE AS");
                 Hide();
                 gameMenu.SaveBtn();
             }

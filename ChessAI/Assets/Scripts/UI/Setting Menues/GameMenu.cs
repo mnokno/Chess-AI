@@ -66,8 +66,14 @@ namespace Chess.UI
         {
             if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove)
             {
-                Debug.Log("SAVE");
-                SaveGame();
+                if (chessGameDataManager.chessGameData.gameResultCode != null && chessGameDataManager.chessGameData.gameResultCode != "") // The game has ended
+                {
+                    
+                }
+                else
+                {
+                    SaveGame();
+                }
                 gameSaveSuccessfully.Show();
             }
             else
@@ -232,7 +238,11 @@ namespace Chess.UI
 
             // Show a message
             chessGameDataManager.chessGameData.saved = true;
-            gameSaveSuccessfully.Show();
+        }
+
+        public void ArchiveGame()
+        {
+
         }
 
         public bool IsGameNameTaken(string gameName)
