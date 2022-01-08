@@ -29,7 +29,7 @@ namespace Chess.UI
             // Gets the current players profile
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(PlayerPrefs.GetString("username"));
+            PlayerDb.PlayerRecord playerRecord = reader.TryGetPlayersRecord(PlayerPrefs.GetString("username"));
             reader.CloseDB();
 
             // Sets the game difficulty to their default AI difficulty

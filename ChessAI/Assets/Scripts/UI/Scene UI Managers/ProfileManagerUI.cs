@@ -70,7 +70,7 @@ namespace Chess.UI
             currentlySelectedListItem = button;
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
+            PlayerDb.PlayerRecord playerRecord = reader.TryGetPlayersRecord(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
             reader.CloseDB();
             inputFieldOldUsername.text = playerRecord.username;
             inputFieldNewUsername.text = "";
@@ -141,7 +141,7 @@ namespace Chess.UI
         {
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(username);
+            PlayerDb.PlayerRecord playerRecord = reader.TryGetPlayersRecord(username);
             reader.CloseDB();
             return playerRecord.isValid;
         }

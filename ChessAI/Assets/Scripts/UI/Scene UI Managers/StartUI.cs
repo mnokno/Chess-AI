@@ -14,7 +14,7 @@ namespace Chess.UI
             {
                 PlayerDbReader reader = new PlayerDbReader();
                 reader.OpenDB();
-                PlayerDb.PlayerRecord playerRecord = reader.TryGetRecord(username);
+                PlayerDb.PlayerRecord playerRecord = reader.TryGetPlayersRecord(username);
                 reader.CloseDB();
                 if (playerRecord.isValid)
                 {

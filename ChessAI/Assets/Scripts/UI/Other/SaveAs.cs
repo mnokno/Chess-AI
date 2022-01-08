@@ -24,7 +24,7 @@ namespace Chess.UI
             // Gets the current players profile
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            currentPlayerRecord = reader.TryGetRecord(PlayerPrefs.GetString("username"));
+            currentPlayerRecord = reader.TryGetPlayersRecord(PlayerPrefs.GetString("username"));
             reader.CloseDB();
         }
 
