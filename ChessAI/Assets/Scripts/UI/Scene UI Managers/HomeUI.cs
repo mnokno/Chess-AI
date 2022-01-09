@@ -18,7 +18,12 @@ namespace Chess.UI
 
         public void ReviewGameBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("ReviewGameSelectionScene");
+            FindObjectOfType<SceneLoader>().LoadScene("ReviewGameScene");
+        }
+
+        public void GameManagerBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("GameManagerScene");
         }
 
         public void LogOutBtn()

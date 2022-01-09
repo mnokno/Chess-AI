@@ -27,6 +27,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Logged/LoadGameScene.unity
     guid: a59866d19dc68844096037c0634aeaf3
   - enabled: 1
+    path: Assets/Scenes/Logged/ReviewGameScene.unity
+    guid: b3e0e59d558655b40a0fff150d3fc0fe
+  - enabled: 1
+    path: Assets/Scenes/Logged/GameManagerScene.unity
+    guid: fb467812d77f673449d3f39a8c0deccb
+  - enabled: 1
     path: Assets/Scenes/Game/GameScene.unity
     guid: 3b1f4f0d13b599d48bf675311d94988b
   - enabled: 1
