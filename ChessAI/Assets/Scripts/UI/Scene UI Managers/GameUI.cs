@@ -191,23 +191,22 @@ namespace Chess.UI
                 if (anwser == PopUpYesNo.Anwser.Yes)
                 {
                     FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+                    chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Surrender.ToString();
+                    if (board.whiteHumman)
+                    {
+                        chessGameDataManager.chessGameData.gameResult = "0-1";
+                    }
+                    else
+                    {
+                        chessGameDataManager.chessGameData.gameResult = "1-0";
+                    }
                 }
                 else
                 {
                     board.inputManager.takeHumanInpuit = true;
                 }
             }
-
-            if (board.whiteHumman)
-            {
-                chessGameDataManager.chessGameData.gameResult = "0-1";
-            }
-            else
-            {
-                chessGameDataManager.chessGameData.gameResult = "1-0";
-            }
-            chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Surrender.ToString();
-
+            
             board.inputManager.takeHumanInpuit = false;
             surrender.SetAction(Action);
             surrender.Show();
@@ -219,6 +218,8 @@ namespace Chess.UI
             {
                 if (chessGameDataManager.chessGameData.gameResultCode != null && chessGameDataManager.chessGameData.gameResultCode != "")
                 {
+                    int turnNumer = (int)System.Math.Ceiling(board.engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
+                    LogMove(turnNumer, chessGameDataManager.chessGameData.gameResult, 0);
                     takeBackButton.gameObject.SetActive(false);
                     startNewGame.gameObject.SetActive(true);
                     reviewButton.interactable = true;
