@@ -46,6 +46,7 @@ namespace Chess.UI
         {
             if (chessGameDataManager.chessGameData.saved)
             {
+                chessGameDataManager.ClearData();
                 FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
             }
             else
@@ -54,6 +55,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
+                        chessGameDataManager.ClearData();
                         FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
                     }
                 }
@@ -98,6 +100,7 @@ namespace Chess.UI
         {
             if (chessGameDataManager.chessGameData.saved)
             {
+                chessGameDataManager.ClearData();
                 base.GoHomeBtn();
             }
             else
@@ -106,6 +109,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
+                        chessGameDataManager.ClearData();
                         base.GoHomeBtn();
                     }
                 }
@@ -118,6 +122,7 @@ namespace Chess.UI
         {
             if (chessGameDataManager.chessGameData.saved)
             {
+                chessGameDataManager.ClearData();
                 base.LogOutBtn();
             }
             else
@@ -126,6 +131,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
+                        chessGameDataManager.ClearData();
                         base.LogOutBtn();
                     }
                 }

@@ -23,6 +23,11 @@ namespace Chess.Common
             }
         }
 
+        public void ClearData()
+        {
+            chessGameData = new ChessGameData();
+        }
+
         [System.Serializable]
         public struct ChessGameData
         {

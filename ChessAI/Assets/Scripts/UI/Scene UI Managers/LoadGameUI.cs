@@ -66,7 +66,7 @@ namespace Chess.UI
                     currentlySelectedItem = null;
                     previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
                     dataGameDisplay.SetAiName("AI");
-                    dataGameDisplay.SetTime(60000, 60000);
+                    dataGameDisplay.SetTime(600000, 600000);
                     return;
                 }
             }
@@ -130,12 +130,12 @@ namespace Chess.UI
                     {
                         if (whitesTurn)
                         {
-                            whiteTime -= int.Parse(timeUse) + timeIncrement;
+                            whiteTime -= (int.Parse(timeUse) - timeIncrement);
                             whitesTurn = false;
                         }
                         else
                         {
-                            blackTime -= int.Parse(timeUse) + timeIncrement;
+                            blackTime -= (int.Parse(timeUse) - timeIncrement);
                             whitesTurn = true;
                         }
                     }
@@ -159,11 +159,12 @@ namespace Chess.UI
             bool loadGame = true;
             bool newGame = false;
             bool saved = true;
+            string moves = savedGameRecord.moves;
             string AiStrength = savedGameRecord.AIStrength;
             string timeUsage = savedGameRecord.timeUsage;
             string[] timeControll = savedGameRecord.timeControll.Split("+");
             int initialTime = int.Parse(timeControll[0]);
-            int timeIncrement = int.Parse(timeControll[0]);
+            int timeIncrement = int.Parse(timeControll[1]);
             int unmakesLimit = savedGameRecord.unmakesLimit;
             int unmakesMade = savedGameRecord.unmakesMade;
             string startDate = savedGameRecord.startDate;
@@ -176,6 +177,7 @@ namespace Chess.UI
                 loadGame = loadGame,
                 newGame = newGame,
                 saved = saved,
+                moves = moves,
                 AiStrength = AiStrength,
                 timeUsage = timeUsage,
                 initialTime = initialTime,
@@ -184,7 +186,7 @@ namespace Chess.UI
                 unmakesMade = unmakesMade,
                 startDate = startDate,
                 gameTitle = gameTitle,
-                isHumanWhite = isHumanWhite
+                isHumanWhite = isHumanWhite,
             };
 
             // Loads next scene after the opening book has loaded

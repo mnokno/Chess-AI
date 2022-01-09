@@ -16,7 +16,7 @@ namespace Chess.EngineUtility
         private Position position;
 
         private float currentTimeTotal = 0;
-        private bool whitesTurn;
+        public bool whitesTurn;
         public Stopwatch stopwatch { get; private set; }
 
         #endregion

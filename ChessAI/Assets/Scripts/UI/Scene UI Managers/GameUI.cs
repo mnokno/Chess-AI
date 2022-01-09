@@ -168,6 +168,7 @@ namespace Chess.UI
         {
             if (chessGameDataManager.chessGameData.saved)
             {
+                chessGameDataManager.ClearData();
                 FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
             }
             else
@@ -176,6 +177,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
+                        chessGameDataManager.ClearData();
                         FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
                     }
                 }

@@ -59,11 +59,14 @@ namespace Chess.UI
                 {
                     if (chessGameDataManager.chessGameData.newGame)
                     {
+                        // Initiates clock
                         engineManager.chessEngine.centralPosition.InitClock(chessGameDataManager.chessGameData.initialTime, chessGameDataManager.chessGameData.timeIncrement);
                     }
                     else
                     {
-                        throw new System.NotImplementedException();
+                        // Initiates clock
+                        engineManager.chessEngine.centralPosition.InitClock(chessGameDataManager.chessGameData.initialTime, chessGameDataManager.chessGameData.timeIncrement);
+                        engineManager.chessEngine.centralPosition.clock.whitesTurn = chessGameDataManager.chessGameData.isHumanWhite;
                     }
                 }
                 else
@@ -94,16 +97,25 @@ namespace Chess.UI
             GetComponentInParent<SpriteRenderer>().enabled = false;
             // Generates the chess board
             GenerateBoard();
-            // Converts FEN string to FEN instance
-            fen = new FEN(fenString);
-            // Sets the player to move
-            whiteToMove = fen.GetSideToMove();
-            // Loads the chess pieces
-            LoadFEN(fen.GetPiecePlacment());
-            // Loads position for the input manager
-            inputManager.LoadFEN(fen);
-            // Loads position for the engine manager
-            engineManager.chessEngine.LoadFEN(fen);
+            // Check what to do
+            Common.ChessGameDataManager chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
+            if (chessGameDataManager != null && !chessGameDataManager.chessGameData.newGame && chessGameDataManager.chessGameData.loadGame)
+            {
+                LoadPosition(chessGameDataManager);
+            }
+            else
+            {
+                // Converts FEN string to FEN instance
+                fen = new FEN(fenString);
+                // Sets the player to move
+                whiteToMove = fen.GetSideToMove();
+                // Loads the chess pieces
+                LoadFEN(fen.GetPiecePlacment());
+                // Loads position for the input manager
+                inputManager.LoadFEN(fen);
+                // Loads position for the engine manager
+                engineManager.chessEngine.LoadFEN(fen);
+            }
 
             // Checks if the game begins with an AI move
             if (!hvh && whiteHumman != whiteToMove)
@@ -111,6 +123,58 @@ namespace Chess.UI
                 // If so an AI move is played
                 engineManager.MakeAIMove();
             }
+        }
+
+        // Loads saved position
+        private void LoadPosition(Common.ChessGameDataManager chessGameDataManager)
+        {
+            // Finds gameUI
+            GameUI gameUI = FindObjectOfType<GameUI>();
+            string[] timeUsage = chessGameDataManager.chessGameData.timeUsage.Split(":");
+            // Calculate the position FEN
+            string[] moves = chessGameDataManager.chessGameData.moves.Split(":");
+            if (moves.Length != 0)
+            {
+                for (int i = moves.Length - 1; i >= 0; i--)
+                {
+                    if (moves[i] != "")
+                    {
+                        ushort move = ushort.Parse(moves[i]);
+                        if (gameUI != null)
+                        {
+                            int turnNumer = (int)Math.Ceiling(engineManager.chessEngine.centralPosition.historicMoveData.Count / 2d);
+                            gameUI.LogMove(turnNumer, Move.ConvertUshortToPNG(move, engineManager.chessEngine.centralPosition), int.Parse(timeUsage[timeUsage.Length - i - 1]));
+                        }
+
+                        engineManager.MakeMove(move);
+                    }
+                }
+            }
+
+            // Calculates time
+            float timeIncrement = chessGameDataManager.chessGameData.timeIncrement * 1000;
+            bool whitesTurn = true;           
+            if (moves.Length != 0)
+            {
+                foreach (string timeUse in timeUsage)
+                {
+                    if (timeUse != "")
+                    {
+                        engineManager.chessEngine.centralPosition.timeTakenPerMove.Add(int.Parse(timeUse));
+                        engineManager.chessEngine.centralPosition.clock.AddTime(whitesTurn, -int.Parse(timeUse) + timeIncrement);
+                        whitesTurn = !whitesTurn;
+                    }
+                }
+            }
+
+            // Converts FEN string to FEN instance
+            fen = new FEN(engineManager.chessEngine.centralPosition.GetFEN());
+            // Sets the player to move
+            whiteToMove = fen.GetSideToMove();
+            // Loads the chess pieces
+            LoadFEN(fen.GetPiecePlacment());
+            // Loads position for the input manager
+            inputManager.LoadFEN(fen);
         }
 
         // Generates board interface
