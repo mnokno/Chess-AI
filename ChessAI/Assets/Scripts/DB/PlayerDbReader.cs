@@ -94,6 +94,47 @@ namespace Chess.DB
             return IsGameNameTaken(gameName, userID, "SavedGames");
         }
 
+        public SavedGameRecord[] ReadSavedGames(int playerID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT * FROM SavedGames WHERE Player_ID={playerID};";
+            // Executes the command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            // Reads all player records
+            List<SavedGameRecord> playerRecords = new List<SavedGameRecord>();
+            while (reader.Read())
+            {
+                playerRecords.Add(new SavedGameRecord()
+                {
+                    gameID = reader.GetInt32(0),
+                    playerID = reader.GetInt32(1),
+                    moves = reader.GetString(2),
+                    timeUsage = reader.GetString(3),
+                    AIStrength = reader.GetString(4),
+                    isHumanWhite = reader.GetString(5),
+                    startDate = reader.GetString(6),
+                    gameTitle = reader.GetString(7),
+                    unmakesLimit = reader.GetInt32(8),
+                    unmakesMade = reader.GetInt32(9),
+                    timeControll = reader.GetString(10)
+                });
+            }
+
+            // Disposes of the reader
+            reader.Close();
+            reader.Dispose();
+
+            // Returns the player records
+            return playerRecords.ToArray();
+        }
+
         #endregion
 
         #region Game records table management

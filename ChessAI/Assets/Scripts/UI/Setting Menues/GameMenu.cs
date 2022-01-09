@@ -94,11 +94,11 @@ namespace Chess.UI
             }
         }
 
-        public void GoHomeBtn()
+        public override void GoHomeBtn()
         {
             if (chessGameDataManager.chessGameData.saved)
             {
-                FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+                base.GoHomeBtn();
             }
             else
             {
@@ -106,7 +106,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
-                        FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+                        base.GoHomeBtn();
                     }
                 }
                 gameNotSaved.SetAction(Action);

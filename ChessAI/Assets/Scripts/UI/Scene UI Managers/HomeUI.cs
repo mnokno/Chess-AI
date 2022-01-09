@@ -13,7 +13,7 @@ namespace Chess.UI
 
         public void LoadGameBtn()
         {
-            FindObjectOfType<SceneLoader>().LoadScene("SavedGameSelectionScene");
+            FindObjectOfType<SceneLoader>().LoadScene("LoadGameScene");
         }
 
         public void ReviewGameBtn()

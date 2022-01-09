@@ -23,5 +23,10 @@ namespace Chess.UI
             PlayerPrefs.SetString("username", "");
             FindObjectOfType<SceneLoader>().LoadScene("StartScene");
         }
+
+        public virtual void GoHomeBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+        }
     }
 }
