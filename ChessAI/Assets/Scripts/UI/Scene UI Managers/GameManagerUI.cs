@@ -91,7 +91,6 @@ namespace Chess.UI
             // Generate all games
             foreach (PlayerDb.GameRecord gameRecord in gameRecords)
             {
-                Debug.Log("HERE");
                 GameObject contentItem = Instantiate(finishedGameItemPerfab, finishedGamesContent);
                 FinishedGameItem finishedGameItem = contentItem.GetComponent<FinishedGameItem>();
                 finishedGameItem.SetGameName(gameRecord.gameTitle);
@@ -264,7 +263,34 @@ namespace Chess.UI
 
         public void DeleteBtn()
         {
-            Debug.Log("DELETE");
+            void Action(PopUpYesNo.Anwser anwser)
+            {
+                if (anwser == PopUpYesNo.Anwser.Yes)
+                {
+                    PlayerDbWriter writer = new PlayerDbWriter();
+                    writer.OpenDB();
+                    if (savedGames)
+                    {
+                        writer.DeleteFromSavedGames(currentlySelectedItem.GetComponent<OnGoingGameItem>().gameID);
+                    }
+                    else
+                    {
+                        writer.DeleteFromGameRecord(currentlySelectedItem.GetComponent<FinishedGameItem>().gameID);
+                    }
+                    writer.CloseDB();
+                    DestroyImmediate(currentlySelectedItem);
+                    currentlySelectedItem = null;
+                    updateGameNameCG.interactable = false;
+                    oldGameNameInputField.text = "";
+                    newGameNameInputField.text = "";
+                    deleteButton.interactable = false;
+                    previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+                    dataGameDisplay.SetAiName("AI");
+                    dataGameDisplay.SetTime(600000, 600000);
+                }
+            }
+            deletionQuestion.SetAction(Action);
+            deletionQuestion.Show();
         }
 
         public void TableViewDrp(int value)
@@ -321,6 +347,55 @@ namespace Chess.UI
 
         #region Update panel management
 
+        public void UpdateGameNameBtn()
+        {
+            string gameName = newGameNameInputField.text;
+            if (IsGameNameEmpty(gameName))
+            {
+                gameNameIsRequiredMessage.Show();
+            }
+            else if (IsGameNameTaken(gameName))
+            {
+                invalidGameNameMessage.SetMessage($"Game name {gameName} is already taken, please chose a different game name.");
+                invalidGameNameMessage.Show();
+            }
+            else
+            {
+                PlayerDbWriter writer = new PlayerDbWriter();
+                writer.OpenDB();
+                if (savedGames)
+                {
+                    OnGoingGameItem onGoingGameItem = currentlySelectedItem.GetComponent<OnGoingGameItem>();
+                    writer.UpdateSavedGames(onGoingGameItem.gameID, gameName);
+                    onGoingGameItem.SetGameName(gameName);
+                }
+                else
+                {
+                    FinishedGameItem finishedGameItem = currentlySelectedItem.GetComponent<FinishedGameItem>();
+                    writer.UpdateGameRecord(finishedGameItem.gameID, gameName);
+                    finishedGameItem.SetGameName(gameName);
+                }
+                writer.CloseDB();
+            }
+        }
+
+        private bool IsGameNameEmpty(string username)
+        {
+            while (username.Contains(" "))
+            {
+                username = username.Replace(" ", "");
+            }
+            return username == "";
+        }
+
+        public bool IsGameNameTaken(string gameName)
+        {
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            bool isTaken = reader.IsGameNameTaken(gameName, currentPlayerRecord.playerID);
+            reader.CloseDB();
+            return isTaken;
+        }
 
         #endregion
     }

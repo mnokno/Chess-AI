@@ -120,8 +120,8 @@ namespace Chess.DB
 
             // Create new text command
             dbcmd.CommandText = $"UPDATE SavedGames SET " +
-                                $"GameTitle='{newGameName}', " +
-                                $"WHERE Game_ID='{gameID}';";
+                                $"GameTitle='{newGameName}' " +
+                                $"WHERE Game_ID={gameID};";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }
@@ -222,8 +222,8 @@ namespace Chess.DB
 
             // Create new text command
             dbcmd.CommandText = $"UPDATE GameRecords SET " +
-                                $"GameTitle='{newGameName}', " +
-                                $"WHERE Game_ID='{gameID}';";
+                                $"GameTitle='{newGameName}' " +
+                                $"WHERE Game_ID={gameID};";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }

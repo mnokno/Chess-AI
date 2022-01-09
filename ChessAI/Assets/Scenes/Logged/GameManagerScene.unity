@@ -240,7 +240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1654526362195338576, guid: beed311595720b24398de8c9b294ba70, type: 3}
       propertyPath: m_text
-      value: Game name {gameName} is already taken, please chouse a different game
+      value: Game name {gameName} is already taken, please chose a different game
         name.
       objectReference: {fileID: 0}
     - target: {fileID: 1654526362195338576, guid: beed311595720b24398de8c9b294ba70, type: 3}
@@ -4687,9 +4687,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Chess.UI.ProfileManagerUI, Assembly-CSharp
-        m_MethodName: UpdateBtn
+      - m_Target: {fileID: 2122937562}
+        m_TargetAssemblyTypeName: Chess.UI.GameManagerUI, Assembly-CSharp
+        m_MethodName: UpdateGameNameBtn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5716,5 +5716,5 @@ MonoBehaviour:
   previewBoard: {fileID: 2010877924}
   dataGameDisplay: {fileID: 671020285}
   deletionQuestion: {fileID: 1533816935}
-  invalidGameNameMessage: {fileID: 41428660}
-  gameNameIsRequiredMessage: {fileID: 40900417}
+  invalidGameNameMessage: {fileID: 40900417}
+  gameNameIsRequiredMessage: {fileID: 41428660}
