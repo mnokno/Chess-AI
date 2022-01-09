@@ -24,6 +24,9 @@ namespace Chess.UI
         public GameObject finishedGameItemPerfab;
         public Board previewBoard;
         public GameDataDisplay dataGameDisplay;
+        public PopUpYesNo deletionQuestion;
+        public PopUpMessage invalidGameNameMessage;
+        public PopUpMessage gameNameIsRequiredMessage;
         private GameObject currentlySelectedItem;
         private PlayerDb.PlayerRecord currentPlayerRecord;
         private bool savedGames = true;
@@ -49,6 +52,7 @@ namespace Chess.UI
             reader.CloseDB();
             // Populates scroll views
             PopulateSavedGames();
+            PopulateFinishedSavedGames();
         }
 
         // Populates saved game
@@ -76,13 +80,32 @@ namespace Chess.UI
         }
 
         // Populates finished games
-        private void FinishedSavedGames()
+        private void PopulateFinishedSavedGames()
         {
+            // Gets all saved game for the current player
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            PlayerDb.GameRecord[] gameRecords = reader.ReadGameRecords(currentPlayerRecord.playerID);
+            reader.CloseDB();
 
+            // Generate all games
+            foreach (PlayerDb.GameRecord gameRecord in gameRecords)
+            {
+                Debug.Log("HERE");
+                GameObject contentItem = Instantiate(finishedGameItemPerfab, finishedGamesContent);
+                FinishedGameItem finishedGameItem = contentItem.GetComponent<FinishedGameItem>();
+                finishedGameItem.SetGameName(gameRecord.gameTitle);
+                string[] timeControll = gameRecord.timeControll.Split("+");
+                finishedGameItem.SetTimeControll(int.Parse(timeControll[0]) / 60 + "|" + timeControll[1]);
+                finishedGameItem.SetEndDate(gameRecord.endDate.Split(" ")[0]);
+                finishedGameItem.SetAiName(FormateAiName(gameRecord.AIStrength));
+                finishedGameItem.SetGameResult(gameRecord.gameResult.Split(":")[0]);
+                finishedGameItem.gameID = gameRecord.gameID;
+                contentItem.GetComponent<Button>().onClick.AddListener(() => ScrollViewItemBtn(contentItem));
+            }
         }
 
         // Scroll view item on pressed event
-        // On clicked list box item event
         private void ScrollViewItemBtn(GameObject button)
         {
             if (currentlySelectedItem != null)
@@ -102,8 +125,9 @@ namespace Chess.UI
                 }
             }
 
-            updateGameNameCG.interactable = false;
+            updateGameNameCG.interactable = true;
             oldGameNameInputField.text = savedGames ? button.GetComponent<OnGoingGameItem>().gameNameText.text : button.GetComponent<FinishedGameItem>().gameNameText.text;
+            newGameNameInputField.text = "";
             deleteButton.interactable = true;
             button.GetComponent<Animator>().SetTrigger("GreenOn");
             currentlySelectedItem = button;
@@ -142,15 +166,16 @@ namespace Chess.UI
             }
             else
             {
-                isHumanWhite = false;
-                AiStreght = "";
-                moves = new string[0];
-                timeControll = new string[0];
-                timeIncrement = 0;
-                whiteTime = 0;
-                blackTime = 0;
-                whitesTurn = false;
-                timeUsage = new string[0];
+                PlayerDb.GameRecord gameRecord = reader.ReadGameRecord(gameID);
+                isHumanWhite = bool.Parse(gameRecord.isHumanWhite);
+                AiStreght = gameRecord.AIStrength;
+                moves = gameRecord.moves.Split(":");
+                timeControll = gameRecord.timeControll.Split("+");
+                timeIncrement = int.Parse(timeControll[1]) * 1000;
+                whiteTime = int.Parse(timeControll[0]) * 1000;
+                blackTime = whiteTime;
+                whitesTurn = true;
+                timeUsage = gameRecord.timeUsage.Split(":");
             }
             reader.CloseDB();
 
@@ -227,6 +252,75 @@ namespace Chess.UI
                 return "AI";
             }
         }
+
+        #endregion
+
+        #region Main panel management
+
+        public void GoBackBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+        }
+
+        public void DeleteBtn()
+        {
+            Debug.Log("DELETE");
+        }
+
+        public void TableViewDrp(int value)
+        {
+            if (value == 0) // Saved games
+            {
+                if (!savedGames)
+                {
+                    if (currentlySelectedItem != null)
+                    {
+                        currentlySelectedItem.GetComponent<Animator>().SetTrigger("GreenOff");
+                        updateGameNameCG.interactable = false;
+                        oldGameNameInputField.text = "";
+                        newGameNameInputField.text = "";
+                        deleteButton.interactable = false;
+                        currentlySelectedItem = null;
+                        previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+                        dataGameDisplay.SetAiName("AI");
+                        dataGameDisplay.SetTime(600000, 600000);
+                    }
+                }
+                savedGames = true;
+                savedGamesScrollViewCG.alpha = 1;
+                savedGamesScrollViewCG.blocksRaycasts = true;
+                finishedGamesScrollViewCG.alpha = 0;
+                finishedGamesScrollViewCG.blocksRaycasts = false;
+            }
+            else // Finished game
+            {
+                if (savedGames)
+                {
+                    if (currentlySelectedItem != null)
+                    {
+                        currentlySelectedItem.GetComponent<Animator>().SetTrigger("GreenOff");
+                        updateGameNameCG.interactable = false;
+                        oldGameNameInputField.text = "";
+                        newGameNameInputField.text = "";
+                        deleteButton.interactable = false;
+                        currentlySelectedItem = null;
+                        previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+                        dataGameDisplay.SetAiName("AI");
+                        dataGameDisplay.SetTime(600000, 600000);
+                    }
+                }
+                savedGames = false;
+                savedGamesScrollViewCG.alpha = 0;
+                savedGamesScrollViewCG.blocksRaycasts = false;
+                finishedGamesScrollViewCG.alpha = 1;
+                finishedGamesScrollViewCG.blocksRaycasts = true;
+            }
+        }
+
+        #endregion
+
+        #region Update panel management
+
 
         #endregion
     }

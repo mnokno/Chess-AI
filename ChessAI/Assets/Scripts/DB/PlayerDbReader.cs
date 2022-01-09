@@ -240,7 +240,7 @@ namespace Chess.DB
             }
 
             // Create a command to check if the record exists in the data base
-            dbcmd.CommandText = $"SELECT * FROM SavedGames WHERE Game_ID={gameID} LIMIT 1;";
+            dbcmd.CommandText = $"SELECT * FROM GameRecords WHERE Game_ID={gameID} LIMIT 1;";
             // Executes the command
             IDataReader reader = dbcmd.ExecuteReader();
 
