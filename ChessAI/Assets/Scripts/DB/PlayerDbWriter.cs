@@ -110,6 +110,22 @@ namespace Chess.DB
             dbcmd.ExecuteNonQuery();
         }
 
+        public void UpdateSavedGames(int gameID, string newGameName)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create new text command
+            dbcmd.CommandText = $"UPDATE SavedGames SET " +
+                                $"GameTitle='{newGameName}', " +
+                                $"WHERE Game_ID='{gameID}';";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
         public void DeleteFromSavedGames(int gameID)
         {
             // Throws an exception if the data base has not been opened
@@ -192,6 +208,36 @@ namespace Chess.DB
                                 $"TimeControll='{gameRecord.timeControll}' " +
                                 $"GameResult='{gameRecord.gameResult}' " +
                                 $"WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        public void UpdateGameRecord(int gameID, string newGameName)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create new text command
+            dbcmd.CommandText = $"UPDATE GameRecords SET " +
+                                $"GameTitle='{newGameName}', " +
+                                $"WHERE Game_ID='{gameID}';";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        public void DeleteFromGameRecord(int gameID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Deletes a game with the given gameID
+            dbcmd.CommandText = $"DELETE FROM GameRecords WHERE Game_ID='{gameID}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }
