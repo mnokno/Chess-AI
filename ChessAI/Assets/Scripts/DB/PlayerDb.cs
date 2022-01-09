@@ -137,20 +137,21 @@ namespace Chess.DB
 
         /*
          *CREATE TABLE "GameRecords" (
-         *    "Game_ID"	INTEGER NOT NULL UNIQUE,
-         *    "Player_ID"	INTEGER NOT NULL,
-         *    "Moves"	TEXT NOT NULL,
-         *    "TimeUsage"	TEXT NOT NULL,
-         *    "AIStrength"	TEXT NOT NULL,
-         *    "IsHumanWhite"	TEXT NOT NULL,
-         *    "GameResult"	TEXT NOT NULL,
-         *    "StartDate"	TEXT NOT NULL,
+	     *    "Game_ID"	INTEGER NOT NULL UNIQUE,
+	     *    "Player_ID"	INTEGER NOT NULL,
+	     *    "Moves"	TEXT NOT NULL,
+	     *    "TimeUsage"	TEXT NOT NULL,
+	     *    "AIStrength"	TEXT NOT NULL,
+	     *    "IsHumanWhite"	TEXT NOT NULL,
+	     *    "StartDate"	TEXT NOT NULL,
          *    "EndDate"	TEXT NOT NULL,
-         *    "GameTitle"	TEXT NOT NULL,
-         *    "WhereUnmakesEnabled"	BLOB NOT NULL,
-         *    "TimeControll"	TEXT NOT NULL,
-         *    FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
-         *    PRIMARY KEY("Game_ID" AUTOINCREMENT)
+	     *    "GameTitle"	TEXT NOT NULL,
+	     *    "UnmakesLimit"	INTEGER NOT NULL,
+	     *    "UnmakesMade"	INTEGER NOT NULL,
+	     *    "TimeControll"	TEXT NOT NULL,
+		 *	  "GameResult" TEXT NOT NULL,
+	     *    FOREIGN KEY("Player_ID") REFERENCES "Players"("Player_ID"),
+	     *    PRIMARY KEY("Game_ID" AUTOINCREMENT)
          *);
          */
         public struct GameRecord
@@ -161,12 +162,13 @@ namespace Chess.DB
             public string timeUsage;
             public string AIStrength;
             public string isHumanWhite;
-            public string gameResult;
             public string startDate;
             public string endDate;
             public string gameTitle;
-            public bool whereUnmakesEnabled;
+            public int unmakesLimit;
+            public int unmakesMade;
             public string timeControll;
+            public string gameResult;
             public bool isValid;
         }
 

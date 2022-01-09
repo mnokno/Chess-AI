@@ -67,7 +67,6 @@ namespace Chess.UI
                 int timeIncrement = timeIncrementInputField.text.Replace("-", "") == "" ? 0 : int.Parse(timeIncrementInputField.text);
                 int unmakesLimit = moveUnamkeLimitInputField.text.Replace("-", "") == "" ? 0 : int.Parse(moveUnamkeLimitInputField.text);
                 int unmakesMade = 0;
-                bool whereUnamkesEnabled = unmakesLimit == 0 ? false : true;
                 string startDate = System.DateTime.Today.ToString();
                 string gameTitle = gameName == "" ? AutoGenerateGameName() : gameName;
                 bool isHumanWhite = GetIsHumanWhite();
@@ -85,7 +84,6 @@ namespace Chess.UI
                     timeIncrement = timeIncrement,
                     unmakesLimit = unmakesLimit,
                     unmakesMade = unmakesMade,
-                    whereUnamkesEnabled = whereUnamkesEnabled,
                     startDate = startDate,
                     gameTitle = gameTitle,
                     isHumanWhite = isHumanWhite

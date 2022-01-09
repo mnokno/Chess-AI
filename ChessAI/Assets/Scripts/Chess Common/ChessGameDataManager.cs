@@ -48,7 +48,6 @@ namespace Chess.Common
             public string gameTitle;
             public string gameResult;
             public string gameResultCode;
-            public bool whereUnamkesEnabled;
         }
     }
 }

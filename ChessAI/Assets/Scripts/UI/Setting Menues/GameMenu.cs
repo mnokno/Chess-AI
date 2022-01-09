@@ -68,7 +68,7 @@ namespace Chess.UI
             {
                 if (chessGameDataManager.chessGameData.gameResultCode != null && chessGameDataManager.chessGameData.gameResultCode != "") // The game has ended
                 {
-                    
+                    ArchiveGame();
                 }
                 else
                 {
@@ -240,16 +240,124 @@ namespace Chess.UI
             chessGameDataManager.chessGameData.saved = true;
         }
 
+        /// <summary>
+        /// Can only by called in humans turn
+        /// </summary>
         public void ArchiveGame()
         {
+            // Gets central position, it contains all information that need to be saved regarding the chess game
+            EngineUtility.Position position = inputManager.parrentBoard.engineManager.chessEngine.centralPosition;
 
+            // Helper functions
+            string GetMoves()
+            {
+                string moves = "";
+                foreach (ushort move in position.moves)
+                {
+                    moves += move.ToString() + ":";
+                }
+                if (moves.Length == 0)
+                {
+                    return moves;
+                }
+                else
+                {
+                    return moves.Remove(moves.Length - 1);
+                }
+            }
+            string GetTimeUsage()
+            {
+                string timeUsage = "";
+                foreach (float time in position.timeTakenPerMove)
+                {
+                    timeUsage += time.ToString() + ":";
+                }
+                if (timeUsage.Length == 0)
+                {
+                    return timeUsage;
+                }
+                else
+                {
+                    return timeUsage.Remove(timeUsage.Length - 1);
+                }
+            }
+
+            // Gathers all data that needs to be saved
+            int playerID = saveAs.currentPlayerRecord.playerID;
+            string moves = GetMoves();
+            string timeUsage = GetTimeUsage();
+            string aiStrenght = chessGameDataManager.chessGameData.AiStrength;
+            string isHumanWhite = inputManager.parrentBoard.whiteHumman.ToString();
+            string startDate = chessGameDataManager.chessGameData.startDate;
+            string endDate = System.DateTime.Today.ToString();
+            string gameTitle = chessGameDataManager.chessGameData.gameTitle;
+            int unmakesLimit = chessGameDataManager.chessGameData.unmakesLimit;
+            int unmakesMade = chessGameDataManager.chessGameData.unmakesMade;
+            string timeControll = chessGameDataManager.chessGameData.initialTime.ToString() + "+" + chessGameDataManager.chessGameData.timeIncrement.ToString();
+            string gameResult = chessGameDataManager.chessGameData.gameResult + ":" + chessGameDataManager.chessGameData.gameResultCode;
+
+            PlayerDb.GameRecord gameRecord = new PlayerDb.GameRecord()
+            {
+                playerID = playerID,
+                moves = moves,
+                timeUsage = timeUsage,
+                AIStrength = aiStrenght,
+                isHumanWhite = isHumanWhite,
+                startDate = startDate,
+                endDate = endDate,
+                gameTitle = gameTitle,
+                unmakesLimit = unmakesLimit,
+                unmakesMade = unmakesMade,
+                timeControll = timeControll,
+                gameResult = gameResult
+            };
+
+            // Saves the game
+            bool isGameNameTaken = IsGameRecordNameTaken(gameTitle);
+            PlayerDbWriter writer = new PlayerDbWriter();
+            writer.OpenDB();
+            if (isGameNameTaken)
+            {
+                writer.UpdateGameRecord(gameRecord, gameTitle, playerID);
+            }
+            else
+            {
+                writer.WriteToGamesRecords(gameRecord);
+            }
+            writer.CloseDB();
+
+            // Deletes the saved game since its finished
+            writer.OpenDB();
+            writer.DeleteFromSavedGames(gameTitle, playerID);
+            writer.CloseDB();
+
+            // Show a message
+            chessGameDataManager.chessGameData.saved = true;
         }
 
-        public bool IsGameNameTaken(string gameName)
+        private bool IsGameNameTaken(string gameName)
         {
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
             bool isTaken = reader.IsGameNameTaken(gameName, saveAs.currentPlayerRecord.playerID);
+            reader.CloseDB();
+            return isTaken;
+        }
+
+        private bool IsSavedNameTaken(string gameName)
+        {
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            bool isTaken = reader.IsSavedGameNameTaken(gameName, saveAs.currentPlayerRecord.playerID);
+            reader.CloseDB();
+            return isTaken;
+        }
+
+        private bool IsGameRecordNameTaken(string gameName)
+        {
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            bool isTaken = reader.IsGameRecordNameTaken(gameName, saveAs.currentPlayerRecord.playerID);
             reader.CloseDB();
             return isTaken;
         }

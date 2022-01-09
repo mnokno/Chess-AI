@@ -83,13 +83,36 @@ namespace Chess.DB
 
         #region Saved game table management
 
+        public bool IsSavedGameNameTaken(string gameName, int userID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
 
+            return IsGameNameTaken(gameName, userID, "SavedGames");
+        }
 
         #endregion
 
-        #region
+        #region Game records table management
 
-        // Returns true if a given name is taken fro a given user
+        public bool IsGameRecordNameTaken(string gameName, int userID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            return IsGameNameTaken(gameName, userID, "GameRecords");
+        }
+
+        #endregion
+
+        #region Other
+
         public bool IsGameNameTaken(string gameName, int userID)
         {
             // Throws an exception if the data base has not been opened
@@ -98,32 +121,32 @@ namespace Chess.DB
                 throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
             }
 
-            bool IsGameNameTaken(string tableName)
+            return IsGameNameTaken(gameName, userID, "SavedGames") || IsGameNameTaken(gameName, userID, "GameRecords");
+        }
+
+        private bool IsGameNameTaken(string gameName, int userID, string tableName)
+        {
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT Game_ID FROM {tableName} WHERE Player_ID='{userID}' AND GameTitle='{gameName}' LIMIT 1;";
+            // Executes the command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            if (reader.IsDBNull(0))
             {
-                // Create a command to check if the record exists in the data base
-                dbcmd.CommandText = $"SELECT Game_ID FROM {tableName} WHERE Player_ID='{userID}' AND GameTitle='{gameName}' LIMIT 1;";
-                // Executes the command
-                IDataReader reader = dbcmd.ExecuteReader();
-
-                if (reader.IsDBNull(0))
-                {
-                    // Disposes of the reader
-                    reader.Close();
-                    reader.Dispose();
-                    // The game name is not taken
-                    return false;
-                }
-                else
-                {
-                    // Disposes of the reader
-                    reader.Close();
-                    reader.Dispose();
-                    // The game name is not taken
-                    return true;
-                }
+                // Disposes of the reader
+                reader.Close();
+                reader.Dispose();
+                // The game name is not taken
+                return false;
             }
-
-            return IsGameNameTaken("SavedGames") || IsGameNameTaken("GameRecords");
+            else
+            {
+                // Disposes of the reader
+                reader.Close();
+                reader.Dispose();
+                // The game name is not taken
+                return true;
+            }
         }
 
         #endregion

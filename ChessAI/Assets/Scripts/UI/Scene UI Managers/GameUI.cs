@@ -198,6 +198,16 @@ namespace Chess.UI
                 }
             }
 
+            if (board.whiteHumman)
+            {
+                chessGameDataManager.chessGameData.gameResult = "0-1";
+            }
+            else
+            {
+                chessGameDataManager.chessGameData.gameResult = "1-0";
+            }
+            chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Surrender.ToString();
+
             board.inputManager.takeHumanInpuit = false;
             surrender.SetAction(Action);
             surrender.Show();
@@ -213,6 +223,7 @@ namespace Chess.UI
                     startNewGame.gameObject.SetActive(true);
                     reviewButton.interactable = true;
                     surrenerButton.interactable = false;
+                    chessGameDataManager.chessGameData.saved = false;
                     break;
                 }
                 else

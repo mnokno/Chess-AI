@@ -119,7 +119,7 @@ namespace Chess.DB
             }
 
             // Deletes a game with the given gameID
-            dbcmd.CommandText = $"DELETE FROM SavedGame WHERE Game_ID='{gameID}';";
+            dbcmd.CommandText = $"DELETE FROM SavedGames WHERE Game_ID='{gameID}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }
@@ -133,7 +133,65 @@ namespace Chess.DB
             }
 
             // Deletes a game with the given gameID
-            dbcmd.CommandText = $"DELETE FROM SavedGame WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
+            dbcmd.CommandText = $"DELETE FROM SavedGames WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region Game records table management
+
+        public void WriteToGamesRecords(GameRecord gameRecord)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create new text command
+            dbcmd.CommandText = $"INSERT INTO 'GameRecords'" +
+                                    "('Player_ID', 'Moves', 'TimeUsage', 'AIStrength', 'IsHumanWhite', 'StartDate', 'EndDate', 'GameTitle', 'UnmakesLimit', 'UnmakesMade', 'TimeControll', 'GameResult')" +
+                                    $"VALUES('{gameRecord.playerID}', " +
+                                    $"'{gameRecord.moves}', " +
+                                    $"'{gameRecord.timeUsage}', " +
+                                    $"'{gameRecord.AIStrength}', " +
+                                    $"'{gameRecord.isHumanWhite}', " +
+                                    $"'{gameRecord.startDate}', " +
+                                    $"'{gameRecord.endDate}', " +
+                                    $"'{gameRecord.gameTitle}', " +
+                                    $"'{gameRecord.unmakesLimit}', " +
+                                    $"'{gameRecord.unmakesMade}', " +
+                                    $"'{gameRecord.timeControll}', " +
+                                    $"'{gameRecord.gameResult}');";
+            // Executes the command
+            dbcmd.ExecuteNonQuery();
+        }
+
+        public void UpdateGameRecord(GameRecord gameRecord, string gameName, int userID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create new text command
+            dbcmd.CommandText = $"UPDATE GameRecords SET " +
+                                $"Player_ID='{gameRecord.playerID}', " +
+                                $"Moves='{gameRecord.moves}', " +
+                                $"TimeUsage='{gameRecord.timeUsage}', " +
+                                $"AIStrength='{gameRecord.AIStrength}', " +
+                                $"IsHumanWhite='{gameRecord}', " +
+                                $"StartDate='{gameRecord.startDate}', " +
+                                $"EndDate='{gameRecord.endDate}', " +
+                                $"GameTitle='{gameRecord.gameTitle}', " +
+                                $"UnmakesLimit='{gameRecord.unmakesLimit}', " +
+                                $"UnmakesMade='{gameRecord.unmakesMade}', " +
+                                $"TimeControll='{gameRecord.timeControll}' " +
+                                $"GameResult='{gameRecord.gameResult}' " +
+                                $"WHERE Player_ID='{userID}' AND GameTitle='{gameName}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
         }
