@@ -98,9 +98,13 @@ namespace Chess.UI
             {
                 aiName = "Normal AI";
             }
-            else
+            else if (code == "3")
             {
                 aiName = "Strong AI";
+            }
+            else
+            {
+                aiName = "AI";
             }
 
             if (board.whiteHumman == board.whiteBottom)
