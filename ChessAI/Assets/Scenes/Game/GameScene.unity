@@ -5511,6 +5511,10 @@ PrefabInstance:
       propertyPath: logMoveToDisplay
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1199519225866134286, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46ff872d16d24784381f3e7198967d42, type: 3}
 --- !u!1 &1264356165

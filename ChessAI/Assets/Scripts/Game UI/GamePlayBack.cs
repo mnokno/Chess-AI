@@ -35,13 +35,11 @@ namespace Chess.UI
                 {
                     if (stringMoves[i] != "")
                     {
-                        Debug.Log(stringMoves[i]);
                         movesList.Add(ushort.Parse(stringMoves[i]));
                     }
                 }
             }
             moves = movesList.ToArray();
-            Debug.Log(moves.Length);
 
             int timeIncrement = timeIncrementG * 1000;
             int whiteTime = initialTime * 1000;
@@ -87,7 +85,7 @@ namespace Chess.UI
 
         public void Next()
         {
-            if (movePointer < moves.Length - 1)
+            if (movePointer < moves.Length)
             {
                 playBackPosition.MakeMove(moves[movePointer]);
                 board.MakeMove(moves[movePointer]);
