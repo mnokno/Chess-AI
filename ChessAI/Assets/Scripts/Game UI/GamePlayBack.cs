@@ -17,6 +17,7 @@ namespace Chess.UI
         // Class constructor
         public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, Board board, GameDataDisplay gameDataDisplay)
         {
+            movePointer = 0;
             this.board = board;
             dataDisplay = gameDataDisplay;
             playBackPosition = new EngineUtility.Position();
@@ -28,17 +29,19 @@ namespace Chess.UI
         {
             string[] stringMoves = movesString.Split(":");
             List<ushort> movesList = new List<ushort>();
-            if (moves.Length != 0)
+            if (stringMoves.Length != 0)
             {
-                for (int i = moves.Length - 1; i >= 0; i--)
+                for (int i = stringMoves.Length - 1; i >= 0; i--)
                 {
                     if (stringMoves[i] != "")
                     {
+                        Debug.Log(stringMoves[i]);
                         movesList.Add(ushort.Parse(stringMoves[i]));
                     }
                 }
             }
             moves = movesList.ToArray();
+            Debug.Log(moves.Length);
 
             int timeIncrement = timeIncrementG * 1000;
             int whiteTime = initialTime * 1000;
@@ -76,7 +79,7 @@ namespace Chess.UI
             if (movePointer != 0)
             {
                 movePointer--;
-                playBackPosition.MakeMove(moves[movePointer]);
+                playBackPosition.UnmakeMove(moves[movePointer]);
                 board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment());
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
             }
@@ -86,10 +89,10 @@ namespace Chess.UI
         {
             if (movePointer < moves.Length - 1)
             {
-                movePointer++;
                 playBackPosition.MakeMove(moves[movePointer]);
                 board.MakeMove(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
+                movePointer++;
             }
         }
     }

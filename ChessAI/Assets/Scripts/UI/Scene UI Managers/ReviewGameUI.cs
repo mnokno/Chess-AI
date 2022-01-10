@@ -104,7 +104,7 @@ namespace Chess.UI
             gameResult.text = $"Game Result: {gameRecord.gameResult.Replace(":", " ")}";
             string[] timeControlParts = gameRecord.timeControll.Split("+");
             timeControll.text = $"Time Control: {int.Parse(timeControlParts[0]) / 60 + "|" + timeControlParts[1]}";
-            movesPlayed.text = $"Moves Played: {gameRecord.moves.Split(":").Length - 1}";
+            movesPlayed.text = $"Moves Played: {(gameRecord.moves != "" ? gameRecord.moves.Split(":").Length : 0)}";
         }
 
         // Load position preview
