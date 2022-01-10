@@ -19,6 +19,7 @@ namespace Chess.UI
         private Board board;
         private Common.ChessGameDataManager chessGameDataManager;
         private GameDataDisplay gameDataDisplay;
+        private GamePlayBack gamePlayBack;
 
         // Class functions
 
@@ -38,6 +39,12 @@ namespace Chess.UI
             gameDisplayActive = true;
 
             gameDataDisplay.SetAiName(chessGameDataManager.chessGameData.AiStrength);
+            gamePlayBack = new GamePlayBack(chessGameDataManager.chessGameData.moves, 
+                chessGameDataManager.chessGameData.timeUsage, 
+                chessGameDataManager.chessGameData.initialTime,
+                chessGameDataManager.chessGameData.timeIncrement,
+                board,
+                gameDataDisplay);
         }
 
         public void GameBtn()
@@ -70,12 +77,12 @@ namespace Chess.UI
 
         public void PreviousBtn()
         {
-
+            gamePlayBack.Previous();
         }
 
         public void NextBtn()
         {
-
+            gamePlayBack.Next();
         }
 
         public void AutoReplayBtn()
