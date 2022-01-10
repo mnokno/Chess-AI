@@ -265,6 +265,7 @@ namespace Chess.UI
                 yield return new WaitForSecondsRealtime(0.1f);
             }
 
+            chessGameDataManager.chessGameData.loadGame = false;
             // Loads the game
             FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
         }

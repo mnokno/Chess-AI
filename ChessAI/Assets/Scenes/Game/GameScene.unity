@@ -9534,7 +9534,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 9201655869162580934}
         m_TargetAssemblyTypeName: Chess.UI.BasicMenu, Assembly-CSharp
         m_MethodName: FullscreenTog
         m_Mode: 0

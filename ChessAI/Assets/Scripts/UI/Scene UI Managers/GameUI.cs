@@ -148,6 +148,7 @@ namespace Chess.UI
         {
             if (chessGameDataManager.chessGameData.saved)
             {
+                chessGameDataManager.chessGameData.loadGame = false;
                 FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
             }
             else
@@ -156,6 +157,7 @@ namespace Chess.UI
                 {
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
+                        chessGameDataManager.chessGameData.loadGame = false;
                         FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
                     }
                 }
