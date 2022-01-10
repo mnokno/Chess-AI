@@ -26,10 +26,15 @@ namespace Chess.UI
 
         #endregion
 
+        private void Awake()
+        {
+            board = FindObjectOfType<Board>();
+        }
+
         // Start is called before the first frame update
         void Start()
         {
-            board = FindObjectOfType<Board>();
+            
             clock = board.engineManager.chessEngine.centralPosition.clock;
             string username = PlayerPrefs.GetString("username");
             string aiName = "AI";
