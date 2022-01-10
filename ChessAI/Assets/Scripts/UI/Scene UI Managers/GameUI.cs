@@ -149,6 +149,7 @@ namespace Chess.UI
             if (chessGameDataManager.chessGameData.saved)
             {
                 chessGameDataManager.chessGameData.loadGame = false;
+                StopAllCoroutines();
                 FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
             }
             else
@@ -158,6 +159,7 @@ namespace Chess.UI
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
                         chessGameDataManager.chessGameData.loadGame = false;
+                        StopAllCoroutines();
                         FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
                     }
                 }
@@ -171,6 +173,7 @@ namespace Chess.UI
             if (chessGameDataManager.chessGameData.saved)
             {
                 chessGameDataManager.ClearData();
+                StopAllCoroutines();
                 FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
             }
             else
@@ -180,6 +183,7 @@ namespace Chess.UI
                     if (anwser == PopUpYesNo.Anwser.Yes)
                     {
                         chessGameDataManager.ClearData();
+                        StopAllCoroutines();
                         FindObjectOfType<SceneLoader>().LoadScene("GameCreationScene");
                     }
                 }

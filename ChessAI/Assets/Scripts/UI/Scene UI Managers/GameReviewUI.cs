@@ -1,18 +1,93 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class GameReviewUI : MonoBehaviour
+namespace Chess.UI
 {
-    // Start is called before the first frame update
-    void Start()
+    public class GameReviewUI : MonoBehaviour
     {
-        
-    }
+        // Class variables
+        public Image gameButtonImage;
+        public Image engineDetailsButtonImage;
+        public Color selected;
+        public Color deselected;
+        public CanvasGroup gameDisplayCG;
+        public CanvasGroup engineDetailsDisplayCG;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private bool gameDisplayActive;
+        private Board board;
+        private Common.ChessGameDataManager chessGameDataManager;
+        private GameDataDisplay gameDataDisplay;
+
+        // Class functions
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            board = FindObjectOfType<Board>();
+            chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
+            gameDataDisplay = FindObjectOfType<GameDataDisplay>();
+
+            gameDisplayCG.alpha = 1;
+            gameDisplayCG.blocksRaycasts = true;
+            engineDetailsDisplayCG.alpha = 0;
+            engineDetailsDisplayCG.blocksRaycasts = false;
+            gameButtonImage.color = selected;
+            engineDetailsButtonImage.color = deselected;
+            gameDisplayActive = true;
+
+            gameDataDisplay.SetAiName(chessGameDataManager.chessGameData.AiStrength);
+        }
+
+        public void GameBtn()
+        {
+            if (!gameDisplayActive)
+            {
+                gameDisplayCG.alpha = 1;
+                gameDisplayCG.blocksRaycasts = true;
+                engineDetailsDisplayCG.alpha = 0;
+                engineDetailsDisplayCG.blocksRaycasts = false;
+                gameButtonImage.color = selected;
+                engineDetailsButtonImage.color = deselected;
+                gameDisplayActive = true;
+            }
+        }
+
+        public void EngineDetailsBtn()
+        {
+            if (gameDisplayActive)
+            {
+                gameDisplayCG.alpha = 0;
+                gameDisplayCG.blocksRaycasts = false;
+                engineDetailsDisplayCG.alpha = 1;
+                engineDetailsDisplayCG.blocksRaycasts = true;
+                gameButtonImage.color = deselected;
+                engineDetailsButtonImage.color = selected;
+                gameDisplayActive = false;
+            }
+        }
+
+        public void PreviousBtn()
+        {
+
+        }
+
+        public void NextBtn()
+        {
+
+        }
+
+        public void AutoReplayBtn()
+        {
+
+        }
+
+        public void GoHomeBtn()
+        {
+            chessGameDataManager.ClearData();
+            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+        }
     }
 }
+
