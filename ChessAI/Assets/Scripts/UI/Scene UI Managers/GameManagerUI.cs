@@ -400,4 +400,3 @@ namespace Chess.UI
         #endregion
     }
 }
-

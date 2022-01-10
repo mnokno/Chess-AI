@@ -17,6 +17,13 @@ namespace Chess.UI
         public Button load;
         private PlayerDb.PlayerRecord currentPlayerRecord;
 
+        public TMPro.TextMeshProUGUI gameName;
+        public TMPro.TextMeshProUGUI aiStrenght;
+        public TMPro.TextMeshProUGUI creationDate;
+        public TMPro.TextMeshProUGUI remainigTakebacks;
+        public TMPro.TextMeshProUGUI timeControll;
+        public TMPro.TextMeshProUGUI movesPlayed;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -44,11 +51,12 @@ namespace Chess.UI
             foreach(PlayerDb.SavedGameRecord savedGame in savedGames)
             {
                 GameObject contentItem = Instantiate(contentItemPrefab, content);
-                SaveGameItem saveGameItem = contentItem.GetComponent<SaveGameItem>();
+                OnGoingGameItem saveGameItem = contentItem.GetComponent<OnGoingGameItem>();
                 saveGameItem.SetGameName(savedGame.gameTitle);
                 string[] timeControll = savedGame.timeControll.Split("+");
                 saveGameItem.SetTimeControll(int.Parse(timeControll[0])/60 + "|" + timeControll[1]);
                 saveGameItem.SetStartDate(savedGame.startDate.Split(" ")[0]);
+                saveGameItem.SetAiName(FormateAiName(savedGame.AIStrength));
                 saveGameItem.gameID = savedGame.gameID;
                 contentItem.GetComponent<Button>().onClick.AddListener(() => ScrollViewItemBtn(contentItem));
             }
@@ -67,6 +75,12 @@ namespace Chess.UI
                     previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
                     dataGameDisplay.SetAiName("AI");
                     dataGameDisplay.SetTime(600000, 600000);
+                    gameName.text = "Game Name:";
+                    aiStrenght.text = "AI Strength:";
+                    creationDate.text = "Creation Date:";
+                    remainigTakebacks.text = "Remaining Takebacks:";
+                    timeControll.text = "Time Control:";
+                    movesPlayed.text = "Moves Played:";
                     return;
                 }
             }
@@ -74,7 +88,22 @@ namespace Chess.UI
             load.interactable = true;
             button.GetComponent<Animator>().SetTrigger("GreenOn");
             currentlySelectedItem = button;
-            LoadPositionPreview(button.GetComponent<SaveGameItem>().gameID);
+            OnGoingGameItem onGoingGameItem = button.GetComponent<OnGoingGameItem>();
+            LoadPositionPreview(onGoingGameItem.gameID);
+
+            // Gets data for info panel
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(onGoingGameItem.gameID);
+            reader.CloseDB();
+            // Updates info panel
+            gameName.text = $"Game Name: {savedGameRecord.gameTitle}";
+            aiStrenght.text = $"AI Strength: {FormateAiName(savedGameRecord.AIStrength)}";
+            creationDate.text = $"Creation Date: {savedGameRecord.startDate.Split(" ")[0]}";
+            remainigTakebacks.text = $"Remaining Takebacks: {savedGameRecord.unmakesLimit - savedGameRecord.unmakesMade}";
+            string[] timeControlParts = savedGameRecord.timeControll.Split("+");
+            timeControll.text = $"Time Control: {int.Parse(timeControlParts[0]) / 60 + "|" + timeControlParts[1]}";
+            movesPlayed.text = $"Moves Played: {savedGameRecord.moves.Split(":").Length - 1}";
         }
 
         // Load position preview
@@ -152,7 +181,7 @@ namespace Chess.UI
             // Reads the game record
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(currentlySelectedItem.GetComponent<SaveGameItem>().gameID);
+            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(currentlySelectedItem.GetComponent<OnGoingGameItem>().gameID);
             reader.CloseDB();
 
             // Gets game data
@@ -198,6 +227,11 @@ namespace Chess.UI
             FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
         }
 
+        public void ChangeProfileBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectionScene");
+        }
+
         public IEnumerator WaitForDB()
         {
             while (!EngineUtility.OpeningBook.hasLoaded)
@@ -207,6 +241,26 @@ namespace Chess.UI
 
             // Loads the game
             FindObjectOfType<SceneLoader>().LoadScene("GameScene");
+        }
+
+        private string FormateAiName(string code)
+        {
+            if (code == "1")
+            {
+                return "Week AI";
+            }
+            else if (code == "2")
+            {
+                return "Normal AI";
+            }
+            else if (code == "3")
+            {
+                return "Strong AI";
+            }
+            else
+            {
+                return "AI";
+            }
         }
     }
 }
