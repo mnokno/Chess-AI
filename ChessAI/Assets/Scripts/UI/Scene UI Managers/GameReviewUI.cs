@@ -43,8 +43,10 @@ namespace Chess.UI
                 chessGameDataManager.chessGameData.timeUsage, 
                 chessGameDataManager.chessGameData.initialTime,
                 chessGameDataManager.chessGameData.timeIncrement,
+                chessGameDataManager.chessGameData.AiStrength,
                 board,
-                gameDataDisplay);
+                gameDataDisplay,
+                FindObjectOfType<BoardInputManager>());
         }
 
         public void GameBtn()
@@ -75,6 +77,11 @@ namespace Chess.UI
             }
         }
 
+        public void FirstBtn()
+        {
+            gamePlayBack.First();
+        }
+
         public void PreviousBtn()
         {
             gamePlayBack.Previous();
@@ -85,9 +92,14 @@ namespace Chess.UI
             gamePlayBack.Next();
         }
 
+        public void LastBtn()
+        {
+            gamePlayBack.Last();
+        }
+
         public void AutoReplayBtn()
         {
-
+            
         }
 
         public void GoHomeBtn()

@@ -13,14 +13,20 @@ namespace Chess.UI
         private GameDataDisplay dataDisplay;
         private int movePointer;
         private EngineUtility.Position playBackPosition;
+        private BoardInputManager inputManager;
+        private int initialTime;
 
         // Class constructor
-        public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, Board board, GameDataDisplay gameDataDisplay)
+        public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, string difficulty, Board board, GameDataDisplay gameDataDisplay, BoardInputManager boardInputManager)
         {
             movePointer = 0;
             this.board = board;
             dataDisplay = gameDataDisplay;
+            dataDisplay.SetAiName(difficulty);
+            dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
+            inputManager = boardInputManager;
             playBackPosition = new EngineUtility.Position();
+            this.initialTime = initialTime;
             ConvertHistory(moves, timeUsage, initialTime, timeIncrement);
         }
 
@@ -79,7 +85,14 @@ namespace Chess.UI
                 movePointer--;
                 playBackPosition.UnmakeMove(moves[movePointer]);
                 board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment());
+                inputManager.localPosition.UnmakeMove(moves[movePointer]);
+                inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
+
+                if (movePointer == 0)
+                {
+                    dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
+                }
             }
         }
 
@@ -89,6 +102,35 @@ namespace Chess.UI
             {
                 playBackPosition.MakeMove(moves[movePointer]);
                 board.MakeMove(moves[movePointer]);
+                inputManager.localPosition.MakeMove(moves[movePointer]);
+                inputManager.PlayMoveSound(moves[movePointer]);
+                dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
+                movePointer++;
+            }
+        }
+
+        public void First()
+        {
+            while (movePointer != 0)
+            {
+                movePointer--;
+                playBackPosition.UnmakeMove(moves[movePointer]);
+                board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment());
+                inputManager.localPosition.UnmakeMove(moves[movePointer]);
+                inputManager.PlayMoveSound(moves[movePointer]);
+                dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
+            }
+            dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
+        }
+
+        public void Last()
+        {
+            while (movePointer < moves.Length)
+            {
+                playBackPosition.MakeMove(moves[movePointer]);
+                board.MakeMove(moves[movePointer]);
+                inputManager.localPosition.MakeMove(moves[movePointer]);
+                inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
                 movePointer++;
             }
