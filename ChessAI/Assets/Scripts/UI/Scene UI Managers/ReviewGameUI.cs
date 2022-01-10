@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Chess.DB;
 using UnityEngine.UI;
+using Chess.DB;
 
 namespace Chess.UI
 {
-    public class LoadGameUI : MonoBehaviour
+    public class ReviewGameUI : MonoBehaviour
     {
         public RectTransform content;
         public GameObject contentItemPrefab;
@@ -14,15 +14,15 @@ namespace Chess.UI
         private Common.ChessGameDataManager chessGameDataManager;
         public GameDataDisplay dataGameDisplay;
         public Board previewBoard;
-        public Button load;
+        public Button review;
         private PlayerDb.PlayerRecord currentPlayerRecord;
 
         public TMPro.TextMeshProUGUI gameName;
         public TMPro.TextMeshProUGUI aiStrenght;
-        public TMPro.TextMeshProUGUI creationDate;
-        public TMPro.TextMeshProUGUI remainigTakebacks;
+        public TMPro.TextMeshProUGUI gameResult;
         public TMPro.TextMeshProUGUI timeControll;
         public TMPro.TextMeshProUGUI movesPlayed;
+        public TMPro.TextMeshProUGUI creationDate;
 
         // Start is called before the first frame update
         void Start()
@@ -44,20 +44,21 @@ namespace Chess.UI
             // Gets all saved game for the current player
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.SavedGameRecord[] savedGames = reader.ReadSavedGames(currentPlayerRecord.playerID);
+            PlayerDb.GameRecord[] gameRecords = reader.ReadGameRecords(currentPlayerRecord.playerID);
             reader.CloseDB();
 
             // Generate all games
-            foreach(PlayerDb.SavedGameRecord savedGame in savedGames)
+            foreach (PlayerDb.GameRecord gameRecord in gameRecords)
             {
                 GameObject contentItem = Instantiate(contentItemPrefab, content);
-                OnGoingGameItem saveGameItem = contentItem.GetComponent<OnGoingGameItem>();
-                saveGameItem.SetGameName(savedGame.gameTitle);
-                string[] timeControll = savedGame.timeControll.Split("+");
-                saveGameItem.SetTimeControll(int.Parse(timeControll[0])/60 + "|" + timeControll[1]);
-                saveGameItem.SetStartDate(savedGame.startDate.Split(" ")[0]);
-                saveGameItem.SetAiName(FormateAiName(savedGame.AIStrength));
-                saveGameItem.gameID = savedGame.gameID;
+                FinishedGameItem finishedGameItem = contentItem.GetComponent<FinishedGameItem>();
+                finishedGameItem.SetGameName(gameRecord.gameTitle);
+                string[] timeControll = gameRecord.timeControll.Split("+");
+                finishedGameItem.SetTimeControll(int.Parse(timeControll[0]) / 60 + "|" + timeControll[1]);
+                finishedGameItem.SetEndDate(gameRecord.startDate.Split(" ")[0]);
+                finishedGameItem.SetAiName(FormateAiName(gameRecord.AIStrength));
+                finishedGameItem.SetGameResult(gameRecord.gameResult.Split(":")[0]);
+                finishedGameItem.gameID = gameRecord.gameID;
                 contentItem.GetComponent<Button>().onClick.AddListener(() => ScrollViewItemBtn(contentItem));
             }
         }
@@ -70,7 +71,7 @@ namespace Chess.UI
                 currentlySelectedItem.GetComponent<Animator>().SetTrigger("GreenOff");
                 if (currentlySelectedItem == button)
                 {
-                    load.interactable = false;
+                    review.interactable = false;
                     currentlySelectedItem = null;
                     previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
                     dataGameDisplay.SetAiName("AI");
@@ -78,32 +79,32 @@ namespace Chess.UI
                     gameName.text = "Game Name:";
                     aiStrenght.text = "AI Strength:";
                     creationDate.text = "Creation Date:";
-                    remainigTakebacks.text = "Remaining Takebacks:";
+                    gameResult.text = "Game Result:";
                     timeControll.text = "Time Control:";
                     movesPlayed.text = "Moves Played:";
                     return;
                 }
             }
 
-            load.interactable = true;
+            review.interactable = true;
             button.GetComponent<Animator>().SetTrigger("GreenOn");
             currentlySelectedItem = button;
-            OnGoingGameItem onGoingGameItem = button.GetComponent<OnGoingGameItem>();
-            LoadPositionPreview(onGoingGameItem.gameID);
+            FinishedGameItem finishedGameItem = button.GetComponent<FinishedGameItem>();
+            LoadPositionPreview(finishedGameItem.gameID);
 
             // Gets data for info panel
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(onGoingGameItem.gameID);
+            PlayerDb.GameRecord gameRecord = reader.ReadGameRecord(finishedGameItem.gameID);
             reader.CloseDB();
             // Updates info panel
-            gameName.text = $"Game Name: {savedGameRecord.gameTitle}";
-            aiStrenght.text = $"AI Strength: {FormateAiName(savedGameRecord.AIStrength).Replace("AI", "")}";
-            creationDate.text = $"Creation Date: {savedGameRecord.startDate.Split(" ")[0]}";
-            remainigTakebacks.text = $"Remaining Takebacks: {savedGameRecord.unmakesLimit - savedGameRecord.unmakesMade}";
-            string[] timeControlParts = savedGameRecord.timeControll.Split("+");
+            gameName.text = $"Game Name: {gameRecord.gameTitle}";
+            aiStrenght.text = $"AI Strength: {FormateAiName(gameRecord.AIStrength).Replace("AI", "")}";
+            creationDate.text = $"Creation Date: {gameRecord.startDate.Split(" ")[0]}";
+            gameResult.text = $"Game Result: {gameRecord.gameResult.Replace(":", " ")}";
+            string[] timeControlParts = gameRecord.timeControll.Split("+");
             timeControll.text = $"Time Control: {int.Parse(timeControlParts[0]) / 60 + "|" + timeControlParts[1]}";
-            movesPlayed.text = $"Moves Played: {savedGameRecord.moves.Split(":").Length - 1}";
+            movesPlayed.text = $"Moves Played: {gameRecord.moves.Split(":").Length - 1}";
         }
 
         // Load position preview
@@ -112,11 +113,11 @@ namespace Chess.UI
             // Reads the game record
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(gameID);
+            PlayerDb.GameRecord gameRecord = reader.ReadGameRecord(gameID);
             reader.CloseDB();
 
             // Loads board settings
-            if (bool.Parse(savedGameRecord.isHumanWhite))
+            if (bool.Parse(gameRecord.isHumanWhite))
             {
                 previewBoard.whiteHumman = true;
                 previewBoard.whiteBottom = true;
@@ -128,11 +129,11 @@ namespace Chess.UI
             }
 
             // Loads AI name
-            dataGameDisplay.SetAiName(savedGameRecord.AIStrength);
+            dataGameDisplay.SetAiName(gameRecord.AIStrength);
 
             // Calculate the position FEN
             EngineUtility.Position position = new EngineUtility.Position();
-            string[] moves = savedGameRecord.moves.Split(":");
+            string[] moves = gameRecord.moves.Split(":");
             if (moves.Length != 0)
             {
                 for (int i = moves.Length - 1; i >= 0; i--)
@@ -145,15 +146,15 @@ namespace Chess.UI
             }
 
             // Calculates time
-            string[] timeControll = savedGameRecord.timeControll.Split("+");
+            string[] timeControll = gameRecord.timeControll.Split("+");
             float timeIncrement = int.Parse(timeControll[1]) * 1000;
             float whiteTime = int.Parse(timeControll[0]) * 1000;
             float blackTime = whiteTime;
             bool whitesTurn = true;
-            string[] timeUsage = savedGameRecord.timeUsage.Split(":");
+            string[] timeUsage = gameRecord.timeUsage.Split(":");
             if (moves.Length != 0)
             {
-                foreach(string timeUse in timeUsage)
+                foreach (string timeUse in timeUsage)
                 {
                     if (timeUse != "")
                     {
@@ -176,73 +177,6 @@ namespace Chess.UI
             previewBoard.LoadFEN(new EngineUtility.FEN(position.GetFEN()).GetPiecePlacment());
         }
 
-        public void LoadBtn()
-        {
-            // Reads the game record
-            PlayerDbReader reader = new PlayerDbReader();
-            reader.OpenDB();
-            PlayerDb.SavedGameRecord savedGameRecord = reader.ReadSavedGame(currentlySelectedItem.GetComponent<OnGoingGameItem>().gameID);
-            reader.CloseDB();
-
-            // Gets game data
-            bool loadGame = true;
-            bool newGame = false;
-            bool saved = true;
-            string moves = savedGameRecord.moves;
-            string AiStrength = savedGameRecord.AIStrength;
-            string timeUsage = savedGameRecord.timeUsage;
-            string[] timeControll = savedGameRecord.timeControll.Split("+");
-            int initialTime = int.Parse(timeControll[0]);
-            int timeIncrement = int.Parse(timeControll[1]);
-            int unmakesLimit = savedGameRecord.unmakesLimit;
-            int unmakesMade = savedGameRecord.unmakesMade;
-            string startDate = savedGameRecord.startDate;
-            string gameTitle = savedGameRecord.gameTitle;
-            bool isHumanWhite = bool.Parse(savedGameRecord.isHumanWhite);
-
-            // Saves game data
-            chessGameDataManager.chessGameData = new Common.ChessGameDataManager.ChessGameData()
-            {
-                loadGame = loadGame,
-                newGame = newGame,
-                saved = saved,
-                moves = moves,
-                AiStrength = AiStrength,
-                timeUsage = timeUsage,
-                initialTime = initialTime,
-                timeIncrement = timeIncrement,
-                unmakesLimit = unmakesLimit,
-                unmakesMade = unmakesMade,
-                startDate = startDate,
-                gameTitle = gameTitle,
-                isHumanWhite = isHumanWhite,
-            };
-
-            // Loads next scene after the opening book has loaded
-            StartCoroutine(nameof(WaitForDB));
-        }
-
-        public void GoBack()
-        {
-            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
-        }
-
-        public void ChangeProfileBtn()
-        {
-            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectionScene");
-        }
-
-        public IEnumerator WaitForDB()
-        {
-            while (!EngineUtility.OpeningBook.hasLoaded)
-            {
-                yield return new WaitForSecondsRealtime(0.1f);
-            }
-
-            // Loads the game
-            FindObjectOfType<SceneLoader>().LoadScene("GameScene");
-        }
-
         private string FormateAiName(string code)
         {
             if (code == "1")
@@ -261,6 +195,78 @@ namespace Chess.UI
             {
                 return "AI";
             }
+        }
+
+        public void ReviewBtn()
+        {
+            // Reads the game record
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            PlayerDb.GameRecord gameRecord = reader.ReadGameRecord(currentlySelectedItem.GetComponent<FinishedGameItem>().gameID);
+            reader.CloseDB();
+
+            // Gets game data
+            bool loadGame = true;
+            bool newGame = false;
+            bool saved = true;
+            string moves = gameRecord.moves;
+            string AiStrength = gameRecord.AIStrength;
+            string timeUsage = gameRecord.timeUsage;
+            string[] timeControll = gameRecord.timeControll.Split("+");
+            int initialTime = int.Parse(timeControll[0]);
+            int timeIncrement = int.Parse(timeControll[1]);
+            int unmakesLimit = gameRecord.unmakesLimit;
+            int unmakesMade = gameRecord.unmakesMade;
+            string startDate = gameRecord.startDate;
+            string endDate = gameRecord.endDate;
+            string gameResult = gameRecord.gameResult;
+            string gameTitle = gameRecord.gameTitle;
+            bool isHumanWhite = bool.Parse(gameRecord.isHumanWhite);
+
+            // Saves game data
+            chessGameDataManager.chessGameData = new Common.ChessGameDataManager.ChessGameData()
+            {
+                loadGame = loadGame,
+                newGame = newGame,
+                saved = saved,
+                moves = moves,
+                AiStrength = AiStrength,
+                timeUsage = timeUsage,
+                initialTime = initialTime,
+                timeIncrement = timeIncrement,
+                unmakesLimit = unmakesLimit,
+                unmakesMade = unmakesMade,
+                startDate = startDate,
+                endDate = endDate,
+                gameResult = gameResult.Split(":")[0],
+                gameResultCode = gameResult.Split(":")[1],
+                gameTitle = gameTitle,
+                isHumanWhite = isHumanWhite,
+            };
+
+            // Loads next scene after the opening book has loaded
+            StartCoroutine(nameof(WaitForDB));
+        }
+
+        public void GoBackBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+        }
+
+        public void ChangeProfileBtn()
+        {
+            FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectionScene");
+        }
+
+        public IEnumerator WaitForDB()
+        {
+            while (!EngineUtility.OpeningBook.hasLoaded)
+            {
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+
+            // Loads the game
+            FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
         }
     }
 }
