@@ -271,6 +271,109 @@ namespace Chess.DB
             return gameRecord;
         }
 
+
+        public GameRecord ReadRandomGameRecord()
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT * FROM GameRecords ORDER BY RAND LIMIT 1;";
+            // Executes the command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            // Checks if the record was found, if not returns null
+            if (reader.IsDBNull(0))
+            {
+                // Disposes of the reader
+                reader.Close();
+                reader.Dispose();
+                // Returns null since the record was not found
+                return new GameRecord() { isValid = false};
+            }
+
+            // Reads all player records
+            reader.Read();
+            GameRecord gameRecord = new GameRecord()
+            {
+                gameID = reader.GetInt32(0),
+                playerID = reader.GetInt32(1),
+                moves = reader.GetString(2),
+                timeUsage = reader.GetString(3),
+                AIStrength = reader.GetString(4),
+                isHumanWhite = reader.GetString(5),
+                startDate = reader.GetString(6),
+                endDate = reader.GetString(7),
+                gameTitle = reader.GetString(8),
+                unmakesLimit = reader.GetInt32(9),
+                unmakesMade = reader.GetInt32(10),
+                timeControll = reader.GetString(11),
+                gameResult = reader.GetString(12),
+                isValid = true
+            };
+
+            // Disposes of the reader
+            reader.Close();
+            reader.Dispose();
+
+            // Returns the game record
+            return gameRecord;
+        }
+
+        public GameRecord ReadRandomGameRecord(int userID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT * FROM GameRecords WHERE Player_ID={userID} ORDER BY RAND LIMIT 1;";
+            // Executes the command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            // Checks if the record was found, if not returns null
+            if (reader.IsDBNull(0))
+            {
+                // Disposes of the reader
+                reader.Close();
+                reader.Dispose();
+                // Returns null since the record was not found
+                return new GameRecord() { isValid = false };
+            }
+
+            // Reads all player records
+            reader.Read();
+            GameRecord gameRecord = new GameRecord()
+            {
+                gameID = reader.GetInt32(0),
+                playerID = reader.GetInt32(1),
+                moves = reader.GetString(2),
+                timeUsage = reader.GetString(3),
+                AIStrength = reader.GetString(4),
+                isHumanWhite = reader.GetString(5),
+                startDate = reader.GetString(6),
+                endDate = reader.GetString(7),
+                gameTitle = reader.GetString(8),
+                unmakesLimit = reader.GetInt32(9),
+                unmakesMade = reader.GetInt32(10),
+                timeControll = reader.GetString(11),
+                gameResult = reader.GetString(12),
+                isValid = true
+            };
+
+            // Disposes of the reader
+            reader.Close();
+            reader.Dispose();
+
+            // Returns the game record
+            return gameRecord;
+        }
+
         #endregion
 
         #region Other
