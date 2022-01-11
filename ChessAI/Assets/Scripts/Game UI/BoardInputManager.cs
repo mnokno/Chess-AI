@@ -372,7 +372,10 @@ namespace Chess.UI
         // Called when the game comes to en end
         public void EndGame()
         {
-            parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+            if (parrentBoard.useClock)
+            {
+                parrentBoard.engineManager.chessEngine.centralPosition.clock.StopClock();
+            }
             interactable = false;
             if (selectedPiece != null)
             {
