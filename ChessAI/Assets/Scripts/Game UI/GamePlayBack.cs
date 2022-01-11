@@ -84,7 +84,7 @@ namespace Chess.UI
             {
                 movePointer--;
                 playBackPosition.UnmakeMove(moves[movePointer]);
-                board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment());
+                board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment(), false);
                 inputManager.localPosition.UnmakeMove(moves[movePointer]);
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
@@ -115,7 +115,7 @@ namespace Chess.UI
             {
                 movePointer--;
                 playBackPosition.UnmakeMove(moves[movePointer]);
-                board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment());
+                board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment(), false);
                 inputManager.localPosition.UnmakeMove(moves[movePointer]);
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);

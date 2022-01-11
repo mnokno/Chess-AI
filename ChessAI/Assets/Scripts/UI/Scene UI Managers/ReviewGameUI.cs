@@ -73,7 +73,7 @@ namespace Chess.UI
                 {
                     review.interactable = false;
                     currentlySelectedItem = null;
-                    previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+                    previewBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", false);
                     dataGameDisplay.SetAiName("AI");
                     dataGameDisplay.SetTime(600000, 600000);
                     gameName.text = "Game Name:";
@@ -176,7 +176,7 @@ namespace Chess.UI
             // Loads the position on the chess board
             previewBoard.whiteHumman = bool.Parse(gameRecord.isHumanWhite);
             previewBoard.whiteBottom = bool.Parse(gameRecord.isHumanWhite);
-            previewBoard.LoadFEN(new EngineUtility.FEN(position.GetFEN()).GetPiecePlacment());
+            previewBoard.LoadFEN(new EngineUtility.FEN(position.GetFEN()).GetPiecePlacment(), true);
         }
 
         private string FormateAiName(string code)

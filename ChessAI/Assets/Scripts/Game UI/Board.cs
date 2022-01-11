@@ -112,7 +112,7 @@ namespace Chess.UI
                 // Sets the player to move
                 whiteToMove = fen.GetSideToMove();
                 // Loads the chess pieces
-                LoadFEN(fen.GetPiecePlacment());
+                LoadFEN(fen.GetPiecePlacment(), false);
                 // Loads position for the input manager
                 inputManager.LoadFEN(fen);
                 // Loads position for the engine manager
@@ -174,7 +174,7 @@ namespace Chess.UI
             // Sets the player to move
             whiteToMove = fen.GetSideToMove();
             // Loads the chess pieces
-            LoadFEN(fen.GetPiecePlacment());
+            LoadFEN(fen.GetPiecePlacment(), true);
             // Loads position for the input manager
             inputManager.LoadFEN(fen);
         }
@@ -211,11 +211,14 @@ namespace Chess.UI
         }
 
         // Removes all existing pieces and loads new FEN
-        public void LoadFEN(string FEN)
+        public void LoadFEN(string FEN, bool reGenBoard)
         {
             // Regenerates the chess board
-            DestroyBoard();
-            GenerateBoard();
+            if (reGenBoard) 
+            {
+                DestroyBoard();
+                GenerateBoard();
+            }
 
             // Splits the FEN into ranks rank 8 ... 1
             string[] ranks = FEN.Split('/');
@@ -349,7 +352,7 @@ namespace Chess.UI
         {
             engineManager.chessEngine.centralPosition.TakeBack();
             string FEN = engineManager.chessEngine.centralPosition.GetFEN();
-            LoadFEN((new FEN(FEN)).GetPiecePlacment());
+            LoadFEN((new FEN(FEN)).GetPiecePlacment(), false);
             inputManager.LoadFEN(new FEN(FEN));
         }
 
