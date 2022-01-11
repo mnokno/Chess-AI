@@ -21,6 +21,7 @@ namespace Chess.UI
         public bool hvh; // Human versus human
         public bool whiteHumman; // True if human play white
         public bool useClock; // Used to deiced whether or not this board will use clock to time move (introduces loses by time)
+        public bool autoPremutateBoard; // Used to deiced whether or not to automatically orientate this board
         [HideInInspector]
         public bool whiteToMove; // True if white is to move
 
@@ -76,7 +77,7 @@ namespace Chess.UI
             }
 
             // Updates board setting
-            if (chessGameDataManager != null & chessGameDataManager.chessGameData.loadGame)
+            if (chessGameDataManager != null && autoPremutateBoard)
             {
                 if (chessGameDataManager.chessGameData.isHumanWhite)
                 {

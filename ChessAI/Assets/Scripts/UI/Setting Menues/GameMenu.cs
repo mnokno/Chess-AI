@@ -66,7 +66,7 @@ namespace Chess.UI
 
         public void SaveBtn()
         {
-            if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove)
+            if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove || inputManager.parrentBoard.engineManager.chessEngine.centralPosition.gameState != EngineUtility.Position.GameState.OnGoing)
             {
                 if (chessGameDataManager.chessGameData.gameResultCode != null && chessGameDataManager.chessGameData.gameResultCode != "") // The game has ended
                 {
