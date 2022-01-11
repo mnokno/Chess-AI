@@ -231,6 +231,14 @@ PrefabInstance:
       value: DB loading progress
       objectReference: {fileID: 0}
     - target: {fileID: 1232757537512957890, guid: e966991b7949b924b8ab035b64e2fb14, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1232757537512957890, guid: e966991b7949b924b8ab035b64e2fb14, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1232757537512957890, guid: e966991b7949b924b8ab035b64e2fb14, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -130
       objectReference: {fileID: 0}

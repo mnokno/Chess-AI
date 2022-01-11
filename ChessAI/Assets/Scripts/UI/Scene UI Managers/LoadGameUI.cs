@@ -236,6 +236,10 @@ namespace Chess.UI
 
         public IEnumerator WaitForDB()
         {
+            if (!EngineUtility.OpeningBook.hasLoaded)
+            {
+                FindObjectOfType<DBLoadingProgress>().Show();
+            }
             while (!EngineUtility.OpeningBook.hasLoaded)
             {
                 yield return new WaitForSecondsRealtime(0.1f);

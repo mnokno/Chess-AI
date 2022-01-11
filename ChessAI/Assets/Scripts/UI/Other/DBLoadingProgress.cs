@@ -13,16 +13,13 @@ namespace Chess.UI
         public TMPro.TextMeshProUGUI subText;
         private const int totalLoadingBarLenght = 180;
 
-        private void Start()
-        {
-            Show();
-        }
         // Class utilities
         public void Show()
         {
             animator.SetTrigger("Show");
             StartCoroutine(nameof(UpdateData));
         }
+
         public void Hide()
         {
             animator.SetTrigger("Hide");
@@ -40,7 +37,7 @@ namespace Chess.UI
                 // Updates progress bar
                 loadingBar.sizeDelta = new Vector2(totalLoadingBarLenght * progress, loadingBar.sizeDelta.y);
                 // Waits till next update
-                yield return new WaitForSecondsRealtime(0.01f);
+                yield return new WaitForSecondsRealtime(0.017f);
             }
         }
     }
