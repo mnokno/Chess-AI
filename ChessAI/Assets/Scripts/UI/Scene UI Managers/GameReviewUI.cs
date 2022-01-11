@@ -142,9 +142,14 @@ namespace Chess.UI
             }
             else
             {
-                StartCoroutine(nameof(AutoPlayBack));
-                onOffAutoPlayText.text = "On";
+                StopAutoPlay();
             }
+        }
+
+        private void StopAutoPlay()
+        {
+            StartCoroutine(nameof(AutoPlayBack));
+            onOffAutoPlayText.text = "On";
         }
 
         public IEnumerator AutoPlayBack()

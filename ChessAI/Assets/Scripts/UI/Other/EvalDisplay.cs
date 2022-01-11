@@ -26,6 +26,8 @@ namespace Chess.UI
         private Board board;
         private ushort currentBestMove;
         private int currentEval;
+        private float upperTarget;
+        private float lowerTarget;
 
         // Class functions
 
@@ -54,6 +56,8 @@ namespace Chess.UI
 
             // Starts checking for updates
             StartCoroutine(nameof(CheckForChanges));
+            // Start animator
+            StartCoroutine(nameof(AnimateBar));
         }
 
         // Checks for display updates
@@ -127,8 +131,16 @@ namespace Chess.UI
         {
             float height = (barMaxHeight / 2f) * ((eval / 100f) / 10f);
             height = height * 2 < -barMaxHeight ? -barMaxHeight / 2f : height;
-            upperBarImage.rectTransform.sizeDelta = new Vector2(upperBarImage.rectTransform.sizeDelta.x, barMaxHeight / 2f + height);
-            lowerBarImage.rectTransform.sizeDelta = new Vector2(upperBarImage.rectTransform.sizeDelta.x, barMaxHeight / 2f - height);
+            if (board.whiteBottom)
+            {
+                upperTarget = barMaxHeight / 2f - height;
+                lowerTarget = barMaxHeight / 2f + height;
+            }
+            else
+            {
+                upperTarget = barMaxHeight / 2f + height;
+                lowerTarget = barMaxHeight / 2f - height;
+            }
         }
 
         // Formats eval
@@ -155,6 +167,26 @@ namespace Chess.UI
                 {
                     return sEval[0].ToString() + sEval[1].ToString();
                 }
+            }
+        }
+        
+        // Animates the evaluation bar
+        private IEnumerator AnimateBar()
+        {
+            while (true)
+            {
+                if (upperBarImage.rectTransform.sizeDelta.y != upperTarget || lowerBarImage.rectTransform.sizeDelta.y != lowerTarget)
+                {
+                    // Upper
+                    float changeRequired = upperTarget - upperBarImage.rectTransform.sizeDelta.y;
+                    float change = changeRequired * 0.05f;
+                    change = changeRequired < 0 ? (change > -1 ? -1 : change) : (change < 1 ? 1 : change);
+                    change = changeRequired < 0 ? (change < changeRequired ? changeRequired : change) : (change > changeRequired ? changeRequired : change);
+                    upperBarImage.rectTransform.sizeDelta = new Vector2(upperBarImage.rectTransform.sizeDelta.x, upperBarImage.rectTransform.sizeDelta.y + change);
+                    // Lower
+                    lowerBarImage.rectTransform.sizeDelta = new Vector2(lowerBarImage.rectTransform.sizeDelta.x, lowerBarImage.rectTransform.sizeDelta.y - change);
+                }
+                yield return new WaitForSecondsRealtime(1f / 60f);
             }
         }
     }
