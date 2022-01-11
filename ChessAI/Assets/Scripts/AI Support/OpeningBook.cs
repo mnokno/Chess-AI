@@ -16,6 +16,10 @@ namespace Chess.EngineUtility
         // Flag to show whether or not the book has loaded
         public static bool hasLoaded { get; private set; }
 
+        // Used to show db loading progress
+        public static int totalEntries = 1500263;
+        public static int readEntries = 0;
+
         #endregion
 
         #region Class constructor
@@ -136,6 +140,7 @@ namespace Chess.EngineUtility
         private static void LoadBookFromCSV()
         {
             // Reads the opening book from a text file and splits it into key - moves formate array
+            readEntries = 0;
             string[] openingBook = System.IO.File.ReadAllLines(openingBookDirectory);
             openingBook[0] = "";
 
@@ -153,6 +158,7 @@ namespace Chess.EngineUtility
                         enties.Add(new Entry(ulong.Parse(parts[0]), ushort.Parse(moves[i]), ushort.Parse(counts[i])));
                     }
                     book.Add(ulong.Parse(parts[0]), enties);
+                    readEntries++;
                 }
             }
 
