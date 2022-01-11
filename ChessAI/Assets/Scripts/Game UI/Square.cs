@@ -21,9 +21,9 @@ namespace Chess.UI
         private ColorSet squareColours; // Stores color set for this square
         private ColorSet annotationColors; // Stores color set for this squares annotation
         public GameObject quad; // Stores reference to a quad that represents this square
-        private GameObject legalCaptureSprite; // Stores reference to a legalCaptureSprite game object (sprite)
-        private GameObject legalNonCaptureSprite; // Stores reference to a legalNonCaptureSprite game object (sprite)
-        private List<GameObject> annotations = new List<GameObject>(); // Stores references to all annotations on this square
+        public GameObject legalCaptureSprite; // Stores reference to a legalCaptureSprite game object (sprite)
+        public GameObject legalNonCaptureSprite; // Stores reference to a legalNonCaptureSprite game object (sprite)
+        public List<GameObject> annotations = new List<GameObject>(); // Stores references to all annotations on this square
 
         #endregion
 

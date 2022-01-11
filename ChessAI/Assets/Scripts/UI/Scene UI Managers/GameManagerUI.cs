@@ -162,6 +162,8 @@ namespace Chess.UI
                 blackTime = whiteTime;
                 whitesTurn = true;
                 timeUsage = savedGameRecord.timeUsage.Split(":");
+                previewBoard.whiteHumman = bool.Parse(savedGameRecord.isHumanWhite);
+                previewBoard.whiteBottom = bool.Parse(savedGameRecord.isHumanWhite);
             }
             else
             {
@@ -175,6 +177,8 @@ namespace Chess.UI
                 blackTime = whiteTime;
                 whitesTurn = true;
                 timeUsage = gameRecord.timeUsage.Split(":");
+                previewBoard.whiteHumman = bool.Parse(gameRecord.isHumanWhite);
+                previewBoard.whiteBottom = bool.Parse(gameRecord.isHumanWhite);
             }
             reader.CloseDB();
 

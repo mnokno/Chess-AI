@@ -192,9 +192,31 @@ namespace Chess.UI
             }
         }
 
+        // Destroys the chess board
+        public void DestroyBoard()
+        {
+            for (int rank = 0; rank < 8; rank++)
+            {
+                for (int file = 0; file < 8; file++)
+                {
+                    DestroyImmediate(squares[rank * 8 + file].quad);
+                    DestroyImmediate(squares[rank * 8 + file].legalCaptureSprite);
+                    DestroyImmediate(squares[rank * 8 + file].legalNonCaptureSprite);
+                    foreach(GameObject go in squares[rank * 8 + file].annotations)
+                    {
+                        DestroyImmediate(go);
+                    }
+                }
+            }
+        }
+
         // Removes all existing pieces and loads new FEN
         public void LoadFEN(string FEN)
         {
+            // Regenerates the chess board
+            DestroyBoard();
+            GenerateBoard();
+
             // Splits the FEN into ranks rank 8 ... 1
             string[] ranks = FEN.Split('/');
 

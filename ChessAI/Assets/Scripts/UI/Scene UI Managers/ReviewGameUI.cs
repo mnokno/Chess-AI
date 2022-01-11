@@ -174,6 +174,8 @@ namespace Chess.UI
             dataGameDisplay.SetTime(whiteTime, blackTime);
 
             // Loads the position on the chess board
+            previewBoard.whiteHumman = bool.Parse(gameRecord.isHumanWhite);
+            previewBoard.whiteBottom = bool.Parse(gameRecord.isHumanWhite);
             previewBoard.LoadFEN(new EngineUtility.FEN(position.GetFEN()).GetPiecePlacment());
         }
 
