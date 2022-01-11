@@ -109,6 +109,45 @@ namespace Chess.Engine
             return bestMove;
         }
 
+        // Evaluates position
+        public ushort Evaluate()
+        {
+            // Clears the moves list
+            generatedMoves.Clear();
+            // Resets flag, and parameters
+            cancelSearch = false;
+            currentBaseDepht = 1;
+            // Starts a timer
+            stopwatch.Restart();
+            stopwatch.Start();
+            // Resets counters
+            eval = 0;
+            nodes = 0;
+            maxDepth = 0;
+            transpositiontableHits = 0;
+
+            while (!cancelSearch)
+            {
+                // Calculates best move at current depth
+                ushort move = CalculateBestMove(currentBaseDepht);
+                if (!cancelSearch)
+                {
+                    // Saves the search results
+                    previousBestMove = bestMove;
+                    bestMove = move;
+                    // Adds the move to generated moves list
+                    generatedMoves.Add(move);
+                    // Updates Depth
+                    currentBaseDepht++;
+                }
+            }
+
+            // Stops the timer
+            stopwatch.Stop();
+            // Returns the best move found
+            return bestMove;
+        }
+
         // Stops the search imminently
         public void CancelSearch()
         {
@@ -125,7 +164,7 @@ namespace Chess.Engine
             dynamicEvolution.CancelSearch();
             cancelSearch = true;
         }
-
+   
         // Calculates and returns the best move, depth need to be at least 1
         private ushort CalculateBestMove(byte depth)
         {
@@ -167,4 +206,3 @@ namespace Chess.Engine
         #endregion
     }
 }
-

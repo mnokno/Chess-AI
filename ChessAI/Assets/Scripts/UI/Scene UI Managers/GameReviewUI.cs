@@ -76,6 +76,11 @@ namespace Chess.UI
             Canvas.ForceUpdateCanvases();
         }
 
+        public void OnNewPosition()
+        {
+            board.engineManager.EvaluatePosition(new Chess.EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
+        }
+
         public void GameBtn()
         {
             if (!gameDisplayActive)
@@ -107,21 +112,25 @@ namespace Chess.UI
         public void FirstBtn()
         {
             gamePlayBack.First();
+            OnNewPosition();
         }
 
         public void PreviousBtn()
         {
             gamePlayBack.Previous();
+            OnNewPosition();
         }
 
         public void NextBtn()
         {
             gamePlayBack.Next();
+            OnNewPosition();
         }
 
         public void LastBtn()
         {
             gamePlayBack.Last();
+            OnNewPosition();
         }
 
         public void AutoReplayBtn()
@@ -144,6 +153,7 @@ namespace Chess.UI
             {
                 yield return new WaitForSecondsRealtime(1f);
                 gamePlayBack.Next();
+                OnNewPosition();
             }
             onOffAutoPlayText.text = "Off";
         }

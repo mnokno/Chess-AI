@@ -333,6 +333,22 @@ namespace Chess.Engine
             // Updates game state
             chessEngine.centralPosition.gameState = Position.GameState.Surrender;
         }
+
+        public void EvaluatePosition(FEN fen)
+        {
+            // Stops preview evaluation
+            chessEngine.CancelSearch();
+            // Create a new chess engine
+            chessEngine = new ChessEngine();
+            chessEngine.LoadFEN(fen);
+            // Start the evaluation
+            Task.Run(() => chessEngine.Evaluate());
+            // Updates display info
+            zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
+            // Updates FEN info
+            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+        }
+
         #endregion
 
         // Updates search info
