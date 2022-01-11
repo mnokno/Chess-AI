@@ -4473,6 +4473,9 @@ MonoBehaviour:
   deselected: {r: 0.12156863, g: 0.11764706, b: 0.105882354, a: 1}
   gameDisplayCG: {fileID: 1099774795}
   engineDetailsDisplayCG: {fileID: 1775947820}
+  onOffAutoPlayText: {fileID: 2032526894}
+  content: {fileID: 1341842045}
+  contentItemPrefab: {fileID: 3941484542217750510, guid: 81653d4c34a560d4d88d01cd8649d49e, type: 3}
 --- !u!1 &1332497687
 GameObject:
   m_ObjectHideFlags: 0

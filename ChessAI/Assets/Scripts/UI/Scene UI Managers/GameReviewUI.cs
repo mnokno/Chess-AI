@@ -14,6 +14,7 @@ namespace Chess.UI
         public Color deselected;
         public CanvasGroup gameDisplayCG;
         public CanvasGroup engineDetailsDisplayCG;
+        public TMPro.TextMeshProUGUI onOffAutoPlayText;
 
         private bool gameDisplayActive;
         private Board board;
@@ -21,15 +22,21 @@ namespace Chess.UI
         private GameDataDisplay gameDataDisplay;
         private GamePlayBack gamePlayBack;
 
+        public Transform content;
+        public GameObject contentItemPrefab;
+        private GameObject currentItem;
+
         // Class functions
 
         // Start is called before the first frame update
         void Start()
         {
+            // Finds objects
             board = FindObjectOfType<Board>();
             chessGameDataManager = FindObjectOfType<Common.ChessGameDataManager>();
             gameDataDisplay = FindObjectOfType<GameDataDisplay>();
 
+            // Sets initiates state
             gameDisplayCG.alpha = 1;
             gameDisplayCG.blocksRaycasts = true;
             engineDetailsDisplayCG.alpha = 0;
@@ -37,8 +44,9 @@ namespace Chess.UI
             gameButtonImage.color = selected;
             engineDetailsButtonImage.color = deselected;
             gameDisplayActive = true;
-
             gameDataDisplay.SetAiName(chessGameDataManager.chessGameData.AiStrength);
+
+            // Creates game play back
             gamePlayBack = new GamePlayBack(chessGameDataManager.chessGameData.moves, 
                 chessGameDataManager.chessGameData.timeUsage, 
                 chessGameDataManager.chessGameData.initialTime,
@@ -47,6 +55,25 @@ namespace Chess.UI
                 board,
                 gameDataDisplay,
                 FindObjectOfType<BoardInputManager>());
+
+            // Creates game history
+            EngineUtility.Position localPlayBackPosition = new EngineUtility.Position();
+            string[] timeUsage = chessGameDataManager.chessGameData.timeUsage.Split(":");
+            string[] moves = chessGameDataManager.chessGameData.moves.Split(":");
+            if (moves.Length != 0)
+            {
+                for (int i = moves.Length - 1; i >= 0; i--)
+                {
+                    if (moves[i] != "")
+                    {
+                        ushort move = ushort.Parse(moves[i]);
+                        int turnNumer = (int)System.Math.Ceiling(localPlayBackPosition.historicMoveData.Count / 2d);
+                        LogMove(turnNumer, EngineUtility.Move.ConvertUshortToPNG(move, localPlayBackPosition), int.Parse(timeUsage[timeUsage.Length - i - 1]));
+                        localPlayBackPosition.MakeMove(move);
+                    }
+                }
+            }
+            Canvas.ForceUpdateCanvases();
         }
 
         public void GameBtn()
@@ -99,13 +126,53 @@ namespace Chess.UI
 
         public void AutoReplayBtn()
         {
-            
+            if (onOffAutoPlayText.text == "On")
+            {
+                StartCoroutine(nameof(AutoPlayBack));
+                onOffAutoPlayText.text = "Off";
+            }
+            else
+            {
+                StopCoroutine(nameof(AutoPlayBack));
+                onOffAutoPlayText.text = "On";
+            }
+        }
+
+        public IEnumerator AutoPlayBack()
+        {
+            while (gamePlayBack.moveLeft > 0)
+            {
+                yield return new WaitForSecondsRealtime(1f);
+                gamePlayBack.Next();
+            }
+            onOffAutoPlayText.text = "Off";
         }
 
         public void GoHomeBtn()
         {
             chessGameDataManager.ClearData();
             FindObjectOfType<SceneLoader>().LoadScene("HomeScene");
+        }
+
+        public void LogMove(int turnNumber, string move, float time)
+        {
+            // Logs the move
+            if (currentItem == null)
+            {
+                currentItem = Instantiate(contentItemPrefab, content);
+                TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
+                turnReportDisplay.SetTrunNumber(turnNumber);
+                turnReportDisplay.SetMove(true, move);
+                turnReportDisplay.SetTime(true, time);
+            }
+            else
+            {
+                TurnReportDisplay turnReportDisplay = currentItem.GetComponent<TurnReportDisplay>();
+                turnReportDisplay.SetTrunNumber(turnNumber);
+                turnReportDisplay.SetMove(false, move);
+                turnReportDisplay.SetTime(false, time);
+                currentItem = null;
+            }
         }
     }
 }

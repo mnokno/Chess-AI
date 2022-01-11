@@ -15,6 +15,7 @@ namespace Chess.UI
         private EngineUtility.Position playBackPosition;
         private BoardInputManager inputManager;
         private int initialTime;
+        public int moveLeft { get; private set; }
 
         // Class constructor
         public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, string difficulty, Board board, GameDataDisplay gameDataDisplay, BoardInputManager boardInputManager)
@@ -28,6 +29,7 @@ namespace Chess.UI
             playBackPosition = new EngineUtility.Position();
             this.initialTime = initialTime;
             ConvertHistory(moves, timeUsage, initialTime, timeIncrement);
+            moveLeft = moves.Length;
         }
 
         // Class initialization support
@@ -93,6 +95,8 @@ namespace Chess.UI
                 {
                     dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
                 }
+
+                moveLeft++;
             }
         }
 
@@ -106,6 +110,7 @@ namespace Chess.UI
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
                 movePointer++;
+                moveLeft--;
             }
         }
 
@@ -121,6 +126,7 @@ namespace Chess.UI
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
             }
             dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
+            moveLeft = moves.Length;
         }
 
         public void Last()
@@ -134,6 +140,7 @@ namespace Chess.UI
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
                 movePointer++;
             }
+            moveLeft = 0;
         }
     }
 }
