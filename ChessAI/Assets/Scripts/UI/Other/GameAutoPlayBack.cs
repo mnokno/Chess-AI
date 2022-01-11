@@ -62,8 +62,8 @@ namespace Chess.UI
                     gameRecord.AIStrength,
                     board,
                     gameDataDisplay,
-                    boardInputManager
-                    );
+                    boardInputManager,
+                    false);
 
                 // Updates labels
                 gameDataDisplay.SetHumanName(playersName);

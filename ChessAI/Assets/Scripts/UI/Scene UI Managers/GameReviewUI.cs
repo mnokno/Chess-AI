@@ -54,7 +54,8 @@ namespace Chess.UI
                 chessGameDataManager.chessGameData.AiStrength,
                 board,
                 gameDataDisplay,
-                FindObjectOfType<BoardInputManager>());
+                FindObjectOfType<BoardInputManager>(),
+                true);
 
             // Creates game history
             EngineUtility.Position localPlayBackPosition = new EngineUtility.Position();
@@ -74,11 +75,6 @@ namespace Chess.UI
                 }
             }
             Canvas.ForceUpdateCanvases();
-        }
-
-        public void OnNewPosition()
-        {
-            board.engineManager.EvaluatePosition(new EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
         }
 
         public void GameBtn()
@@ -112,25 +108,21 @@ namespace Chess.UI
         public void FirstBtn()
         {
             gamePlayBack.First();
-            OnNewPosition();
         }
 
         public void PreviousBtn()
         {
             gamePlayBack.Previous();
-            OnNewPosition();
         }
 
         public void NextBtn()
         {
             gamePlayBack.Next();
-            OnNewPosition();
         }
 
         public void LastBtn()
         {
             gamePlayBack.Last();
-            OnNewPosition();
         }
 
         public void AutoReplayBtn()
@@ -157,7 +149,6 @@ namespace Chess.UI
             while (gamePlayBack.moveLeft > 0)
             {
                 gamePlayBack.Next();
-                OnNewPosition();
                 yield return new WaitForSecondsRealtime(1f);
             }
             onOffAutoPlayText.text = "Off";

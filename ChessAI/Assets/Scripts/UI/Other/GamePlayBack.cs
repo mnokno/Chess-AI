@@ -15,10 +15,11 @@ namespace Chess.UI
         private EngineUtility.Position playBackPosition;
         private BoardInputManager inputManager;
         private int initialTime;
+        private bool evalAfterChange;
         public int moveLeft { get; private set; }
 
         // Class constructor
-        public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, string difficulty, Board board, GameDataDisplay gameDataDisplay, BoardInputManager boardInputManager)
+        public GamePlayBack(string moves, string timeUsage, int initialTime, int timeIncrement, string difficulty, Board board, GameDataDisplay gameDataDisplay, BoardInputManager boardInputManager, bool evalAfterChange)
         {
             movePointer = 0;
             this.board = board;
@@ -30,6 +31,7 @@ namespace Chess.UI
             this.initialTime = initialTime;
             ConvertHistory(moves, timeUsage, initialTime, timeIncrement);
             moveLeft = moves.Length;
+            this.evalAfterChange = evalAfterChange;
         }
 
         // Class initialization support
@@ -88,6 +90,7 @@ namespace Chess.UI
                 playBackPosition.UnmakeMove(moves[movePointer]);
                 board.LoadFEN(new EngineUtility.FEN(playBackPosition.GetFEN()).GetPiecePlacment(), false);
                 inputManager.localPosition.UnmakeMove(moves[movePointer]);
+                OnNewPosition();
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
 
@@ -107,6 +110,7 @@ namespace Chess.UI
                 playBackPosition.MakeMove(moves[movePointer]);
                 board.MakeMove(moves[movePointer]);
                 inputManager.localPosition.MakeMove(moves[movePointer]);
+                OnNewPosition();
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
                 movePointer++;
@@ -125,6 +129,7 @@ namespace Chess.UI
                 inputManager.PlayMoveSound(moves[movePointer]);
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
             }
+            OnNewPosition();
             dataDisplay.SetTime(initialTime * 1000, initialTime * 1000);
             moveLeft = moves.Length;
         }
@@ -140,7 +145,16 @@ namespace Chess.UI
                 dataDisplay.SetTime(times[movePointer].x, times[movePointer].y);
                 movePointer++;
             }
+            OnNewPosition();
             moveLeft = 0;
+        }
+
+        private void OnNewPosition()
+        {
+            if (evalAfterChange)
+            {
+                board.engineManager.EvaluatePosition(new EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
+            }
         }
     }
 }
