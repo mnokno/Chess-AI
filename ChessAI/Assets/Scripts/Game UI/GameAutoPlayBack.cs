@@ -7,8 +7,7 @@ namespace Chess.UI
 {
     public class GameAutoPlayBack : MonoBehaviour
     {
-        public bool useNameConstraint;
-        public string name;
+        public bool useUserIDConstraint;
         private GamePlayBack gamePlayBack;
         private PlayerDb.GameRecord gameRecord;
         private string playersName;
@@ -18,11 +17,18 @@ namespace Chess.UI
             // Reads the game record
             PlayerDbReader reader = new PlayerDbReader();
             reader.OpenDB();
-            gameRecord = reader.ReadRandomGameRecord();
-            reader.CloseDB();
-            // Reads players name
-            reader.OpenDB();
-            playersName = reader.TryGetPlayersRecord(gameRecord.playerID).username;
+            if (useUserIDConstraint)
+            {
+                PlayerDb.PlayerRecord playerRecord  = reader.TryGetPlayersRecord(PlayerPrefs.GetString("username"));
+                playersName = playerRecord.username;
+                gameRecord = reader.ReadRandomGameRecord(playerRecord.playerID);
+            }
+            else
+            {
+                gameRecord = reader.ReadRandomGameRecord();
+                playersName = reader.TryGetPlayersRecord(gameRecord.playerID).username;
+
+            }
             reader.CloseDB();
             // Gets references
             Board board = FindObjectOfType<Board>();
