@@ -246,8 +246,9 @@ namespace Chess.UI
                 isHumanWhite = isHumanWhite,
             };
 
-            // Loads next scene after the opening book has loaded
-            StartCoroutine(nameof(WaitForDB));
+            // Loads the game
+            chessGameDataManager.chessGameData.loadGame = false;
+            FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
         }
 
         public void GoBackBtn()
@@ -258,22 +259,6 @@ namespace Chess.UI
         public void ChangeProfileBtn()
         {
             FindObjectOfType<SceneLoader>().LoadScene("ProfileSelectionScene");
-        }
-
-        public IEnumerator WaitForDB()
-        {
-            if (!EngineUtility.OpeningBook.hasLoaded)
-            {
-                FindObjectOfType<DBLoadingProgress>().Show();
-            }
-            while (!EngineUtility.OpeningBook.hasLoaded)
-            {
-                yield return new WaitForSecondsRealtime(0.1f);
-            }
-
-            chessGameDataManager.chessGameData.loadGame = false;
-            // Loads the game
-            FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
         }
     }
 }

@@ -78,7 +78,7 @@ namespace Chess.UI
 
         public void OnNewPosition()
         {
-            board.engineManager.EvaluatePosition(new Chess.EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
+            board.engineManager.EvaluatePosition(new EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
         }
 
         public void GameBtn()
@@ -137,12 +137,12 @@ namespace Chess.UI
         {
             if (onOffAutoPlayText.text == "On")
             {
-                StartCoroutine(nameof(AutoPlayBack));
+                StopCoroutine(nameof(AutoPlayBack));
                 onOffAutoPlayText.text = "Off";
             }
             else
             {
-                StopCoroutine(nameof(AutoPlayBack));
+                StartCoroutine(nameof(AutoPlayBack));
                 onOffAutoPlayText.text = "On";
             }
         }
@@ -151,9 +151,9 @@ namespace Chess.UI
         {
             while (gamePlayBack.moveLeft > 0)
             {
-                yield return new WaitForSecondsRealtime(1f);
                 gamePlayBack.Next();
                 OnNewPosition();
+                yield return new WaitForSecondsRealtime(1f);
             }
             onOffAutoPlayText.text = "Off";
         }
