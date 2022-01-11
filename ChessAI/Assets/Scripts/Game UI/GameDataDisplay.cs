@@ -10,6 +10,7 @@ namespace Chess.UI
         #region Class variables
 
         public bool autoUpdateTimeDisplay = false;
+        public bool uatoSetNames = true;
         public Color whiteTimeDisplayColor;
         public Color blackTimeDisplayColor;
         public Color whiteTimeDisplayFontColor;
@@ -54,15 +55,18 @@ namespace Chess.UI
                 lowerTimeDisplay.color = blackTimeDisplayFontColor;
             }
 
-            if (board.whiteHumman == board.whiteBottom)
+            if (uatoSetNames)
             {
-                upperUsername.text = aiName;
-                lowerUsername.text = username;
-            }
-            else
-            {
-                upperUsername.text = username;
-                lowerUsername.text = aiName;
+                if (board.whiteHumman == board.whiteBottom)
+                {
+                    upperUsername.text = aiName;
+                    lowerUsername.text = username;
+                }
+                else
+                {
+                    upperUsername.text = username;
+                    lowerUsername.text = aiName;
+                }
             }
 
             if (autoUpdateTimeDisplay)
@@ -89,6 +93,32 @@ namespace Chess.UI
             {
                 upperTimeDisplay.text = FormatTime(whitesTime);
                 lowerTimeDisplay.text = FormatTime(balckTime);
+            }
+        }
+
+        public void SetTime(bool white, float time)
+        {
+            if (board.whiteBottom)
+            {
+                if (white)
+                {
+                    lowerTimeDisplay.text = FormatTime(time);
+                }
+                else
+                {
+                    upperTimeDisplay.text = FormatTime(time);
+                }
+            }
+            else
+            {
+                if (white)
+                {
+                    upperTimeDisplay.text = FormatTime(time);
+                }
+                else
+                {
+                    lowerTimeDisplay.text = FormatTime(time);
+                }
             }
         }
 
@@ -122,6 +152,17 @@ namespace Chess.UI
             }
         }
 
+        public void SetHumanName(string name)
+        {
+            if (board.whiteHumman == board.whiteBottom)
+            {
+                lowerUsername.text = name;
+            }
+            else
+            {
+                upperUsername.text = name;
+            }
+        }
         private IEnumerator UpdateTimeDisplay()
         {
             while (true)

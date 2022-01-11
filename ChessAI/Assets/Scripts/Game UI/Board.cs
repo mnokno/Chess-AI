@@ -74,8 +74,9 @@ namespace Chess.UI
                     engineManager.chessEngine.centralPosition.InitClock(1, 180);
                 }
             }
+
             // Updates board setting
-            if (chessGameDataManager != null)
+            if (chessGameDataManager != null & chessGameDataManager.chessGameData.loadGame)
             {
                 if (chessGameDataManager.chessGameData.isHumanWhite)
                 {

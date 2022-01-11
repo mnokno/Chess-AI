@@ -49,7 +49,45 @@ namespace Chess.DB
             // Returns the record
             return new PlayerRecord(Player_ID, Username, DefaultDifficulty, true);
         }
-        
+
+        // Reads players
+        public PlayerRecord TryGetPlayersRecord(int playerID)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Create a command to check if the record exists in the data base
+            dbcmd.CommandText = $"SELECT * FROM Players WHERE Player_ID='{playerID}' LIMIT 1;";
+            // Executes the command
+            IDataReader reader = dbcmd.ExecuteReader();
+
+            // Checks if the record was found, if not returns null
+            if (reader.IsDBNull(0))
+            {
+                // Disposes of the reader
+                reader.Close();
+                reader.Dispose();
+                // Returns null since the record was not found
+                return new PlayerRecord(0, "", "", false);
+            }
+
+            // Gets the record
+            reader.Read();
+            int Player_ID = reader.GetInt32(0);
+            string Username = reader.GetString(1);
+            string DefaultDifficulty = reader.GetString(2);
+
+            // Disposes of the reader
+            reader.Close();
+            reader.Dispose();
+
+            // Returns the record
+            return new PlayerRecord(Player_ID, Username, DefaultDifficulty, true);
+        }
+
         // Returns all player records
         public PlayerRecord[] ReadAllPlayers()
         {
@@ -271,7 +309,6 @@ namespace Chess.DB
             return gameRecord;
         }
 
-
         public GameRecord ReadRandomGameRecord()
         {
             // Throws an exception if the data base has not been opened
@@ -281,7 +318,7 @@ namespace Chess.DB
             }
 
             // Create a command to check if the record exists in the data base
-            dbcmd.CommandText = $"SELECT * FROM GameRecords ORDER BY RAND LIMIT 1;";
+            dbcmd.CommandText = $"SELECT * FROM GameRecords ORDER BY RANDOM() LIMIT 1;";
             // Executes the command
             IDataReader reader = dbcmd.ExecuteReader();
 
@@ -332,7 +369,7 @@ namespace Chess.DB
             }
 
             // Create a command to check if the record exists in the data base
-            dbcmd.CommandText = $"SELECT * FROM GameRecords WHERE Player_ID={userID} ORDER BY RAND LIMIT 1;";
+            dbcmd.CommandText = $"SELECT * FROM GameRecords WHERE Player_ID={userID} ORDER BY RANDOM() LIMIT 1;";
             // Executes the command
             IDataReader reader = dbcmd.ExecuteReader();
 
