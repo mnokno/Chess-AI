@@ -67,11 +67,11 @@ namespace Chess.UI
                     position.LoadFEN(new FEN(board.inputManager.localPosition.GetFEN()));
                     try
                     {
-                        UpdateDisplay(engineManager.chessEngine.eval, (engineManager.chessEngine.bestMove == 0 ? "" : Move.ConvertUshortToPNG(engineManager.chessEngine.bestMove, position)), engineManager.chessEngine.bestMove, position.sideToMove);
+                        UpdateDisplay(engineManager.chessEngine.eval, (engineManager.chessEngine.bestMove == 65535 ? "" : Move.ConvertUshortToPNG(engineManager.chessEngine.bestMove, position)), engineManager.chessEngine.bestMove, position.sideToMove);
                     }
                     catch
                     {
-                        UpdateDisplay(engineManager.chessEngine.eval, "", 0, position.sideToMove);
+                        // Do nothing
                     }
                 }
                 yield return new WaitForSecondsRealtime(0.1f);
@@ -84,13 +84,51 @@ namespace Chess.UI
             // Updates recommender move
             bestMoveText.text = $"Recommender Move: {bestMove}";
 
-            // Updates eval bar
-            eval *= whiteToMove ? 1 : -1;
-            Debug.Log(eval);
+            // Updates eval bar & eval text
+            eval *= whiteToMove ? -1 : 1;
+            UpdateEvalBar(eval);
+            string sEval = FormatEval(eval);
+            upperEvalText.text = sEval;
+            lowerEvalText.text = sEval;
+            if (board.whiteBottom)
+            {
+                if (eval < 0)
+                {
+                    upperEvalText.enabled = true;
+                    lowerEvalText.enabled = false;
+                }
+                else
+                {
+                    upperEvalText.enabled = false;
+                    lowerEvalText.enabled = true;
+                }
+            }
+            else
+            {
+                if (eval > 0)
+                {
+                    upperEvalText.enabled = true;
+                    lowerEvalText.enabled = false;
+                }
+                else
+                {
+                    upperEvalText.enabled = false;
+                    lowerEvalText.enabled = true;
+                }
+            }
 
             // Sets current values
             currentEval = eval;
             currentBestMove = move;
+        }
+
+        // Updates eval bar
+        private void UpdateEvalBar(int eval)
+        {
+            float height = (barMaxHeight / 2f) * ((eval / 100f) / 10f);
+            height = height * 2 < -barMaxHeight ? -barMaxHeight / 2f : height;
+            upperBarImage.rectTransform.sizeDelta = new Vector2(upperBarImage.rectTransform.sizeDelta.x, barMaxHeight / 2f + height);
+            lowerBarImage.rectTransform.sizeDelta = new Vector2(upperBarImage.rectTransform.sizeDelta.x, barMaxHeight / 2f - height);
         }
 
         // Formats eval
@@ -111,11 +149,11 @@ namespace Chess.UI
                 string sEval = lEval.ToString() + ".0";
                 if (lEval < 10)
                 {
-                    return $"{sEval[0] + sEval[1] + sEval[2]}";
+                    return sEval[0].ToString() + sEval[1].ToString() + sEval[2].ToString();
                 }
                 else
                 {
-                    return $"{sEval[0] + sEval[1]}";
+                    return sEval[0].ToString() + sEval[1].ToString();
                 }
             }
         }
