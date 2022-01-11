@@ -7,6 +7,7 @@ namespace Chess.UI
 {
     public class FloatingChessPieceManager : MonoBehaviour
     {
+        public static FloatingChessPieceManager floatingChessPieceManager;
         public float torqueRange = 3.5f;
         public int forceRange = 200;
         public SpriteAtlas spriteAtlas;
@@ -17,7 +18,7 @@ namespace Chess.UI
         public Sprite[] sprites;
         private float saftyRadiusX2 = 0.3f;
 
-        // To adovide overlaping when spawning
+        // To provide overlapping when spawning
         [HideInInspector]
         public List<Transform> transforms = new List<Transform>();
 
@@ -25,6 +26,16 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
+            //if (floatingChessPieceManager == null)
+            //{
+            //    floatingChessPieceManager = this;
+            //}
+            //else
+            //{
+            //    Destroy(this.gameObject);
+            //    return;
+            //}
+            //DontDestroyOnLoad(this.gameObject);
             sprites = new Sprite[12];
             spriteAtlas.GetSprites(sprites);
             StartCoroutine("SpawnPieces");
@@ -85,7 +96,7 @@ namespace Chess.UI
             }
         }
 
-        // Checks fro overplaing
+        // Checks fro overplaying
         private bool DoesOverlap(Vector2 pos)
         {
             for (int i = 0; i < transforms.Count; i++)
@@ -104,6 +115,18 @@ namespace Chess.UI
                 }
             }
             return false;
+        }
+
+        // Hide the floating chess pieces
+        public void Hide()
+        {
+
+        }
+
+        // Shows the floating chess pieces
+        public void Show()
+        {
+
         }
     }
 }

@@ -12,11 +12,12 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
+            //DontDestroyOnLoad(this.gameObject);
             this.gameObject.AddComponent<PolygonCollider2D>();
             StartCoroutine("CheckForDispawn");
         }
 
-        // Couroutine for dispowing
+        // Coroutine for disposing
         public IEnumerator CheckForDispawn()
         {
             while (true)
