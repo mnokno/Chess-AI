@@ -104,7 +104,7 @@ namespace Chess.EngineUtility
             sideToMove = fen.GetSideToMove();
             castlingRights = fen.GetCastlingRights();
             enPassantTargetFile = fen.GetEnPassantTargetFile();
-            halfmoveClock = fen.GetFullmoveCounter();
+            halfmoveClock = fen.GetHalfmoveClock();
             // Loads the position on the bit board
             bitboard = new Bitboard(fen.GetPiecePlacment());
             // Loads the potion on the square centric
