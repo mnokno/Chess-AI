@@ -108,21 +108,25 @@ namespace Chess.UI
         public void FirstBtn()
         {
             gamePlayBack.First();
+            StopAutoPlay();
         }
 
         public void PreviousBtn()
         {
             gamePlayBack.Previous();
+            StopAutoPlay();
         }
 
         public void NextBtn()
         {
             gamePlayBack.Next();
+            StopAutoPlay();
         }
 
         public void LastBtn()
         {
             gamePlayBack.Last();
+            StopAutoPlay();
         }
 
         public void AutoReplayBtn()
@@ -134,14 +138,18 @@ namespace Chess.UI
             }
             else
             {
-                StopAutoPlay();
+                if (gamePlayBack.moveLeft > 0)
+                {
+                    StartCoroutine(nameof(AutoPlayBack));
+                    onOffAutoPlayText.text = "On";
+                }
             }
         }
 
         private void StopAutoPlay()
         {
-            StartCoroutine(nameof(AutoPlayBack));
-            onOffAutoPlayText.text = "On";
+            StopCoroutine(nameof(AutoPlayBack));
+            onOffAutoPlayText.text = "Off";
         }
 
         public IEnumerator AutoPlayBack()
