@@ -46,17 +46,6 @@ namespace Chess.UI
             gameDisplayActive = true;
             gameDataDisplay.SetAiName(chessGameDataManager.chessGameData.AiStrength);
 
-            // Creates game play back
-            gamePlayBack = new GamePlayBack(chessGameDataManager.chessGameData.moves, 
-                chessGameDataManager.chessGameData.timeUsage, 
-                chessGameDataManager.chessGameData.initialTime,
-                chessGameDataManager.chessGameData.timeIncrement,
-                chessGameDataManager.chessGameData.AiStrength,
-                board,
-                gameDataDisplay,
-                FindObjectOfType<BoardInputManager>(),
-                true);
-
             // Creates game history
             EngineUtility.Position localPlayBackPosition = new EngineUtility.Position();
             string[] timeUsage = chessGameDataManager.chessGameData.timeUsage.Split(":");
@@ -69,13 +58,33 @@ namespace Chess.UI
                     {
                         ushort move = ushort.Parse(moves[i]);
                         int turnNumer = (int)System.Math.Ceiling(localPlayBackPosition.historicMoveData.Count / 2d);
-                        LogMove(turnNumer, EngineUtility.Move.ConvertUshortToPNG(move, localPlayBackPosition), int.Parse(timeUsage[timeUsage.Length - i - 1]));
+                        try
+                        {
+                            LogMove(turnNumer, EngineUtility.Move.ConvertUshortToPNG(move, localPlayBackPosition), int.Parse(timeUsage[timeUsage.Length - i - 1]));
+                        }
+                        catch
+                        {
+                            LogMove(turnNumer, EngineUtility.Move.ConvertUshortToPNG(move, localPlayBackPosition), 0);
+                            chessGameDataManager.chessGameData.timeUsage += ":0";
+                        }
                         localPlayBackPosition.MakeMove(move);
                     }
                 }
             }
             int latTurnNumer = (int)System.Math.Ceiling(localPlayBackPosition.historicMoveData.Count / 2d);
             LogMove(latTurnNumer, chessGameDataManager.chessGameData.gameResult, 0);
+
+            // Creates game play back
+            gamePlayBack = new GamePlayBack(chessGameDataManager.chessGameData.moves,
+                chessGameDataManager.chessGameData.timeUsage,
+                chessGameDataManager.chessGameData.initialTime,
+                chessGameDataManager.chessGameData.timeIncrement,
+                chessGameDataManager.chessGameData.AiStrength,
+                board,
+                gameDataDisplay,
+                FindObjectOfType<BoardInputManager>(),
+                true);
+
             Canvas.ForceUpdateCanvases();
         }
 
