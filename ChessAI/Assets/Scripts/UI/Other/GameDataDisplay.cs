@@ -134,7 +134,7 @@ namespace Chess.UI
             string aiName;
             if (code == "1")
             {
-                aiName = "Week AI";
+                aiName = "Weak AI";
             }
             else if (code == "2")
             {

@@ -2504,7 +2504,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5602575406669824024, guid: bbbb1242df822f24482c5d8ce2836a9f, type: 3}
       propertyPath: m_text
-      value: The game is not saved, do you want leave to leave?
+      value: The game is not saved, do you want leave?
       objectReference: {fileID: 0}
     - target: {fileID: 5602575408520362579, guid: bbbb1242df822f24482c5d8ce2836a9f, type: 3}
       propertyPath: m_LocalScale.x
