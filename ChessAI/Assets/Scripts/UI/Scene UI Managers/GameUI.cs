@@ -150,6 +150,7 @@ namespace Chess.UI
             {
                 chessGameDataManager.chessGameData.loadGame = false;
                 StopAllCoroutines();
+                LoadReviewData();
                 FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
             }
             else
@@ -160,12 +161,53 @@ namespace Chess.UI
                     {
                         chessGameDataManager.chessGameData.loadGame = false;
                         StopAllCoroutines();
+                        LoadReviewData();
                         FindObjectOfType<SceneLoader>().LoadScene("GameReviewScene");
                     }
                 }
                 gameNotSaved.SetAction(Action);
                 gameNotSaved.Show();
             }
+        }
+
+        private void LoadReviewData()
+        {
+            // Helper functions
+            string GetMoves()
+            {
+                string moves = "";
+                foreach (ushort move in board.inputManager.parrentBoard.engineManager.chessEngine.centralPosition.moves)
+                {
+                    moves += move.ToString() + ":";
+                }
+                if (moves.Length == 0)
+                {
+                    return moves;
+                }
+                else
+                {
+                    return moves.Remove(moves.Length - 1);
+                }
+            }
+            string GetTimeUsage()
+            {
+                string timeUsage = "";
+                foreach (float time in board.inputManager.parrentBoard.engineManager.chessEngine.centralPosition.moves)
+                {
+                    timeUsage += time.ToString() + ":";
+                }
+                if (timeUsage.Length == 0)
+                {
+                    return timeUsage;
+                }
+                else
+                {
+                    return timeUsage.Remove(timeUsage.Length - 1);
+                }
+            }
+
+            chessGameDataManager.chessGameData.moves = GetMoves();
+            chessGameDataManager.chessGameData.timeUsage = GetTimeUsage();
         }
 
         public void StartNewGameBtn()
