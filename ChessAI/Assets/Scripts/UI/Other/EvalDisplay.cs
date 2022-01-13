@@ -124,7 +124,15 @@ namespace Chess.UI
         private void UpdateEvalBar(int eval)
         {
             float height = (barMaxHeight / 2f) * ((eval / 100f) / 10f);
-            height = height * 2 < -barMaxHeight ? -barMaxHeight / 2f : height;
+            if (eval < 0)
+            {
+                height = height * 2 < -barMaxHeight ? -barMaxHeight / 2f : height;
+            }
+            else
+            {
+                height = height * 2 > barMaxHeight ? barMaxHeight / 2f : height;
+            }
+
             if (board.whiteBottom)
             {
                 upperTarget = barMaxHeight / 2f - height;
