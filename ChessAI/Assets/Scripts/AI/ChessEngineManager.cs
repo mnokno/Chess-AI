@@ -412,7 +412,7 @@ namespace Chess.Engine
         {
             if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- 5% for a random move
             {
-                return Random.Range(0, 20) == 0;
+                return Random.Range(0, 0) == 0;
             }
             else if (chessGameDataManager.chessGameData.AiStrength == "2") // Medium --- 2.5% for a random move
             {
@@ -438,8 +438,10 @@ namespace Chess.Engine
                         List<ushort> moves = chessEngine.GenerateLegalMoves((byte)(chessEngine.centralPosition.sideToMove ? 0 : 1));
                         // Choses a random move
                         moveToPlay = moves[Random.Range(0, moves.Count - 1)];
+                        MakeMove(moveToPlay);
+                        inputManager.MakeAIMove(Move.GetFrom(moveToPlay), Move.GetTo(moveToPlay));
                         // Sets a flag
-                        calculated = true;
+                        calculated = false;
                         // TESTING START
                         Debug.Log("Random Move");
                         // TEST END
