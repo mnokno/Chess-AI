@@ -153,8 +153,6 @@ namespace Chess.UI
         {
             if (evalAfterChange)
             {
-                //Debug.Log(board.inputManager.localPosition.halfmoveClock);
-                Debug.Log(board.inputManager.localPosition.GetFEN());
                 board.engineManager.EvaluatePosition(new EngineUtility.FEN(board.inputManager.localPosition.GetFEN()));
             }
         }

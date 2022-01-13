@@ -346,7 +346,7 @@ namespace Chess.Engine
             // Updates display info
             zobristHashText.text = $"Zobrist Hash: {System.Convert.ToString((long)chessEngine.centralPosition.zobristKey, 2)}";
             // Updates FEN info
-            FENText.text = $"FEN: {chessEngine.centralPosition.GetFEN()}";
+            FENText.text = $"FEN: {fen.GetInitialStringFEN()}";
         }
 
         #endregion

@@ -67,16 +67,10 @@ namespace Chess.UI
             {
                 if (engineManager.chessEngine.bestMove != currentBestMove || engineManager.chessEngine.eval != currentEval)
                 {
-                    Position position = new Position();
-                    position.LoadFEN(new FEN(board.inputManager.localPosition.GetFEN()));
-                    try
-                    {
-                        UpdateDisplay(engineManager.chessEngine.eval, (engineManager.chessEngine.bestMove == 65535 ? "" : Move.ConvertUshortToPNG(engineManager.chessEngine.bestMove, position)), engineManager.chessEngine.bestMove, position.sideToMove);
-                    }
-                    catch
-                    {
-                        // Do nothing
-                    }
+                    UpdateDisplay(engineManager.chessEngine.eval, 
+                        ((engineManager.chessEngine.bestMove == 65535) || (engineManager.chessEngine.bestMove == 0)) ? "" : Move.ConvertUshortToPNG(engineManager.chessEngine.bestMove, board.inputManager.localPosition), 
+                        engineManager.chessEngine.bestMove, 
+                        board.inputManager.localPosition.sideToMove);
                 }
                 yield return new WaitForSecondsRealtime(0.1f);
             }
