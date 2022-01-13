@@ -99,6 +99,10 @@ namespace Chess.UI
                 currentlySelectedListItem = null;
                 // Disables buttons
                 deleteButton.interactable = false;
+                updatePanel.interactable = false;
+                inputFieldOldUsername.text = "";
+                inputFieldNewUsername.text = "";
+                dropdown.SetValueWithoutNotify(0);
             }
         }
 
