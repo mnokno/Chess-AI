@@ -256,18 +256,21 @@ namespace Chess.UI
         }
 
         // Selected currently selected piece
-        private void Deselect()
+        public void Deselect()
         {
-            movementState = MousePieceMovementState.None; // Sets movement mode to none
-            selectedPiece.ResetPosition(); // Resets the position
-            selectedPiece.piece.GetComponent<SpriteRenderer>().sortingOrder = 20; // Changes back the ordering layer
-            highlightedSquare.Highlighted(false); // dehighlight's highlighted square
-            selectedPiece = null; // Sets to null since to piece is selected
-            highlightedSquare = null; // Sets to null since to square is highlighted
-            HideLegalMoves(); // Hides all legal moves
-            if (lastMoveSquares[1] != null)
+            if (selectedPiece != null)
             {
-                lastMoveSquares[1].Highlighted(true); // Highlights the last to square in case it was dehighlighted
+                movementState = MousePieceMovementState.None; // Sets movement mode to none
+                selectedPiece.ResetPosition(); // Resets the position
+                selectedPiece.piece.GetComponent<SpriteRenderer>().sortingOrder = 20; // Changes back the ordering layer
+                highlightedSquare.Highlighted(false); // dehighlight's highlighted square
+                selectedPiece = null; // Sets to null since to piece is selected
+                highlightedSquare = null; // Sets to null since to square is highlighted
+                HideLegalMoves(); // Hides all legal moves
+                if (lastMoveSquares[1] != null)
+                {
+                    lastMoveSquares[1].Highlighted(true); // Highlights the last to square in case it was dehighlighted
+                }
             }
         }
 

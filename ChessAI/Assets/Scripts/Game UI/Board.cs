@@ -353,6 +353,7 @@ namespace Chess.UI
         // Takes back two move (one turn)
         public void TakeBack()
         {
+            inputManager.Deselect();
             engineManager.chessEngine.centralPosition.TakeBack();
             string FEN = engineManager.chessEngine.centralPosition.GetFEN();
             LoadFEN((new FEN(FEN)).GetPiecePlacment(), false);
