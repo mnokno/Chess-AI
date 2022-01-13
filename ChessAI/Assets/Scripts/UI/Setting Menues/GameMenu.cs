@@ -86,7 +86,7 @@ namespace Chess.UI
 
         public void SaveAsBtn()
         {
-            if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove)
+            if (inputManager.parrentBoard.whiteHumman == inputManager.parrentBoard.whiteToMove || inputManager.parrentBoard.engineManager.chessEngine.centralPosition.gameState != EngineUtility.Position.GameState.OnGoing)
             {
                 saveAs.Show();
             }
