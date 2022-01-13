@@ -192,7 +192,7 @@ namespace Chess.UI
             string GetTimeUsage()
             {
                 string timeUsage = "";
-                foreach (float time in board.inputManager.parrentBoard.engineManager.chessEngine.centralPosition.moves)
+                foreach (float time in board.inputManager.parrentBoard.engineManager.chessEngine.centralPosition.timeTakenPerMove)
                 {
                     timeUsage += time.ToString() + ":";
                 }

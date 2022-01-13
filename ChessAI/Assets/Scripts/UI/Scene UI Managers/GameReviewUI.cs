@@ -74,6 +74,8 @@ namespace Chess.UI
                     }
                 }
             }
+            int latTurnNumer = (int)System.Math.Ceiling(localPlayBackPosition.historicMoveData.Count / 2d);
+            LogMove(latTurnNumer, chessGameDataManager.chessGameData.gameResult, 0);
             Canvas.ForceUpdateCanvases();
         }
 
