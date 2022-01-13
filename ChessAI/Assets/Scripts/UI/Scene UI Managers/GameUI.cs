@@ -24,6 +24,7 @@ namespace Chess.UI
         public TMPro.TextMeshProUGUI takeBackText;
 
         public PopUpMessage invalidTakeback;
+        public PopUpMessage invalidSurrender;
         public PopUpYesNo surrender;
         public PopUpYesNo gameNotSaved;
 
@@ -236,30 +237,39 @@ namespace Chess.UI
 
         public void SurrenderBtn()
         {
-            void Action(PopUpYesNo.Anwser anwser)
+            if (board.whiteHumman == board.whiteToMove)
             {
-                if (anwser == PopUpYesNo.Anwser.Yes)
+                void Action(PopUpYesNo.Anwser anwser)
                 {
-                    FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
-                    chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Surrender.ToString();
-                    if (board.whiteHumman)
+                    if (anwser == PopUpYesNo.Anwser.Yes)
                     {
-                        chessGameDataManager.chessGameData.gameResult = "0-1";
+                        FindObjectOfType<Engine.ChessEngineManager>().SurrenderHuman();
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Surrender.ToString();
+                        if (board.whiteHumman)
+                        {
+                            chessGameDataManager.chessGameData.gameResult = "0-1";
+                        }
+                        else
+                        {
+                            chessGameDataManager.chessGameData.gameResult = "1-0";
+                        }
                     }
                     else
                     {
-                        chessGameDataManager.chessGameData.gameResult = "1-0";
+                        board.inputManager.takeHumanInpuit = true;
                     }
                 }
-                else
-                {
-                    board.inputManager.takeHumanInpuit = true;
-                }
+
+                board.inputManager.takeHumanInpuit = false;
+                surrender.SetAction(Action);
+                surrender.Show();
             }
-            
-            board.inputManager.takeHumanInpuit = false;
-            surrender.SetAction(Action);
-            surrender.Show();
+            else
+            {
+                board.inputManager.takeHumanInpuit = false;
+                invalidSurrender.SetAction(() => board.inputManager.takeHumanInpuit = true);
+                invalidSurrender.Show();
+            }
         }
 
         public IEnumerator CheckGameState()
