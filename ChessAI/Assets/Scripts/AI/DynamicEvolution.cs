@@ -82,7 +82,7 @@ namespace Chess.Engine
                 {
                     chessEngine.nodes++;
                     position.gameState = Position.GameState.Checkmate;
-                    return Constants.negativeInfinity + (coreDepthSearch - depth);
+                    return Constants.negativeInfinity + (coreDepthSearch - depth + 1);
                 }
                 else
                 {
