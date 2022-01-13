@@ -412,7 +412,7 @@ namespace Chess.Engine
         {
             if (chessGameDataManager.chessGameData.AiStrength == "1") // Easy --- 5% for a random move
             {
-                return Random.Range(0, 0) == 0;
+                return Random.Range(0, 20) == 0;
             }
             else if (chessGameDataManager.chessGameData.AiStrength == "2") // Medium --- 2.5% for a random move
             {
