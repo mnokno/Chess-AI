@@ -213,6 +213,9 @@ namespace Chess.UI
         // Removes all existing pieces and loads new FEN
         public void LoadFEN(string FEN, bool reGenBoard)
         {
+            // Stops potential animations
+            StopAllCoroutines();
+
             // Regenerates the chess board
             if (reGenBoard) 
             {
