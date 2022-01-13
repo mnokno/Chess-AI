@@ -4944,6 +4944,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7784635111523869074, guid: df62b48c93f86c04bab6c348934a85f7, type: 3}
+      propertyPath: uatoSetNames
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7784635111523869074, guid: df62b48c93f86c04bab6c348934a85f7, type: 3}
       propertyPath: autoUpdateTimeDisplay
       value: 0
       objectReference: {fileID: 0}

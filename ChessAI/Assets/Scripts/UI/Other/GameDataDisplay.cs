@@ -35,7 +35,7 @@ namespace Chess.UI
         // Start is called before the first frame update
         void Start()
         {
-            
+
             clock = board.engineManager.chessEngine.centralPosition.clock;
             string username = PlayerPrefs.GetString("username");
             string aiName = "AI";
@@ -60,13 +60,20 @@ namespace Chess.UI
                 if (board.whiteHumman == board.whiteBottom)
                 {
                     upperUsername.text = aiName;
-                    lowerUsername.text = username;
                 }
                 else
                 {
-                    upperUsername.text = username;
                     lowerUsername.text = aiName;
                 }
+            }
+
+            if (board.whiteHumman == board.whiteBottom)
+            {
+                lowerUsername.text = username;
+            }
+            else
+            {
+                upperUsername.text = username;
             }
 
             if (autoUpdateTimeDisplay)

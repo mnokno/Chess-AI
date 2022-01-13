@@ -524,7 +524,7 @@ namespace Chess.EngineUtility
                 }
                 if (counter >= 2)
                 {
-                    gameState = GameState.ThreefoldRepetition;
+                    gameState = GameState.Repetition;
                 }
             }
             
@@ -654,7 +654,7 @@ namespace Chess.EngineUtility
         {
             OnGoing = 0,
             Checkmate = 1,
-            ThreefoldRepetition = 2,
+            Repetition = 2,
             FiftyMoveRule = 3,
             Stalemate = 4,
             InsufficientMaterial = 5,

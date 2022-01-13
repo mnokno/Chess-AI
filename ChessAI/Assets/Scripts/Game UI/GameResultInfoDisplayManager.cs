@@ -107,8 +107,8 @@ namespace Chess.UI
                         chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Stalemate.ToString();
                         newSubDisplayText = "Stalemate";
                         break;
-                    case EngineUtility.Position.GameState.ThreefoldRepetition:
-                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.ThreefoldRepetition.ToString();
+                    case EngineUtility.Position.GameState.Repetition:
+                        chessGameDataManager.chessGameData.gameResultCode = EngineUtility.Position.GameState.Repetition.ToString();
                         newSubDisplayText = "Repetition";
                         break;
                     default: // EngineUtility.Position.GameState.FiftyMoveRule
