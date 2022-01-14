@@ -88,13 +88,15 @@ namespace Chess.UI
         {
             if (anwser == PopUpYesNo.Anwser.Yes)
             {
-                // Delets the profile
+                // Deletes the profile
                 PlayerDbWriter writer = new PlayerDbWriter();
                 writer.OpenDB();
+                writer.DeleteFromSavedGames(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
+                writer.DeleteFromGameRecord(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
                 writer.DeleteFromPlayers(currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text);
                 writer.CloseDB();
 
-                // Delets the list item corresponding to the deleted profile
+                // Deletes the list item corresponding to the deleted profile
                 Destroy(currentlySelectedListItem);
                 currentlySelectedListItem = null;
                 // Disables buttons
@@ -108,7 +110,7 @@ namespace Chess.UI
 
         public void DeleteBtn()
         {
-            deletionConfirmation.SetMessage($"Are you shure you want to delete '{currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text}' profile, this action can not be undone.");
+            deletionConfirmation.SetMessage($"Are you sure you want to delete '{currentlySelectedListItem.GetComponentInChildren<TMPro.TextMeshProUGUI>().text}' profile, this action can not be undone.");
             deletionConfirmation.Show();
         }
 
@@ -126,7 +128,7 @@ namespace Chess.UI
             }
             else if (inputFieldOldUsername.text != inputFieldNewUsername.text && IsUsernameTaken(inputFieldNewUsername.text)) // Invalid username
             {
-                invalidUserName.SetMessage($"Username '{inputFieldNewUsername.text}' is already taken, please chouse a different username.");
+                invalidUserName.SetMessage($"Username '{inputFieldNewUsername.text}' is already taken, please chose a different username.");
                 invalidUserName.Show();
             }
             else // Updates user profile

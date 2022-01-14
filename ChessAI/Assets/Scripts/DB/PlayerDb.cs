@@ -15,7 +15,7 @@ namespace Chess.DB
         protected static readonly string conn = "URI=file:" + Application.streamingAssetsPath + "/PlayerPlayedGames.db"; // Path to the opening database
         protected IDbConnection dbconn; // Connection to the data base
         protected IDbCommand dbcmd; // Command interface for the data base
-        protected bool isOpen; // true if teh connection to the data base is open
+        protected bool isOpen; // true if the connection to the data base is open
         protected static bool isOpenGlobal = false; // true if the data base is open by some instance of openingDB
 
         #endregion
@@ -34,12 +34,8 @@ namespace Chess.DB
         // Opens connection to the data base
         public void OpenDB()
         {
-            // Check if the data base can be close
-            if (isOpenGlobal)
-            {
-                throw new Exception("You can't open the connection to the opening data base since its used by another process/diffrent instance of OpeningDbReader or OpeningDbWriter!");
-            }
-            else if (isOpen)
+            // Check if the data base is already open
+            if (isOpen)
             {
                 return;
             }
@@ -47,8 +43,8 @@ namespace Chess.DB
             dbconn = new SqliteConnection(conn); // Create connection to the data base
             dbconn.Open(); // Opens connection
             dbcmd = dbconn.CreateCommand(); // Create command interface for the data base
-            isOpen = true; // Marks the connsction as open
-            isOpenGlobal = true; // Marks the connsction as open
+            isOpen = true; // Marks the connection as open
+            isOpenGlobal = true; // Marks the connection as open
         }
 
         // Closes connection to the data base
@@ -65,7 +61,7 @@ namespace Chess.DB
             }
 
             dbconn.Close(); // Loses connection
-            dbconn.Dispose(); // Disposes of the conenction
+            dbconn.Dispose(); // Disposes of the connection
             dbcmd.Dispose(); // Disposes of the command interface
             isOpen = false; // Marks the connection as closed
             isOpenGlobal = false; // Marks the connection as closed

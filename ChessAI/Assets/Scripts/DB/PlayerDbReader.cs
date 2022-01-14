@@ -428,6 +428,12 @@ namespace Chess.DB
 
         private bool IsGameNameTaken(string gameName, int userID, string tableName)
         {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
             // Create a command to check if the record exists in the data base
             dbcmd.CommandText = $"SELECT Game_ID FROM {tableName} WHERE Player_ID='{userID}' AND GameTitle='{gameName}' LIMIT 1;";
             // Executes the command

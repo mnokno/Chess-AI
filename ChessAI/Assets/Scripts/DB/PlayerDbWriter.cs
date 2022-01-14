@@ -154,6 +154,30 @@ namespace Chess.DB
             dbcmd.ExecuteNonQuery();
         }
 
+        public void DeleteFromSavedGames(string playerName)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Gets the players ID
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            PlayerRecord playerRecord = reader.TryGetPlayersRecord(playerName);
+            reader.CloseDB();
+
+            // Deletes all games corresponding to that player if the record is valid
+            if (playerRecord.isValid)
+            {
+                // Deletes a game with the given gameID
+                dbcmd.CommandText = $"DELETE FROM SavedGames WHERE Player_ID='{playerRecord.playerID}';";
+                // Executes the command
+                dbcmd.ExecuteNonQuery();
+            }
+        }
+
         #endregion
 
         #region Game records table management
@@ -240,6 +264,30 @@ namespace Chess.DB
             dbcmd.CommandText = $"DELETE FROM GameRecords WHERE Game_ID='{gameID}';";
             // Executes the command
             dbcmd.ExecuteNonQuery();
+        }
+
+        public void DeleteFromGameRecord(string playerName)
+        {
+            // Throws an exception if the data base has not been opened
+            if (!this.isOpen)
+            {
+                throw new Exception("The players data base has to be opened before you can perform a read operation!\nYou can open and close connection to the data base by calling OpenDB and CloseDb respectively.");
+            }
+
+            // Gets the players ID
+            PlayerDbReader reader = new PlayerDbReader();
+            reader.OpenDB();
+            PlayerRecord playerRecord = reader.TryGetPlayersRecord(playerName);
+            reader.CloseDB();
+
+            // Deletes all games corresponding to that player if the record is valid
+            if (playerRecord.isValid)
+            {
+                // Deletes a game with the given gameID
+                dbcmd.CommandText = $"DELETE FROM GameRecords WHERE Player_ID='{playerRecord.playerID}';";
+                // Executes the command
+                dbcmd.ExecuteNonQuery();
+            }
         }
 
         #endregion
