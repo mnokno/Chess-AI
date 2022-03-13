@@ -91,14 +91,25 @@ namespace Chess.Engine
                 scores[i] = score;
             }
 
-            // Sorts the list after the scores have been assigned
-            SortMoves(moves);
+            // Sorts the list after the scores have been assigned, multiple sort algorithms have been implemented to achieve maximum performance
+            if (moves.Count < 6)
+            {
+                BoobleSort(moves);
+            }
+            else if (moves.Count < 200)
+            {
+                QuickSort(ref moves);
+            }
+            else
+            {
+                MergeSort(ref moves);
+            }
         }
 
-        // Sorts the list using quick sort
-        private void SortMoves(List<ushort> moves)
+        // Sorts the list using bobble sort
+        private void BoobleSort(List<ushort> moves)
         {
-            // Swaps tow elements
+            // Swaps two elements
             void Swap(int indexA, int indexB)
             {
                 (scores[indexA], scores[indexB]) = (scores[indexB], scores[indexA]);
@@ -117,6 +128,131 @@ namespace Chess.Engine
                     }
                 }
             }
+        }
+
+        // Sorts the list using quick sort
+        private void QuickSort(ref List<ushort> moves)
+        {
+            void QuickSort(ref List<ushort> toSort, int beg, int end)
+            {
+                if (beg < end)
+                {
+                    // Orders the partition and return the index of the pivot point after ordering 
+                    int pivotIndex = Partition(ref toSort, beg, end);
+
+                    // Sorts the partition to the left and right of the pivot index
+                    QuickSort(ref toSort, beg, pivotIndex - 1);
+                    QuickSort(ref toSort, pivotIndex + 1, end);
+                }
+            }
+
+            int Partition(ref List<ushort> toSort, int beg, int end)
+            {
+                // Gets the pivot element (most right element)
+                int pivot = scores[end];
+
+                // Orders the partition
+                int pivotIndex = beg;
+                for (int j = beg; j < end; j++)
+                {
+                    if (scores[j] > pivot)
+                    {
+                        (toSort[pivotIndex], toSort[j]) = (toSort[j], toSort[pivotIndex]);
+                        (scores[pivotIndex], scores[j]) = (scores[j], scores[pivotIndex]);
+                        pivotIndex++;
+                    }
+                }
+                (toSort[pivotIndex], toSort[end]) = (toSort[end], toSort[pivotIndex]);
+                (scores[pivotIndex], scores[end]) = (scores[end], scores[pivotIndex]);
+
+                // Return the pivot index
+                return pivotIndex;
+            }
+
+            QuickSort(ref moves, 0, moves.Count - 1);
+        }
+
+        // Sorts the list using merge sort
+        private void MergeSort(ref List<ushort> moves)
+        {
+            void Merge(ref List<ushort> toSort, int beg, int mid, int end)
+            {
+                // Extracts the arrays
+                int leftSize = mid - beg + 1;
+                int righSize = end - mid;
+
+                ushort[] leftArray = new ushort[leftSize];
+                int[] leftArrayScores = new int[leftSize];
+                ushort[] rightArray = new ushort[righSize];
+                int[] rightArrayScores = new int[righSize];
+
+                for (int i = 0; i < leftSize; ++i)
+                {
+                    leftArray[i] = toSort[beg + i];
+                    leftArrayScores[i] = scores[beg + i];
+                }
+                for (int i = 0; i < righSize; ++i)
+                {
+                    rightArray[i] = toSort[mid + 1 + i];
+                    leftArrayScores[i] = scores[beg + i];
+                }
+
+
+                // Index counters
+                int leftIndex = 0;
+                int rightIndex = 0;
+                int mainIndex = beg;
+
+                // Sorts the result data into the array
+                while (leftIndex < leftSize && rightIndex < righSize)
+                {
+                    if (scores[leftIndex] > scores[rightIndex])
+                    {
+                        toSort[mainIndex] = leftArray[leftIndex];
+                        scores[mainIndex] = leftArrayScores[leftIndex];
+                        leftIndex++;
+                    }
+                    else
+                    {
+                        toSort[mainIndex] = rightArray[rightIndex];
+                        scores[mainIndex] = rightArrayScores[rightIndex];
+                        rightIndex++;
+                    }
+                    mainIndex++;
+                }
+
+                // Appends remaining elements
+                while (leftIndex < leftSize)
+                {
+                    toSort[mainIndex] = leftArray[leftIndex];
+                    scores[mainIndex] = leftArrayScores[leftIndex];
+                    leftIndex++;
+                    mainIndex++;
+                }
+                while (rightIndex < righSize)
+                {
+                    toSort[mainIndex] = rightArray[rightIndex];
+                    scores[mainIndex] = rightArrayScores[rightIndex];
+                    rightIndex++;
+                    mainIndex++;
+                }
+            }
+
+            void MergeSort(ref List<ushort> toSort, int beg, int end)
+            {
+                if (beg >= end)
+                {
+                    return;
+                }
+
+                int mid = beg + (end - beg) / 2;
+                MergeSort(ref toSort, beg, mid);
+                MergeSort(ref toSort, mid + 1, end);
+                Merge(ref toSort, beg, mid, end);
+            }
+
+
+            MergeSort(ref moves, 0, moves.Count - 1);
         }
 
         #endregion
